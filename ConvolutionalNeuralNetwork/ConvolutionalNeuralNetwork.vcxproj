@@ -12,9 +12,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="matrix.cpp" />
     <ClCompile Include="neural_network.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="matrix.hpp" />
     <ClInclude Include="neural_network.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

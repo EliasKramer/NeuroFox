@@ -13,18 +13,36 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\test">
+      <UniqueIdentifier>{cb7fa77d-9b2e-4863-915b-494b9f6d69fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nn">
+      <UniqueIdentifier>{faf2dd5a-f26a-4272-b578-ccb1c836b1e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\nn">
+      <UniqueIdentifier>{d796eb59-317a-46ef-921f-a559f8a28d40}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CNN_Test.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\test</Filter>
     </ClCompile>
     <ClCompile Include="..\ConvolutionalNeuralNetwork\neural_network.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\nn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\matrix.cpp">
+      <Filter>Source Files\nn</Filter>
+    </ClCompile>
+    <ClCompile Include="matrix_test.cpp">
+      <Filter>Source Files\test</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ConvolutionalNeuralNetwork\neural_network.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\nn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\matrix.hpp">
+      <Filter>Header Files\nn</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

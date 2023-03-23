@@ -7,17 +7,26 @@
     <Filter Include="source">
       <UniqueIdentifier>{e5a3cbbe-c27b-4fb2-be02-b2ed34656d9f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\main">
+      <UniqueIdentifier>{24b2a962-c13f-497d-90e6-539f67ffc49d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="neural_network.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="neural_network.cpp">
+    <ClCompile Include="main.cpp">
+      <Filter>source\main</Filter>
+    </ClCompile>
+    <ClCompile Include="matrix.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="neural_network.hpp">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="matrix.hpp">
       <Filter>header</Filter>
     </ClInclude>
   </ItemGroup>

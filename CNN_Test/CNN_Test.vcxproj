@@ -156,8 +156,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\matrix.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\neural_network.cpp" />
     <ClCompile Include="CNN_Test.cpp" />
+    <ClCompile Include="matrix_test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ConvolutionalNeuralNetwork\ConvolutionalNeuralNetwork.vcxproj">
@@ -165,6 +167,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\matrix.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\neural_network.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
