@@ -6,7 +6,7 @@ int main()
 
 	convolutional_layer* conv_layer = create_convolutional_layer(3, 32, 1, relu);
 	pooling_layer* pool_layer = create_pooling_layer(2, 2, max);
-	fully_connected_layer* fc_layer = create_fully_connected_layer(10, relu);
+	fully_connected_layer* fc_layer = create_fully_connected_layer(10, sigmoid);
 
 	std::vector<convolutional_layer*> conv_layers;
 	conv_layers.push_back(conv_layer);

@@ -4,16 +4,16 @@
     <Filter Include="header">
       <UniqueIdentifier>{a63eecde-0db4-4729-8f87-2ea050c10684}</UniqueIdentifier>
     </Filter>
-    <Filter Include="cpps">
+    <Filter Include="source">
       <UniqueIdentifier>{e5a3cbbe-c27b-4fb2-be02-b2ed34656d9f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
-      <Filter>cpps</Filter>
+      <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="neural_network.cpp">
-      <Filter>cpps</Filter>
+      <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

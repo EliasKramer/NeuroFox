@@ -1,5 +1,5 @@
 #pragma once
-#include <vector>
+#include "matrix.hpp"
 
 enum _activation_function
 {
@@ -13,13 +13,6 @@ enum _pooling_type
 	min,
 	average
 } typedef pooling_type;
-
-struct _matrix {
-	int width;
-	int height;
-	int depth;
-	std::vector<float> data;
-} typedef matrix;
 
 struct _fully_connected_layer {
 	matrix* input;
