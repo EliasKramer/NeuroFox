@@ -12,6 +12,9 @@
     <ClCompile Include="main.cpp">
       <Filter>cpps</Filter>
     </ClCompile>
+    <ClCompile Include="neural_network.cpp">
+      <Filter>cpps</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="neural_network.hpp">
