@@ -13,6 +13,9 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="neural_network.hpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{48535A13-B99F-4D97-8066-3C121550564E}</ProjectGuid>
     <RootNamespace>ConvolutionalNeuralNetwork</RootNamespace>
