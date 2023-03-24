@@ -6,13 +6,9 @@
 struct _matrix {
 	int width;
 	int height;
+	int depth;
 	std::vector<float> data;
 } typedef matrix;
-
-struct _matrix_3D
-{
-	std::vector<matrix> data;
-} typedef matrix_3D;
 
 matrix* create_matrix(int width, int height, int depth);
 
@@ -31,3 +27,5 @@ float get_at(const matrix& m, int x, int y, int z);
 float get_at(const matrix& m, int x, int z);
 
 void dot(const matrix& a, const matrix& b, matrix& result);
+
+bool are_equal(const matrix& a, const matrix& b);

@@ -92,4 +92,20 @@ void dot(const matrix& a, const matrix& b, matrix& result)
 	}
 }
 
+bool are_equal(const matrix& a, const matrix& b)
+{
+	if (a.width != b.width || a.height != b.height || a.depth != b.depth)
+	{
+		return false;
+	}
 
+	for (int i = 0; i < a.data.size(); i++)
+	{
+		if (a.data[i] != b.data[i])
+		{
+			return false;
+		}
+	}
+
+	return true;
+}

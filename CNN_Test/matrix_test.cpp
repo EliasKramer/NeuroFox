@@ -15,6 +15,8 @@ namespace CNNTest
 			Assert::AreEqual(3, m->height);
 			Assert::AreEqual(4, m->depth);
 			Assert::AreEqual(24, (int)m->data.size());
+
+			delete m;
 		}
 		TEST_METHOD(setting_getting)
 		{
@@ -67,22 +69,76 @@ namespace CNNTest
 			Assert::AreEqual(22, (int)get_at(*m, 1, 1, 3));
 			Assert::AreEqual(23, (int)get_at(*m, 0, 2, 3));
 			Assert::AreEqual(24, (int)get_at(*m, 1, 2, 3));
+
+			delete m;
 		}
-		TEST_METHOD(dot_test)
+		TEST_METHOD(equal_test)
 		{
-			matrix* m1 = create_matrix(2, 5, 1);
+			matrix* original_matrix = create_matrix(2, 5, 3);
+			matrix* equal_matrix = create_matrix(2, 5, 3);
+			matrix* one_different = create_matrix(2, 5, 3);
+			matrix* size_different = create_matrix(2, 5, 2);
+
+			set_all(*original_matrix, 1);
+			set_all(*equal_matrix, 1);
+			set_all(*one_different, 1);
+			set_all(*size_different, 1);
+
+			set_at(*one_different, 0, 0, 0, 2);
+
+			Assert::IsTrue(are_equal(*original_matrix, *original_matrix));
+
+			Assert::IsTrue(are_equal(*original_matrix, *equal_matrix));
+			Assert::IsTrue(are_equal(*equal_matrix, *original_matrix));
+			
+			Assert::IsFalse(are_equal(*original_matrix, *one_different));
+			Assert::IsFalse(are_equal(*one_different, *original_matrix));
+
+			Assert::IsFalse(are_equal(*original_matrix, *size_different));
+			Assert::IsFalse(are_equal(*size_different, *original_matrix));
+
+			delete original_matrix;
+			delete equal_matrix;
+			delete one_different;
+			delete size_different;
+		}
+		TEST_METHOD(dot_test_2D)
+		{
+			matrix* m1 = create_matrix(2, 4, 1);
 			matrix* m2 = create_matrix(3, 2, 1);
 
 			set_all(*m1, 3);
 			set_all(*m2, 2);
 
-			matrix* m3 = create_matrix(2, 2, 1);
+			matrix* m3 = create_matrix(3, 4, 1);
 			dot(*m1, *m2, *m3);
 
 			for (int i = 0; i < m3->data.size(); i++)
 			{
 				Assert::AreEqual(12, (int)m3->data[i]);
 			}
+
+			delete m1;
+			delete m2;
+		}
+		TEST_METHOD(dot_test_3D)
+		{
+			matrix* m1 = create_matrix(2, 4, 2);
+			matrix* m2 = create_matrix(3, 2, 2);
+
+			set_all(*m1, 3);
+			set_all(*m2, 2);
+
+			matrix* m3 = create_matrix(3, 4, 2);
+			dot(*m1, *m2, *m3);
+
+			for (int i = 0; i < m3->data.size(); i++)
+			{
+				Assert::AreEqual(12, (int)m3->data[i]);
+			}
+
+			delete m1;
+			delete m2;
 		}
 	};
 }
