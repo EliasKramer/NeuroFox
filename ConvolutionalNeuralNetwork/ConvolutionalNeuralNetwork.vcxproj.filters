@@ -10,6 +10,12 @@
     <Filter Include="source\main">
       <UniqueIdentifier>{24b2a962-c13f-497d-90e6-539f67ffc49d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="header\layer">
+      <UniqueIdentifier>{33ad602b-68e6-4bc1-80e0-d86ee4ce9aa9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\layer">
+      <UniqueIdentifier>{9aba3599-d721-45cc-8853-a31eb9c906f2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="neural_network.cpp">
@@ -21,6 +27,18 @@
     <ClCompile Include="matrix.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="pooling_layer.hpp">
+      <Filter>header\layer</Filter>
+    </ClCompile>
+    <ClCompile Include="pooling_layer.cpp">
+      <Filter>source\layer</Filter>
+    </ClCompile>
+    <ClCompile Include="fully_connected_layer.cpp">
+      <Filter>source\layer</Filter>
+    </ClCompile>
+    <ClCompile Include="convolutional_layer.cpp">
+      <Filter>source\layer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="neural_network.hpp">
@@ -29,5 +47,12 @@
     <ClInclude Include="matrix.hpp">
       <Filter>header</Filter>
     </ClInclude>
+    <ClInclude Include="fully_connected_layer.hpp">
+      <Filter>header\layer</Filter>
+    </ClInclude>
+    <ClInclude Include="convolutional_layer.hpp">
+      <Filter>header\layer</Filter>
+    </ClInclude>
+    <ClInclude Include="layer.hpp" />
   </ItemGroup>
 </Project>

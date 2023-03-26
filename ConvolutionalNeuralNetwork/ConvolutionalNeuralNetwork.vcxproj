@@ -11,11 +11,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="convolutional_layer.cpp" />
+    <ClCompile Include="fully_connected_layer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="matrix.cpp" />
     <ClCompile Include="neural_network.cpp" />
+    <ClCompile Include="pooling_layer.cpp" />
+    <ClCompile Include="pooling_layer.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="convolutional_layer.hpp" />
+    <ClInclude Include="fully_connected_layer.hpp" />
+    <ClInclude Include="layer.hpp" />
     <ClInclude Include="matrix.hpp" />
     <ClInclude Include="neural_network.hpp" />
   </ItemGroup>
