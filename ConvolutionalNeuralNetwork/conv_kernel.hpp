@@ -3,6 +3,6 @@
 
 struct _neural_kernel {
 	matrix weights;
-	matrix biases;
+	float biase;
 	matrix output;
 } typedef neural_kernel;
