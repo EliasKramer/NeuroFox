@@ -111,7 +111,7 @@ namespace CNNTest
 			set_all(*m2, 2);
 
 			matrix* m3 = create_matrix(3, 4, 1);
-			dot(*m1, *m2, *m3);
+			matrix_dot(*m1, *m2, *m3);
 
 			for (int i = 0; i < m3->data.size(); i++)
 			{
@@ -130,7 +130,7 @@ namespace CNNTest
 			set_all(*m2, 2);
 
 			matrix* m3 = create_matrix(3, 4, 2);
-			dot(*m1, *m2, *m3);
+			matrix_dot(*m1, *m2, *m3);
 
 			for (int i = 0; i < m3->data.size(); i++)
 			{

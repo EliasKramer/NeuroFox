@@ -39,6 +39,7 @@
     <ClCompile Include="convolutional_layer.cpp">
       <Filter>source\layer</Filter>
     </ClCompile>
+    <ClCompile Include="math_functions.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="neural_network.hpp">
@@ -53,6 +54,11 @@
     <ClInclude Include="convolutional_layer.hpp">
       <Filter>header\layer</Filter>
     </ClInclude>
-    <ClInclude Include="layer.hpp" />
+    <ClInclude Include="conv_kernel.hpp">
+      <Filter>header\layer</Filter>
+    </ClInclude>
+    <ClInclude Include="math_functions.hpp">
+      <Filter>header</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

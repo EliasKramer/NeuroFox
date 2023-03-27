@@ -8,12 +8,17 @@ static int get_idx(const matrix& m, int x, int y, int z)
 matrix* create_matrix(int width, int height, int depth)
 {
 	matrix* m = new matrix;
-	m->width = width;
-	m->height = height;
-	m->depth = depth;
-	m->data.resize(width * height * depth);
+	resize_matrix(*m, width, height, depth);
 
 	return m;
+}
+
+void resize_matrix(matrix& m, int width, int height, int depth)
+{
+	m.width = width;
+	m.height = height;
+	m.depth = depth;
+	m.data.resize(width * height * depth);
 }
 
 void set_all(matrix& m, float value)
@@ -64,7 +69,7 @@ float get_at(const matrix& m, int x, int z)
 	return get_at(m, x, 0, z);
 }
 
-void dot(const matrix& a, const matrix& b, matrix& result)
+void matrix_dot(const matrix& a, const matrix& b, matrix& result)
 {
 	if (a.width != b.height || a.depth != b.depth)
 	{
@@ -87,6 +92,43 @@ void dot(const matrix& a, const matrix& b, matrix& result)
 					sum += get_at(a, i, y, z) * get_at(b, x, i, z);
 				}
 				set_at(result, x, y, z, sum);
+			}
+		}
+	}
+}
+
+void matrix_add(const matrix& a, const matrix& b, matrix& result)
+{
+	if (a.width != b.width || a.height != b.height || a.depth != b.depth)
+	{
+		throw "addition could not be performed. input matrices are in the wrong format";
+	}
+	if (result.width != a.width || result.height != a.height || result.depth != a.depth)
+	{
+		throw "addition could not be performed. result matrix is not the correct size";
+	}
+
+	for (int z = 0; z < result.depth; z++)
+	{
+		for (int y = 0; y < result.height; y++)
+		{
+			for (int x = 0; x < result.width; x++)
+			{
+				set_at(result, x, y, z, get_at(a, x, y, z) + get_at(b, x, y, z));
+			}
+		}
+	}
+}
+
+void matrix_apply_activation(matrix& m, activation activation_fn)
+{
+	for (int z = 0; z < m.depth; z++)
+	{
+		for (int y = 0; y < m.height; y++)
+		{
+			for (int x = 0; x < m.width; x++)
+			{
+				set_at(m, x, y, z, activation_fn(get_at(m, x, y, z)));
 			}
 		}
 	}

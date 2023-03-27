@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#include "math_functions.hpp"
 
 struct _matrix {
 	int width;
@@ -11,6 +12,7 @@ struct _matrix {
 } typedef matrix;
 
 matrix* create_matrix(int width, int height, int depth);
+void resize_matrix(matrix& m, int width, int height, int depth);
 
 void set_all(matrix& m, float value);
 
@@ -26,6 +28,8 @@ float get_at(const matrix& m, int x, int y, int z);
 //getting value where z = 0
 float get_at(const matrix& m, int x, int z);
 
-void dot(const matrix& a, const matrix& b, matrix& result);
+void matrix_dot(const matrix& a, const matrix& b, matrix& result);
+void matrix_add(const matrix& a, const matrix& b, matrix& result);
+void matrix_apply_activation(matrix& m, activation activation_fn);
 
 bool are_equal(const matrix& a, const matrix& b);
