@@ -108,29 +108,17 @@ void matrix_add(const matrix& a, const matrix& b, matrix& result)
 		throw "addition could not be performed. result matrix is not the correct size";
 	}
 
-	for (int z = 0; z < result.depth; z++)
+	for (int i = 0; i < a.data.size(); i++)
 	{
-		for (int y = 0; y < result.height; y++)
-		{
-			for (int x = 0; x < result.width; x++)
-			{
-				set_at(result, x, y, z, get_at(a, x, y, z) + get_at(b, x, y, z));
-			}
-		}
+		result.data[i] = a.data[i] + b.data[i];
 	}
 }
 
 void matrix_apply_activation(matrix& m, activation activation_fn)
 {
-	for (int z = 0; z < m.depth; z++)
+	for (int i = 0; i < m.data.size(); i++)
 	{
-		for (int y = 0; y < m.height; y++)
-		{
-			for (int x = 0; x < m.width; x++)
-			{
-				set_at(m, x, y, z, activation_fn(get_at(m, x, y, z)));
-			}
-		}
+		m.data[i] = ACTIVATION[activation_fn](m.data[i]);
 	}
 }
 

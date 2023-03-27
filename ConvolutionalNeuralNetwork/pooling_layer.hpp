@@ -17,4 +17,7 @@ struct _pooling_layer {
 	matrix output;
 } typedef pooling_layer;
 
-pooling_layer* create_pooling_layer(int size, int stride, pooling_type type);
+pooling_layer* create_pooling_layer(
+	int size, 
+	int stride, 
+	pooling_type type);

@@ -13,9 +13,7 @@ struct _fully_connected_layer {
 
 fully_connected_layer* create_fully_connected_layer(
 	int number_of_neurons,
-	activation activation,
-	matrix* input
-);
+	matrix* input,
+	activation activation);
 
-void forward_propagate_fully_connected_layer(
-	fully_connected_layer& layer);
+void feed_forward(fully_connected_layer& layer);

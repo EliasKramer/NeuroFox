@@ -156,9 +156,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\convolutional_layer.cpp" />
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\fully_connected_layer.cpp" />
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\math_functions.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\matrix.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\neural_network.cpp" />
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\pooling_layer.cpp" />
     <ClCompile Include="CNN_Test.cpp" />
+    <ClCompile Include="fc_layer_test.cpp" />
+    <ClCompile Include="math_test.cpp" />
     <ClCompile Include="matrix_test.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -167,8 +173,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\convolutional_layer.hpp" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\conv_kernel.hpp" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\fully_connected_layer.hpp" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\math_functions.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\matrix.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\neural_network.hpp" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\pooling_layer.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

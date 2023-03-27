@@ -1,6 +1,6 @@
 #pragma once
 #include "matrix.hpp"
-#include "layer.hpp"
+#include "math_functions.hpp"
 #include "pooling_layer.hpp"
 #include "fully_connected_layer.hpp"
 #include "convolutional_layer.hpp"
@@ -8,7 +8,7 @@
 
 struct _neural_network {
 	matrix input;
-	matrix output;
+	matrix* output;
 
 	//layer order is like this:
 	//the first layer is always a convolutional layer
@@ -21,11 +21,10 @@ struct _neural_network {
 	std::vector<fully_connected_layer> fully_connected_layers;
 } typedef neural_network;
 
-
 neural_network* create_neural_network(
-	int input_size,
-	int output_size,
-	std::vector<convolutional_layer*> conv_layers,
-	std::vector<pooling_layer*> pool_layers,
-	std::vector<fully_connected_layer*> fc_layers
+	matrix input,
+	matrix output,
+	std::vector<convolutional_layer> conv_layers,
+	std::vector<pooling_layer> pool_layers,
+	std::vector<fully_connected_layer> fc_layers
 );
