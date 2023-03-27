@@ -4,13 +4,13 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace CNNTest
 {
-	TEST_CLASS(PoolingTest)
+	TEST_CLASS(pasting_test)
 	{
 	public:
 		
-		TEST_METHOD(PoolingTest1)
+		TEST_METHOD(placeholder)
 		{
-			pooling_layer* pool_layer = create_pooling_layer(2, 2, max);
+			Assert::AreEqual(1, 1);
 		}
 	};
 }

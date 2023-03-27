@@ -166,6 +166,7 @@
     <ClCompile Include="fc_layer_test.cpp" />
     <ClCompile Include="math_test.cpp" />
     <ClCompile Include="matrix_test.cpp" />
+    <ClCompile Include="pooling_layer_test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ConvolutionalNeuralNetwork\ConvolutionalNeuralNetwork.vcxproj">

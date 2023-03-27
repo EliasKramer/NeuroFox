@@ -54,6 +54,9 @@
     <ClCompile Include="math_test.cpp">
       <Filter>Source Files\test</Filter>
     </ClCompile>
+    <ClCompile Include="pooling_layer_test.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ConvolutionalNeuralNetwork\neural_network.hpp">
