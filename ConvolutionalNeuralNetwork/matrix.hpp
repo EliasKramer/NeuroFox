@@ -24,9 +24,9 @@ void set_at(matrix& m, int x, int y, int z, float value);
 void set_at(matrix& m, int x, int y, int value);
 
 //getter
-float get_at(const matrix& m, int x, int y, int z);
+float matrix_get_at(const matrix& m, int x, int y, int z);
 //getting value where z = 0
-float get_at(const matrix& m, int x, int z);
+float matrix_get_at(const matrix& m, int x, int z);
 
 void matrix_dot(const matrix& a, const matrix& b, matrix& result);
 void matrix_add(const matrix& a, const matrix& b, matrix& result);

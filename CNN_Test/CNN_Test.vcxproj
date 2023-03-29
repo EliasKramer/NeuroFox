@@ -157,6 +157,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\ConvolutionalNeuralNetwork\convolutional_layer.cpp" />
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\conv_kernel.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\fully_connected_layer.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\math_functions.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\matrix.cpp" />

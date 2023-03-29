@@ -79,7 +79,7 @@ void feed_forward(pooling_layer& layer)
 							break;
 						
 						//get the value of the input at the current index
-						const float curr_val = get_at(*input, j, i, d);
+						const float curr_val = matrix_get_at(*input, j, i, d);
 
 						//if the current value is greater than the max value
 						//set the max value to the current value

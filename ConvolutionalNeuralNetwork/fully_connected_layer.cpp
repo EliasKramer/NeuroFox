@@ -33,6 +33,7 @@ void feed_forward(fully_connected_layer& layer)
 	matrix* weights = &layer.weights;
 	matrix* biases = &layer.biases;
 
+	//TODO - straighten out the input matrix
 	matrix_dot(*weights, *input, *output);
 	matrix_add(*output, *biases, *output);
 	matrix_apply_activation(*output, layer.activation_fn);

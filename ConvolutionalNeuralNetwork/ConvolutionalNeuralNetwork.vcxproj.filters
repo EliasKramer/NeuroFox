@@ -42,6 +42,7 @@
     <ClCompile Include="math_functions.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="conv_kernel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="neural_network.hpp">

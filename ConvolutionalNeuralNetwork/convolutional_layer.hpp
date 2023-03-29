@@ -17,3 +17,5 @@ convolutional_layer* create_convolutional_layer(
 	int number_of_kernels, 
 	int stride, 
 	activation activation_fn);
+
+void feed_forward(convolutional_layer& layer);

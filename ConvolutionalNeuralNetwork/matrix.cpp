@@ -39,7 +39,7 @@ std::string get_matrix_string(matrix& m)
 		{
 			for (int x = 0; x < m.width; x++)
 			{
-				ret_val += std::to_string(get_at(m, x, y, z)) + " ";
+				ret_val += std::to_string(matrix_get_at(m, x, y, z)) + " ";
 			}
 			ret_val += "\n";
 		}
@@ -59,14 +59,14 @@ void set_at(matrix& m, int x, int y, int value)
 	set_at(m, x, y, 0, value);
 }
 
-float get_at(const matrix& m, int x, int y, int z)
+float matrix_get_at(const matrix& m, int x, int y, int z)
 {
 	return m.data[get_idx(m, x, y, z)];
 }
 
-float get_at(const matrix& m, int x, int z)
+float matrix_get_at(const matrix& m, int x, int z)
 {
-	return get_at(m, x, 0, z);
+	return matrix_get_at(m, x, 0, z);
 }
 
 void matrix_dot(const matrix& a, const matrix& b, matrix& result)
@@ -89,7 +89,7 @@ void matrix_dot(const matrix& a, const matrix& b, matrix& result)
 				float sum = 0;
 				for (int i = 0; i < a.width; i++)
 				{
-					sum += get_at(a, i, y, z) * get_at(b, x, i, z);
+					sum += matrix_get_at(a, i, y, z) * matrix_get_at(b, x, i, z);
 				}
 				set_at(result, x, y, z, sum);
 			}
