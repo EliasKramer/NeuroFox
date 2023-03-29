@@ -38,3 +38,7 @@ void feed_forward(fully_connected_layer& layer)
 	matrix_add(*output, *biases, *output);
 	matrix_apply_activation(*output, layer.activation_fn);
 }
+
+void learn()
+{
+}

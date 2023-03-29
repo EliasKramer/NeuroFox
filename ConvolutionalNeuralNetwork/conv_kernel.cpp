@@ -24,5 +24,4 @@ float lay_kernel_over_matrix(
 		}
 	}
 	return sum + kernel.bias;
-
 }

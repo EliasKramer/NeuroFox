@@ -5,7 +5,6 @@
 #include "fully_connected_layer.hpp"
 #include "convolutional_layer.hpp"
 
-
 struct _neural_network {
 	matrix input;
 	matrix* output;
