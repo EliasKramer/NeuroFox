@@ -3,8 +3,8 @@
 #include "math_functions.hpp"
 #include "layer.hpp"
 
-struct _fully_connected_layer : layer{
-
+class fully_connected_layer : public layer {
+private:
 	matrix weights;
 	matrix biases;
 	
@@ -12,13 +12,17 @@ struct _fully_connected_layer : layer{
 	matrix bias_deltas;
 
 	activation activation_fn;
-} typedef fully_connected_layer;
+public:
+	//constructor
+	fully_connected_layer(
+		int number_of_neurons,
+		matrix* given_input,
+		activation activation_function
+	);
 
-fully_connected_layer create_fully_connected_layer(
-	int number_of_neurons,
-	matrix* input,
-	activation activation	
-);
+	void set_input(matrix* input) override;
+	void set_error_right(matrix* output) override;
 
-void feed_forward(fully_connected_layer& layer);
-void learn(fully_connected_layer& layer);
+	void forward_propagation() override;
+	void back_propagation() override;
+};

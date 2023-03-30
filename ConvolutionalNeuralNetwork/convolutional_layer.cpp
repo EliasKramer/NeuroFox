@@ -57,3 +57,23 @@ void feed_forward(convolutional_layer& layer)
 	}
 	matrix_apply_activation(layer.output, layer.activation_fn);
 }
+
+convolutional_layer::convolutional_layer(matrix* input, int kernel_size, int number_of_kernels, int stride, activation activation_fn)
+{
+}
+
+void convolutional_layer::set_input(matrix* input)
+{
+}
+
+void convolutional_layer::set_error_right(matrix* output)
+{
+}
+
+void convolutional_layer::forward_propagation()
+{
+}
+
+void convolutional_layer::back_propagation()
+{
+}

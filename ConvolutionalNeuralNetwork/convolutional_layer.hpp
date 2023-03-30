@@ -4,20 +4,26 @@
 #include "conv_kernel.hpp"
 #include "layer.hpp"
 
-struct _convolutional_layer : layer {
-
+class convolutional_layer : public layer {
+private:
 	std::vector<neural_kernel> kernels;
 	std::vector<neural_kernel> kernel_deltas;
 
 	int stride;
 	activation activation_fn;
-} typedef convolutional_layer;
+public:
+	//constructor
+	convolutional_layer(
+		matrix* input,
+		int kernel_size,
+		int number_of_kernels,
+		int stride,
+		activation activation_fn
+	);
 
-convolutional_layer* create_convolutional_layer(
-	matrix* input,
-	int kernel_size,
-	int number_of_kernels,
-	int stride,
-	activation activation_fn);
+	void set_input(matrix* input) override;
+	void set_error_right(matrix* output) override;
 
-void feed_forward(convolutional_layer& layer);
+	void forward_propagation() override;
+	void back_propagation() override;	
+};

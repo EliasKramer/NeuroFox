@@ -114,3 +114,23 @@ void feed_forward(pooling_layer& layer)
 		}
 	}
 }
+
+pooling_layer::pooling_layer(matrix* input, int filter_size, int stride, pooling_type pooling_fn)
+{
+}
+
+void pooling_layer::set_input(matrix* input)
+{
+}
+
+void pooling_layer::set_error_right(matrix* output)
+{
+}
+
+void pooling_layer::forward_propagation()
+{
+}
+
+void pooling_layer::back_propagation()
+{
+}

@@ -9,16 +9,23 @@ enum _pooling_type
 	average_pooling
 } typedef pooling_type;
 
-struct _pooling_layer : layer {
+class pooling_layer : public layer {
+private:
 	int filter_size;
 	int stride;
 	pooling_type pooling_fn;
-} typedef pooling_layer;
+public:
+	//constructor
+	pooling_layer(
+		matrix* input,
+		int filter_size,
+		int stride,
+		pooling_type pooling_fn
+	);
 
-pooling_layer* create_pooling_layer(
-	matrix* input,
-	int filter_size,
-	int stride, 
-	pooling_type pooling_fn);
+	void set_input(matrix* input) override;
+	void set_error_right(matrix* output) override;
 
-void feed_forward(pooling_layer& layer);
+	void forward_propagation() override;
+	void back_propagation() override;
+};

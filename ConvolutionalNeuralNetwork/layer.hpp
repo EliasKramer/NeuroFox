@@ -7,10 +7,22 @@ typedef enum _layer_type {
 	fully_connected
 } layer_type;
 
-typedef struct _layer {
-	layer_type type;
+class layer {
+
+protected:
 	matrix* input;
 	matrix output;
 	matrix* error_right;
 	matrix error;
-} layerd;
+
+public:
+	layer(matrix* input);
+
+	layer_type layer_type;
+
+	virtual void set_input(matrix* input) = 0;
+	virtual void set_error_right(matrix* error_right) = 0;
+
+	virtual void forward_propagation() = 0;
+	virtual void back_propagation() = 0;
+};
