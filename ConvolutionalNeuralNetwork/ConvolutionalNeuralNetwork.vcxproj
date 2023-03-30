@@ -25,6 +25,7 @@
     <ClInclude Include="convolutional_layer.hpp" />
     <ClInclude Include="conv_kernel.hpp" />
     <ClInclude Include="fully_connected_layer.hpp" />
+    <ClInclude Include="layer.hpp" />
     <ClInclude Include="math_functions.hpp" />
     <ClInclude Include="matrix.hpp" />
     <ClInclude Include="neural_network.hpp" />

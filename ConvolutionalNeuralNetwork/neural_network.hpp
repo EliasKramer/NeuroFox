@@ -7,23 +7,37 @@
 
 struct _neural_network {
 	matrix input;
-	matrix* output;
+	matrix output;
 
-	//layer order is like this:
-	//the first layer is always a convolutional layer
-	//every convolutional layer has a pooling layer after it
-	//they are always the same size
-	//the last layers are always fully connected layers
+	std::vector<layer_type> layer_types;
 
 	std::vector<convolutional_layer> convolutional_layers;
 	std::vector<pooling_layer> pooling_layers;
 	std::vector<fully_connected_layer> fully_connected_layers;
 } typedef neural_network;
 
-neural_network* create_neural_network(
-	matrix input,
-	matrix output,
-	std::vector<convolutional_layer> conv_layers,
-	std::vector<pooling_layer> pool_layers,
-	std::vector<fully_connected_layer> fc_layers
+neural_network* create_neural_network();
+
+void add_fully_connected_layer(
+	neural_network& nn,
+	int number_of_neurons,
+	activation activation
 );
+void add_convolutional_layer(
+	neural_network& nn,
+	int kernel_size,
+	int number_of_kernels,
+	int stride);
+void add_pooling_layer(
+	neural_network& nn,
+	int kernel_size,
+	int stride);
+
+void set_input_format(
+	neural_network& nn,
+	matrix input_format
+);
+
+void set_output_format(
+	neural_network& nn,
+	matrix output_format);

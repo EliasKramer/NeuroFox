@@ -1,5 +1,6 @@
 #pragma once
 #include "matrix.hpp"
+#include "layer.hpp"
 
 enum _pooling_type
 {
@@ -8,12 +9,10 @@ enum _pooling_type
 	average_pooling
 } typedef pooling_type;
 
-struct _pooling_layer {
-	matrix* input;
+struct _pooling_layer : layer {
 	int filter_size;
 	int stride;
 	pooling_type pooling_fn;
-	matrix output;
 } typedef pooling_layer;
 
 pooling_layer* create_pooling_layer(
