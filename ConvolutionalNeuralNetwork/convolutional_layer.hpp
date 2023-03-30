@@ -18,12 +18,8 @@ public:
 		int kernel_size,
 		int number_of_kernels,
 		int stride,
-		activation activation_fn
+		activation activation_function
 	);
-
-	void set_input(matrix* input) override;
-	void set_error_right(matrix* output) override;
-
 	void forward_propagation() override;
 	void back_propagation() override;	
 };

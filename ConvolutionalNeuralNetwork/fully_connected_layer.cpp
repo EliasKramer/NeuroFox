@@ -32,25 +32,6 @@ fully_connected_layer::fully_connected_layer(
 	activation_fn = activation_function;
 }
 
-void fully_connected_layer::set_input(matrix* input)
-{
-	if (input->width != 1 || input->depth != 1)
-	{
-		throw "Input matrix must be a vector (width and depth must be 1)";
-	}
-	input = input;
-}
-
-void fully_connected_layer::set_error_right(matrix* error_right)
-{
-	if (error_right->width != 1 || error_right->depth != 1)
-	{
-		throw "Output matrix must be a vector (width and depth must be 1)";
-	}
-	error_right = error_right;
-}
-
-
 void fully_connected_layer::forward_propagation()
 {
 	//TODO - straighten out the input matrix

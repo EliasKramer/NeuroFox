@@ -4,7 +4,8 @@
 typedef enum _layer_type {
 	convolution,
 	pooling,
-	fully_connected
+	fully_connected,
+	NO_TYPE
 } layer_type;
 
 class layer {
@@ -20,8 +21,8 @@ public:
 
 	layer_type layer_type;
 
-	virtual void set_input(matrix* input) = 0;
-	virtual void set_error_right(matrix* error_right) = 0;
+	void set_input(matrix* input);
+	void set_error_right(matrix* error_right);
 
 	virtual void forward_propagation() = 0;
 	virtual void back_propagation() = 0;
