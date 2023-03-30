@@ -14,6 +14,7 @@
     <ClCompile Include="convolutional_layer.cpp" />
     <ClCompile Include="conv_kernel.cpp" />
     <ClCompile Include="fully_connected_layer.cpp" />
+    <ClCompile Include="layer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="math_functions.cpp" />
     <ClCompile Include="matrix.cpp" />

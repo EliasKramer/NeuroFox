@@ -122,3 +122,40 @@ void set_output_format(neural_network& nn, matrix output_format)
 {
 	nn.output = output_format;
 }
+
+neural_network::neural_network()
+{
+}
+
+void neural_network::set_input(matrix input)
+{
+}
+
+matrix* neural_network::get_output()
+{
+	return nullptr;
+}
+
+void neural_network::add_layer(std::unique_ptr<layer> layer)
+{
+}
+
+void neural_network::forward_propagation()
+{
+}
+
+void neural_network::back_propagation(matrix* expected_output)
+{
+}
+
+void neural_network::add_layer(layer_type layer_type)
+{
+}
+
+void neural_network::add_layer(layer_type layer_type, int kernel_size, int number_of_kernels, int stride)
+{
+}
+
+void neural_network::add_layer(layer_type layer_type, int number_of_neurons, activation activation)
+{
+}

@@ -45,6 +45,7 @@
     <ClCompile Include="conv_kernel.cpp">
       <Filter>source\layer</Filter>
     </ClCompile>
+    <ClCompile Include="layer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="neural_network.hpp">

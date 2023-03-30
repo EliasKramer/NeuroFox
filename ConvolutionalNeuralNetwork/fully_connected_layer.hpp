@@ -20,9 +20,6 @@ public:
 		activation activation_function
 	);
 
-	void set_input(matrix* input) override;
-	void set_error_right(matrix* output) override;
-
 	void forward_propagation() override;
 	void back_propagation() override;
 };
