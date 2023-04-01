@@ -21,6 +21,16 @@ void resize_matrix(matrix& m, int width, int height, int depth)
 	m.data.resize(width * height * depth);
 }
 
+void resize_matrix(matrix& resizing_matrix, const matrix& source)
+{
+	resize_matrix(resizing_matrix, source.width, source.height, source.depth);
+}
+
+bool matrix_equal_format(const matrix& a, const matrix& b)
+{
+	return a.width == b.width && a.height == b.height && a.depth == b.depth;
+}
+
 void set_all(matrix& m, float value)
 {
 	for (int i = 0; i < m.data.size(); i++)

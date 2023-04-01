@@ -7,14 +7,30 @@
 
 class neural_network {
 private:
-	matrix input;
-	matrix* output;
+	matrix* input_p = nullptr;
+	matrix* output_p = nullptr;
 
-	std::vector<std::unique_ptr<layer>> layer_types;
+	//the input format is the width, height and depth of the input
+	matrix input_format;
+	//the input matrix can only be set once
+	bool input_format_set = false;
+	
+	//the output format is the width, height and depth of the output
+	matrix output_format;
+	//the output matrix can only be set once
+	bool output_format_set = false;
+
+	std::vector<std::unique_ptr<layer>> layers;
 public:
 	neural_network();
 
-	void set_input(matrix input);
+	//sets the input matrix to a certain format
+	void set_input_format(const matrix& given_input_format);
+	//sets the output matrix to a certain format
+	void set_output_format(const matrix& given_output_format);
+	
+	void set_input(matrix* input);
+
 	matrix* get_output();
 
 	void add_layer(const std::unique_ptr<layer> layer);

@@ -32,6 +32,16 @@ fully_connected_layer::fully_connected_layer(
 	activation_fn = activation_function;
 }
 
+const matrix& fully_connected_layer::get_weights() const
+{
+	return weights;
+}
+
+const matrix& fully_connected_layer::get_biases() const
+{
+	return biases;
+}
+
 void fully_connected_layer::forward_propagation()
 {
 	//TODO - straighten out the input matrix

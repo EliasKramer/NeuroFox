@@ -12,7 +12,11 @@ struct _matrix {
 } typedef matrix;
 
 matrix* create_matrix(int width, int height, int depth);
+
 void resize_matrix(matrix& m, int width, int height, int depth);
+void resize_matrix(matrix& resizing_matrix, const matrix& source);
+
+bool matrix_equal_format(const matrix& a, const matrix& b);
 
 void set_all(matrix& m, float value);
 

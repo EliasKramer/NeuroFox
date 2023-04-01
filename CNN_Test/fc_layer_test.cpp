@@ -10,25 +10,27 @@ namespace CNNTest
 		TEST_METHOD(creating_fully_connected_layer_simple)
 		{
 			matrix* input = create_matrix(1, 1, 1);
-			fully_connected_layer* fc_layer = create_fully_connected_layer(5, input, relu_fn);
+			fully_connected_layer fc_layer(5, input, relu_fn);
+			matrix output = fc_layer.get_output();
 
-			Assert::AreEqual(5, fc_layer->output.height);
 
-			delete fc_layer;
+			Assert::AreEqual(5, output.height);
+
 			delete input;
 		}
 		TEST_METHOD(creating_fully_connected_layer_with_multiple_inputs)
 		{
 			matrix* input = create_matrix(1, 4, 1);
-			fully_connected_layer* fc_layer = create_fully_connected_layer(5, input, relu_fn);
+			const fully_connected_layer fc_layer(5, input, relu_fn);
 
-			Assert::AreEqual(5, fc_layer->output.height);
-			Assert::AreEqual(5, fc_layer->weights.height);
-			Assert::AreEqual(4, fc_layer->weights.width);
+		
+			Assert::AreEqual(5, fc_layer.get_output().height);
 
-			Assert::AreEqual(5, fc_layer->biases.height);
+			Assert::AreEqual(5, fc_layer.get_weights().height);
+			Assert::AreEqual(4, fc_layer.get_weights().width);
 
-			delete fc_layer;
+			Assert::AreEqual(5, fc_layer.get_biases().height);
+
 			delete input;
 		}
 		TEST_METHOD(input_is_no_vector)
@@ -36,7 +38,7 @@ namespace CNNTest
 			matrix* input = create_matrix(1, 4, 4);
 			try
 			{
-				fully_connected_layer* fc_layer = create_fully_connected_layer(5, input, relu_fn);
+				fully_connected_layer fc_layer = fully_connected_layer(5, input, relu_fn);
 			}
 			catch (const char* msg)
 			{
@@ -47,7 +49,7 @@ namespace CNNTest
 			input = create_matrix(4, 1, 1);
 			try
 			{
-				fully_connected_layer* fc_layer = create_fully_connected_layer(5, input, relu_fn);
+				fully_connected_layer fc_layer(5, input, relu_fn);
 			}
 			catch (const char* msg)
 			{
@@ -59,7 +61,10 @@ namespace CNNTest
 		{
 			matrix* input = create_matrix(1, 1, 1);
 			input->data[0] = 2;
-			fully_connected_layer* fc_layer = create_fully_connected_layer(1, input, relu_fn);
+			fully_connected_layer fc_layer(1, input, relu_fn);
+
+			//CONTINUE HERE
+
 			fc_layer->weights.data[0] = 3;
 			fc_layer->biases.data[0] = 1;
 

@@ -7,7 +7,7 @@ class fully_connected_layer : public layer {
 private:
 	matrix weights;
 	matrix biases;
-	
+
 	matrix weight_deltas;
 	matrix bias_deltas;
 
@@ -19,6 +19,9 @@ public:
 		matrix* given_input,
 		activation activation_function
 	);
+
+	const matrix& get_weights() const;
+	const matrix& get_biases() const;
 
 	void forward_propagation() override;
 	void back_propagation() override;
