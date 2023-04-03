@@ -33,7 +33,7 @@ void layer::set_error_right(matrix* error_right)
 	this->error_right = error_right;
 }
 
-const matrix& layer::get_output() const
+const matrix& layer::get_activations() const
 {
-	return output;
+	return activations;
 }

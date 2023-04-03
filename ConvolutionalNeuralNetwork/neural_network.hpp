@@ -31,7 +31,7 @@ public:
 	
 	void set_input(matrix* input);
 
-	matrix* get_output();
+	const matrix& get_output() const;
 
 	void add_layer(const std::unique_ptr<layer> layer);
 

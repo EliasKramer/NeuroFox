@@ -22,6 +22,8 @@ public:
 
 	const matrix& get_weights() const;
 	const matrix& get_biases() const;
+	matrix& get_weights_ref();
+	matrix& get_biases_ref();
 
 	void forward_propagation() override;
 	void back_propagation() override;

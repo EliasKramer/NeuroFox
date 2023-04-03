@@ -13,7 +13,7 @@ fully_connected_layer::fully_connected_layer(
 	}
 
 	//make an output matrix (1 Dimensional)
-	resize_matrix(output, 1, number_of_neurons, 1);
+	resize_matrix(activations, 1, number_of_neurons, 1);
 
 	//the error is needed for every output (we need it for learning)
 	resize_matrix(error, 1, number_of_neurons, 1);
@@ -42,12 +42,22 @@ const matrix& fully_connected_layer::get_biases() const
 	return biases;
 }
 
+matrix& fully_connected_layer::get_weights_ref()
+{
+	return weights;
+}
+
+matrix& fully_connected_layer::get_biases_ref()
+{
+	return biases;
+}
+
 void fully_connected_layer::forward_propagation()
 {
 	//TODO - straighten out the input matrix
-	matrix_dot(weights, *input, output);
-	matrix_add(output, biases, output);
-	matrix_apply_activation(output, activation_fn);
+	matrix_dot(weights, *input, activations);
+	matrix_add(activations, biases, activations);
+	matrix_apply_activation(activations, activation_fn);
 }
 
 void fully_connected_layer::back_propagation()

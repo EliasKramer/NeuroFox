@@ -12,7 +12,7 @@ class layer {
 
 protected:
 	matrix* input;
-	matrix output;
+	matrix activations;
 	matrix* error_right;
 	matrix error;
 
@@ -24,7 +24,7 @@ public:
 	void set_input(matrix* input);
 	void set_error_right(matrix* error_right);
 
-	const matrix& get_output() const;
+	const matrix& get_activations() const;
 
 	virtual void forward_propagation() = 0;
 	virtual void back_propagation() = 0;
