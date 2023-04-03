@@ -4,8 +4,18 @@
 layer::layer(matrix* input)
 	:input(input),
 	error_right(nullptr),
-	layer_type(_layer_type::NO_TYPE)
+	layer_type_(_layer_type::NO_TYPE)
 {}
+
+const layer_type layer::get_layer_type() const
+{
+	return layer_type_;
+}
+
+const matrix* layer::get_input_p() const
+{
+	return input;
+}
 
 void layer::set_input(matrix* input)
 {

@@ -23,6 +23,10 @@ public:
 		pooling_type pooling_fn
 	);
 
+	int get_filter_size() const;
+	int get_stride() const;
+	pooling_type get_pooling_fn() const;
+
 	void forward_propagation() override;
 	void back_propagation() override;
 };

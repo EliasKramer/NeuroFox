@@ -11,6 +11,8 @@ typedef enum _layer_type {
 class layer {
 
 protected:
+	layer_type layer_type_;
+
 	matrix* input;
 	matrix activations;
 	matrix* error_right;
@@ -19,7 +21,8 @@ protected:
 public:
 	layer(matrix* input);
 
-	layer_type layer_type;
+	const layer_type get_layer_type() const;
+	const matrix* get_input_p() const;
 
 	void set_input(matrix* input);
 	void set_error_right(matrix* error_right);

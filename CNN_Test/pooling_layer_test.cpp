@@ -11,45 +11,41 @@ namespace CNNTest
 		TEST_METHOD(pooling_constructor_test_1)
 		{
 			matrix* input = create_matrix(2, 2, 1);
-			pooling_layer* pooling = create_pooling_layer(input , 1, 1, max_pooling);
-			Assert::AreEqual(2, pooling->output.height);
-			Assert::AreEqual(2, pooling->output.width);
-			Assert::AreEqual(1, pooling->output.depth);
+			pooling_layer pooling(input , 1, 1, max_pooling);
+			Assert::AreEqual(2, pooling.get_activations().height);
+			Assert::AreEqual(2, pooling.get_activations().width);
+			Assert::AreEqual(1, pooling.get_activations().depth);
 
-			Assert::IsTrue(input == pooling->input);
-			Assert::AreEqual(1, pooling->stride);
-			Assert::AreEqual(1, pooling->filter_size);
-			Assert::AreEqual((int)max_pooling, (int)pooling->pooling_fn);
+			Assert::IsTrue(input == pooling.get_input_p());
+			Assert::AreEqual(1, pooling.get_stride());
+			Assert::AreEqual(1, pooling.get_filter_size());
+			Assert::AreEqual((int)max_pooling, (int)pooling.get_pooling_fn());
 
-			delete pooling;
 			delete input;
 		}
 		TEST_METHOD(pooling_constructor_test_2)
 		{
 			matrix* input = create_matrix(6, 6, 2);
-			pooling_layer* pooling = create_pooling_layer(input, 2, 2, average_pooling);
-			Assert::AreEqual(3, pooling->output.height);
-			Assert::AreEqual(3, pooling->output.width);
-			Assert::AreEqual(2, pooling->output.depth);
+			pooling_layer pooling(input, 2, 2, average_pooling);
+			Assert::AreEqual(3, pooling.get_activations().height);
+			Assert::AreEqual(3, pooling.get_activations().width);
+			Assert::AreEqual(2, pooling.get_activations().depth);
 
-			Assert::IsTrue(input == pooling->input);
-			Assert::AreEqual(2, pooling->stride);
-			Assert::AreEqual(2, pooling->filter_size);
-			Assert::AreEqual((int)average_pooling, (int)pooling->pooling_fn);
+			Assert::IsTrue(input == pooling.get_input_p());
+			Assert::AreEqual(2, pooling.get_stride());
+			Assert::AreEqual(2, pooling.get_filter_size());
+			Assert::AreEqual((int)average_pooling, (int)pooling.get_pooling_fn());
 
-			delete pooling;
 			delete input;
 		}
 		TEST_METHOD(pooling_constructor_test_invalid_arguments)
 		{
 			matrix* input = create_matrix(6, 6, 2);
-			pooling_layer* pooling;
 			
 			//wrong filter
 			try
 			{
-				pooling = create_pooling_layer(input, 0, 2, average_pooling);
-				delete pooling;
+				pooling_layer pooling(input, 0, 2, average_pooling);
 				Assert::Fail();
 			}
 			catch (const char* msg)
@@ -60,8 +56,7 @@ namespace CNNTest
 			//wrong stride
 			try
 			{
-				pooling = create_pooling_layer(input, 2, 0, average_pooling);
-				delete pooling;
+				pooling_layer pooling(input, 2, 0, average_pooling);
 				Assert::Fail();
 			}
 			catch (const char* msg)
@@ -74,7 +69,7 @@ namespace CNNTest
 			//wrong input
 			try
 			{
-				pooling = create_pooling_layer(input, 2, 2, average_pooling);
+				pooling_layer pooling(input, 2, 2, average_pooling);
 				Assert::Fail();
 			}
 			catch (const char* msg)
@@ -88,19 +83,18 @@ namespace CNNTest
 			set_all(*input, 1);
 			set_at(*input, 0, 0, 0, 0);
 			
-			pooling_layer* pooling = create_pooling_layer(input, 2, 2, min_pooling);
-			feed_forward(*pooling);
-			Assert::AreEqual(3, pooling->output.height);
-			Assert::AreEqual(3, pooling->output.width);
-			Assert::AreEqual(2, pooling->output.depth);
+			pooling_layer pooling(input, 2, 2, min_pooling);
+			pooling.forward_propagation();
+			Assert::AreEqual(3, pooling.get_activations().height);
+			Assert::AreEqual(3, pooling.get_activations().width);
+			Assert::AreEqual(2, pooling.get_activations().depth);
 
-			Assert::AreEqual(0.0f, pooling->output.data[0]);
-			for (int i = 1; i < pooling->output.data.size(); i++)
+			Assert::AreEqual(0.0f, pooling.get_activations().data[0]);
+			for (int i = 1; i < pooling.get_activations().data.size(); i++)
 			{
-				Assert::AreEqual(1.0f, pooling->output.data[i]);
+				Assert::AreEqual(1.0f, pooling.get_activations().data[i]);
 			}
 
-			delete pooling;
 			delete input;
 		}
 	};

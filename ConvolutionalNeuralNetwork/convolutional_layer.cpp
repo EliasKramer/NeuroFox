@@ -24,15 +24,15 @@ convolutional_layer::convolutional_layer(
 		kernels.push_back(kernel);
 	}
 
-	resize_matrix(output, output_width, output_height, number_of_kernels);
+	resize_matrix(activations, output_width, output_height, number_of_kernels);
 }
 
 void convolutional_layer::forward_propagation()
 {
 	const int kernel_size = kernels[0].weights.width;
 	const int number_of_kernels = kernels.size();
-	const int output_width = output.width;
-	const int output_height = output.height;
+	const int output_width = activations.width;
+	const int output_height = activations.height;
 	const int input_depth = input->depth;
 
 	for (int depth = 0; depth < number_of_kernels; depth++)
@@ -48,11 +48,11 @@ void convolutional_layer::forward_propagation()
 					x * stride,
 					y * stride,
 					kernel_size);
-				set_at(output, x, y, depth, value);
+				set_at(activations, x, y, depth, value);
 			}
 		}
 	}
-	matrix_apply_activation(output, activation_fn);
+	matrix_apply_activation(activations, activation_fn);
 }
 
 void convolutional_layer::back_propagation()

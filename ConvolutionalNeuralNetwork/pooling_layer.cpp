@@ -23,26 +23,41 @@ pooling_layer::pooling_layer(
 	int output_depth = input->depth;
 
 	resize_matrix(
-		output,
+		activations,
 		output_width,
 		output_height,
 		output_depth);
+}
+
+int pooling_layer::get_filter_size() const
+{
+	return filter_size;
+}
+
+int pooling_layer::get_stride() const
+{
+	return stride;
+}
+
+pooling_type pooling_layer::get_pooling_fn() const
+{
+	return pooling_fn;
 }
 
 void pooling_layer::forward_propagation()
 {
 
 	//iterate over each depth
-	for (int d = 0; d < output.depth; d++)
+	for (int d = 0; d < activations.depth; d++)
 	{
 		//iterate over each row of the output
-		for (int y = 0; y < output.height; y++)
+		for (int y = 0; y < activations.height; y++)
 		{
 			//calculate the start and end index of the filter on the y axis
 			const int start_idx_y = y * stride;
 			const int end_idx_y = start_idx_y + filter_size;
 
-			for (int x = 0; x < output.width; x++)
+			for (int x = 0; x < activations.width; x++)
 			{
 				//calculate the start and end index of the filter on the x axis
 				const int start_idx_x = x * stride;
@@ -85,13 +100,13 @@ void pooling_layer::forward_propagation()
 				switch (pooling_fn)
 				{
 				case max_pooling:
-					set_at(output, x, y, d, max);
+					set_at(activations, x, y, d, max);
 					break;
 				case min_pooling:
-					set_at(output, x, y, d, min);
+					set_at(activations, x, y, d, min);
 					break;
 				case average_pooling:
-					set_at(output, x, y, d, sum / (filter_size * filter_size));
+					set_at(activations, x, y, d, sum / (filter_size * filter_size));
 					break;
 				default:
 					throw "Invalid pooling type";

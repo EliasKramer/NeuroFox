@@ -42,7 +42,7 @@ void neural_network::set_input(matrix* input)
 
 const matrix& neural_network::get_output() const
 {
-	// TODO: insert return statement here
+	return *output_p;
 }
 
 void neural_network::add_layer(std::unique_ptr<layer> layer)
