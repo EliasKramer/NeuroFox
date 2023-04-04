@@ -48,9 +48,9 @@ namespace CNNTest
 				pooling_layer pooling(input, 0, 2, average_pooling);
 				Assert::Fail();
 			}
-			catch (const char* msg)
+			catch (std::invalid_argument e)
 			{
-				Assert::AreEqual("filter size must be greater than 0", msg);
+				Assert::AreEqual("filter size must be greater than 0", e.what());
 			}
 
 			//wrong stride
@@ -59,9 +59,9 @@ namespace CNNTest
 				pooling_layer pooling(input, 2, 0, average_pooling);
 				Assert::Fail();
 			}
-			catch (const char* msg)
+			catch (std::invalid_argument e)
 			{
-				Assert::AreEqual("stride must be greater than 0", msg);
+				Assert::AreEqual("stride must be greater than 0", e.what());
 			}
 
 			delete input;
@@ -72,9 +72,9 @@ namespace CNNTest
 				pooling_layer pooling(input, 2, 2, average_pooling);
 				Assert::Fail();
 			}
-			catch (const char* msg)
+			catch (std::invalid_argument e)
 			{
-				Assert::AreEqual("input cannot be null", msg);
+				Assert::AreEqual("input cannot be null", e.what());
 			}
 		}
 		TEST_METHOD(feed_forward_test_min_pooling)

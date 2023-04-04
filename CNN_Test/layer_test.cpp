@@ -11,7 +11,6 @@ namespace CNNTest
 	TEST_CLASS(layer_test)
 	{
 	public:
-
 		TEST_METHOD(layer_gets_right_type_in_constructor)
 		{
 			matrix* input = create_matrix(1, 1, 1);

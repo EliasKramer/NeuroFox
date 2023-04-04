@@ -9,7 +9,7 @@ void neural_network::set_input_format(const matrix& given_input_format)
 	if (input_format_set == false)
 		input_format_set = true;
 	else
-		throw "Cannot set input format twice.";
+		throw std::runtime_error("Cannot set input format twice.");
 
 	resize_matrix(this->input_format, given_input_format);
 }
@@ -19,7 +19,7 @@ void neural_network::set_output_format(const matrix& given_output_format)
 	if (output_format_set == false)
 		output_format_set = true;
 	else
-		throw "Cannot set output format twice.";
+		throw std::runtime_error("Cannot set output format twice.");
 
 	resize_matrix(this->output_format, given_output_format);
 }
@@ -45,14 +45,36 @@ const matrix& neural_network::get_output() const
 	return *output_p;
 }
 
-void neural_network::add_layer(std::unique_ptr<layer> layer)
+static bool layer_can_be_added(
+	const layer& given_layer,
+	const layer* last_layer)
 {
+	//TODO
+
+	return true;
+}
+
+void neural_network::add_layer(std::unique_ptr<layer>&& layer)
+{
+	if (layer_can_be_added(*layer.get(), layers.back().get()))
+	{
+		layers.push_back(std::move(layer));
+	}
+	else
+	{
+		throw std::runtime_error("A layer could not be added");
+	}
 }
 
 void neural_network::forward_propagation()
 {
+	for (auto& layer : layers)
+	{
+		layer->forward_propagation();
+	}
 }
 
-void neural_network::back_propagation(matrix* expected_output)
+void neural_network::back_propagation(const matrix& expected_output)
 {
+	//TODO
 }

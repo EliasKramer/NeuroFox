@@ -83,11 +83,11 @@ void matrix_dot(const matrix& a, const matrix& b, matrix& result)
 {
 	if (a.width != b.height || a.depth != b.depth)
 	{
-		throw "dot product could not be performed. input matrices are in the wrong format";
+		throw std::invalid_argument("dot product could not be performed. input matrices are in the wrong format");
 	}
 	if (result.width != b.width || result.height != a.height || result.depth != a.depth)
 	{
-		throw "dot product could not be performed. result matrix is not the correct size";
+		throw std::invalid_argument("dot product could not be performed. result matrix is not the correct size");
 	}
 
 	for (int z = 0; z < result.depth; z++)
@@ -111,11 +111,11 @@ void matrix_add(const matrix& a, const matrix& b, matrix& result)
 {
 	if (a.width != b.width || a.height != b.height || a.depth != b.depth)
 	{
-		throw "addition could not be performed. input matrices are in the wrong format";
+		throw std::invalid_argument("addition could not be performed. input matrices are in the wrong format");
 	}
 	if (result.width != a.width || result.height != a.height || result.depth != a.depth)
 	{
-		throw "addition could not be performed. result matrix is not the correct size";
+		throw std::invalid_argument("addition could not be performed. result matrix is not the correct size");
 	}
 
 	for (int i = 0; i < a.data.size(); i++)

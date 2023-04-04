@@ -9,7 +9,7 @@ fully_connected_layer::fully_connected_layer(
 {
 	if (given_input->width != 1 || given_input->depth != 1)
 	{
-		throw "Input matrix must be a vector (width and depth must be 1)";
+		throw std::invalid_argument("Input matrix must be a vector (width and depth must be 1)");
 	}
 
 	//make an output matrix (1 Dimensional)

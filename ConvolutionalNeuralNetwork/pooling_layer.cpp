@@ -12,11 +12,11 @@ pooling_layer::pooling_layer(
 	pooling_fn(pooling_fn)
 {
 	if (!input)
-		throw "input cannot be null";
+		throw std::invalid_argument("input cannot be null");
 	if (filter_size <= 0)
-		throw "filter size must be greater than 0";
+		throw std::invalid_argument("filter size must be greater than 0");
 	if (stride <= 0)
-		throw "stride must be greater than 0";
+		throw std::invalid_argument("stride must be greater than 0");
 
 	int output_width = (input->width - filter_size) / stride + 1;
 	int output_height = (input->height - filter_size) / stride + 1;
@@ -109,7 +109,7 @@ void pooling_layer::forward_propagation()
 					set_at(activations, x, y, d, sum / (filter_size * filter_size));
 					break;
 				default:
-					throw "Invalid pooling type";
+					throw std::runtime_error("Invalid pooling type");
 					break;
 				}
 			}

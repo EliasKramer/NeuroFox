@@ -38,11 +38,11 @@ namespace CNNTest
 			matrix* input = create_matrix(1, 4, 4);
 			try
 			{
-				fully_connected_layer fc_layer = fully_connected_layer(5, input, relu_fn);
+				fully_connected_layer fc_layer(5, input, relu_fn);
 			}
-			catch (const char* msg)
+			catch (std::invalid_argument e)
 			{
-				Assert::AreEqual("Input matrix must be a vector (width and depth must be 1)", msg);
+				Assert::AreEqual("Input matrix must be a vector (width and depth must be 1)", e.what());
 			}
 			delete input;
 
@@ -51,9 +51,9 @@ namespace CNNTest
 			{
 				fully_connected_layer fc_layer(5, input, relu_fn);
 			}
-			catch (const char* msg)
+			catch (std::invalid_argument e)
 			{
-				Assert::AreEqual("Input matrix must be a vector (width and depth must be 1)", msg);
+				Assert::AreEqual("Input matrix must be a vector (width and depth must be 1)", e.what());
 			}
 			delete input;
 		}
