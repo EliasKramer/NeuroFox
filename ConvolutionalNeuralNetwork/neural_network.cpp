@@ -54,11 +54,14 @@ static bool layer_can_be_added(
 	return true;
 }
 
-void neural_network::add_layer(std::unique_ptr<layer>&& layer)
+void neural_network::add_layer(std::unique_ptr<layer>&& given_layer)
 {
-	if (layer_can_be_added(*layer.get(), layers.back().get()))
+	const layer* last_layer = 
+		layers.empty() ? nullptr : layers.back().get();
+
+	if (layer_can_be_added(*given_layer.get(), last_layer))
 	{
-		layers.push_back(std::move(layer));
+		layers.push_back(std::move(given_layer));
 	}
 	else
 	{

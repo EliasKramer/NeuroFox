@@ -33,7 +33,7 @@ public:
 
 	const matrix& get_output() const;
 
-	void add_layer(std::unique_ptr<layer>&& layer);
+	void add_layer(std::unique_ptr<layer>&& given_layer);
 
 	void forward_propagation();
 	void back_propagation(const matrix& expected_output);
