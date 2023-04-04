@@ -5,7 +5,7 @@ struct _neural_kernel {
 	matrix weights;
 	float bias;
 	matrix output;
-} typedef neural_kernel;
+} typedef neural_kernel_t;
 
 /// <summary>
 /// sums up all the values in the input matrix multiplied by the kernel
@@ -18,7 +18,7 @@ struct _neural_kernel {
 
 float lay_kernel_over_matrix(
 	const matrix& input_matrix,
-	const neural_kernel& kernel,
+	const neural_kernel_t& kernel,
 	int start_x,
 	int start_y,
 	int kernel_size);

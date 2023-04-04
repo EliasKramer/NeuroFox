@@ -6,11 +6,11 @@
 
 class convolutional_layer : public layer {
 private:
-	std::vector<neural_kernel> kernels;
-	std::vector<neural_kernel> kernel_deltas;
+	std::vector<neural_kernel_t> kernels;
+	std::vector<neural_kernel_t> kernel_deltas;
 
 	int stride;
-	activation activation_fn;
+	e_activation_t activation_fn;
 public:
 	//constructor
 	convolutional_layer(
@@ -18,7 +18,7 @@ public:
 		int kernel_size,
 		int number_of_kernels,
 		int stride,
-		activation activation_function
+		e_activation_t activation_function
 	);
 	void forward_propagation() override;
 	void back_propagation() override;	

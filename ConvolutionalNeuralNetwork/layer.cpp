@@ -3,15 +3,15 @@
 
 layer::layer(
 	matrix* input, 
-	layer_type given_layer_type)
+	e_layer_type_t given_layer_type)
 	:input(input),
 	error_right(nullptr),
-	layer_type_(given_layer_type)
+	type(given_layer_type)
 {}
 
-const layer_type layer::get_layer_type() const
+const e_layer_type_t layer::get_layer_type() const
 {
-	return layer_type_;
+	return type;
 }
 
 const matrix* layer::get_input_p() const

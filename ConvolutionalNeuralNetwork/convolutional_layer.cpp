@@ -5,9 +5,9 @@ convolutional_layer::convolutional_layer(
 	int kernel_size, 
 	int number_of_kernels, 
 	int stride, 
-	activation activation_function
+	e_activation_t activation_function
 )
-	:layer(input, layer_type::convolution),
+	:layer(input, e_layer_type_t::convolution),
 	stride(stride),
 	kernels(),
 	kernel_deltas(),
@@ -19,7 +19,7 @@ convolutional_layer::convolutional_layer(
 
 	for (int i = 0; i < number_of_kernels; i++)
 	{
-		neural_kernel kernel;
+		neural_kernel_t kernel;
 		resize_matrix(kernel.weights, kernel_size, kernel_size, input_depth);
 		kernels.push_back(kernel);
 	}
@@ -37,7 +37,7 @@ void convolutional_layer::forward_propagation()
 
 	for (int depth = 0; depth < number_of_kernels; depth++)
 	{
-		neural_kernel& kernel = kernels[depth];
+		neural_kernel_t& kernel = kernels[depth];
 		for (int y = 0; y < output_height; y++)
 		{
 			for (int x = 0; x < output_width; x++)

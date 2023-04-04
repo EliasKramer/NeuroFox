@@ -11,13 +11,13 @@ private:
 	matrix weight_deltas;
 	matrix bias_deltas;
 
-	activation activation_fn;
+	e_activation_t activation_fn;
 public:
 	//constructor
 	fully_connected_layer(
 		int number_of_neurons,
 		matrix* given_input,
-		activation activation_function
+		e_activation_t activation_function
 	);
 
 	const matrix& get_weights() const;

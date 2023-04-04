@@ -3,7 +3,7 @@
 enum _activation {
 	sigmoid_fn,
 	relu_fn
-} typedef activation;
+} typedef e_activation_t;
 
 float sigmoid(float x);
 float relu(float x);

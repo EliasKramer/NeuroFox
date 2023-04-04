@@ -6,12 +6,12 @@ typedef enum _layer_type {
 	pooling,
 	fully_connected,
 	NO_TYPE
-} layer_type;
+} e_layer_type_t;
 
 class layer {
 
 protected:
-	layer_type layer_type_;
+	e_layer_type_t type;
 
 	matrix* input;
 	matrix activations;
@@ -19,9 +19,9 @@ protected:
 	matrix error;
 
 public:
-	layer(matrix* input, layer_type given_layer_type);
+	layer(matrix* input, e_layer_type_t given_layer_type);
 
-	const layer_type get_layer_type() const;
+	const e_layer_type_t get_layer_type() const;
 	const matrix* get_input_p() const;
 
 	void set_input(matrix* input);

@@ -68,6 +68,7 @@ void neural_network::add_layer(std::unique_ptr<layer>&& layer)
 
 void neural_network::forward_propagation()
 {
+	//std::vector<std::unique_ptr<layer>>::iterator::value_type
 	for (auto& layer : layers)
 	{
 		layer->forward_propagation();

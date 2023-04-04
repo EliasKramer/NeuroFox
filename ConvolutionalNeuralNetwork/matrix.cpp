@@ -124,7 +124,7 @@ void matrix_add(const matrix& a, const matrix& b, matrix& result)
 	}
 }
 
-void matrix_apply_activation(matrix& m, activation activation_fn)
+void matrix_apply_activation(matrix& m, e_activation_t activation_fn)
 {
 	for (int i = 0; i < m.data.size(); i++)
 	{

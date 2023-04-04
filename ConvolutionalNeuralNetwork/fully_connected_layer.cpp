@@ -3,9 +3,9 @@
 fully_connected_layer::fully_connected_layer(
 	int number_of_neurons,
 	matrix* given_input,
-	activation activation_function
+	e_activation_t activation_function
 )
-	:layer(given_input, layer_type::fully_connected)
+	:layer(given_input, e_layer_type_t::fully_connected)
 {
 	if (given_input->width != 1 || given_input->depth != 1)
 	{

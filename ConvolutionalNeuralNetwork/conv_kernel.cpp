@@ -2,7 +2,7 @@
 
 float lay_kernel_over_matrix(
 	const matrix& input_matrix,
-	const neural_kernel& kernel,
+	const neural_kernel_t& kernel,
 	int start_x,
 	int start_y,
 	int kernel_size)

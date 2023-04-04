@@ -14,13 +14,13 @@ namespace CNNTest
 		TEST_METHOD(layer_gets_right_type_in_constructor)
 		{
 			matrix* input = create_matrix(1, 1, 1);
-			fully_connected_layer fc(1, input, activation::relu_fn);
-			convolutional_layer c(input, 2, 2, 2, activation::sigmoid_fn);
+			fully_connected_layer fc(1, input, e_activation_t::relu_fn);
+			convolutional_layer c(input, 2, 2, 2, e_activation_t::sigmoid_fn);
 			pooling_layer p(input, 2, 2, pooling_type::max_pooling);
 
-			Assert::AreEqual((int)fc.get_layer_type(), (int)layer_type::fully_connected);
-			Assert::AreEqual((int)c.get_layer_type(), (int)layer_type::convolution);
-			Assert::AreEqual((int)p.get_layer_type(), (int)layer_type::pooling);
+			Assert::AreEqual((int)fc.get_layer_type(), (int)e_layer_type_t::fully_connected);
+			Assert::AreEqual((int)c.get_layer_type(), (int)e_layer_type_t::convolution);
+			Assert::AreEqual((int)p.get_layer_type(), (int)e_layer_type_t::pooling);
 		}
 	};
 }
