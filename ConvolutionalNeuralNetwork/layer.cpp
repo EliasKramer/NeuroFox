@@ -1,10 +1,12 @@
 #include "layer.hpp"
 #include "layer.hpp"
 
-layer::layer(matrix* input)
+layer::layer(
+	matrix* input, 
+	layer_type given_layer_type)
 	:input(input),
 	error_right(nullptr),
-	layer_type_(_layer_type::NO_TYPE)
+	layer_type_(given_layer_type)
 {}
 
 const layer_type layer::get_layer_type() const

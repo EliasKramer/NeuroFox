@@ -19,7 +19,7 @@ protected:
 	matrix error;
 
 public:
-	layer(matrix* input);
+	layer(matrix* input, layer_type given_layer_type);
 
 	const layer_type get_layer_type() const;
 	const matrix* get_input_p() const;

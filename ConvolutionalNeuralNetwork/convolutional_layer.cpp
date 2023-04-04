@@ -7,7 +7,7 @@ convolutional_layer::convolutional_layer(
 	int stride, 
 	activation activation_function
 )
-	:layer(input),
+	:layer(input, layer_type::convolution),
 	stride(stride),
 	kernels(),
 	kernel_deltas(),

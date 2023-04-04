@@ -5,7 +5,7 @@ fully_connected_layer::fully_connected_layer(
 	matrix* given_input,
 	activation activation_function
 )
-	:layer(given_input)
+	:layer(given_input, layer_type::fully_connected)
 {
 	if (given_input->width != 1 || given_input->depth != 1)
 	{

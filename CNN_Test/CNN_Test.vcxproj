@@ -167,6 +167,7 @@
     <ClCompile Include="CNN_Test.cpp" />
     <ClCompile Include="convolutional_layer_test.cpp" />
     <ClCompile Include="fc_layer_test.cpp" />
+    <ClCompile Include="layer_test.cpp" />
     <ClCompile Include="math_test.cpp" />
     <ClCompile Include="matrix_test.cpp" />
     <ClCompile Include="pooling_layer_test.cpp" />

@@ -6,7 +6,7 @@ pooling_layer::pooling_layer(
 	int stride, 
 	pooling_type pooling_fn
 )
-	:layer(input),
+	:layer(input, layer_type::pooling),
 	filter_size(filter_size),
 	stride(stride),
 	pooling_fn(pooling_fn)
