@@ -1,4 +1,5 @@
 #include "matrix.hpp"
+#include <numeric>
 
 static int get_idx(const matrix& m, int x, int y, int z)
 {
@@ -11,6 +12,14 @@ matrix* create_matrix(int width, int height, int depth)
 	resize_matrix(*m, width, height, depth);
 
 	return m;
+}
+
+size_t matrix_hash(const matrix& m)
+{
+	return std::accumulate(m.data.begin(), m.data.end(), 0,
+		[](size_t h, float f) {
+			return h + std::hash<float>()(f);
+		});
 }
 
 void resize_matrix(matrix& m, int width, int height, int depth)
@@ -39,25 +48,15 @@ void set_all(matrix& m, float value)
 	}
 }
 
-std::string get_matrix_string(matrix& m)
+std::vector<float>& matrix_flat(matrix& m)
 {
-	std::string ret_val = "";
-
-	for (int z = 0; z < m.depth; z++)
-	{
-		for (int y = 0; y < m.height; y++)
-		{
-			for (int x = 0; x < m.width; x++)
-			{
-				ret_val += std::to_string(matrix_get_at(m, x, y, z)) + " ";
-			}
-			ret_val += "\n";
-		}
-		ret_val += "\n";
-	}
-
-	return ret_val;
+	return m.data;
 }
+const std::vector<float>& matrix_flat_readonly(const matrix& m)
+{
+	return m.data;
+}
+
 
 void set_at(matrix& m, int x, int y, int z, float value)
 {
@@ -148,4 +147,24 @@ bool are_equal(const matrix& a, const matrix& b)
 	}
 
 	return true;
+}
+
+std::string get_matrix_string(matrix& m)
+{
+	std::string ret_val = "";
+
+	for (int z = 0; z < m.depth; z++)
+	{
+		for (int y = 0; y < m.height; y++)
+		{
+			for (int x = 0; x < m.width; x++)
+			{
+				ret_val += std::to_string(matrix_get_at(m, x, y, z)) + " ";
+			}
+			ret_val += "\n";
+		}
+		ret_val += "\n";
+	}
+
+	return ret_val;
 }

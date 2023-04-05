@@ -4,7 +4,7 @@ pooling_layer::pooling_layer(
 	matrix* input, 
 	int filter_size, 
 	int stride, 
-	pooling_type pooling_fn
+	e_pooling_type_t pooling_fn
 )
 	:layer(input, e_layer_type_t::pooling),
 	filter_size(filter_size),
@@ -39,7 +39,7 @@ int pooling_layer::get_stride() const
 	return stride;
 }
 
-pooling_type pooling_layer::get_pooling_fn() const
+e_pooling_type_t pooling_layer::get_pooling_fn() const
 {
 	return pooling_fn;
 }

@@ -69,6 +69,15 @@
     <ClCompile Include="layer_test.cpp">
       <Filter>Source Files\test</Filter>
     </ClCompile>
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\digit_interpreter.cpp">
+      <Filter>Source Files\nn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\interpreter.cpp">
+      <Filter>Source Files\nn</Filter>
+    </ClCompile>
+    <ClCompile Include="digit_interpreter_test.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ConvolutionalNeuralNetwork\neural_network.hpp">
@@ -94,6 +103,12 @@
     </ClInclude>
     <ClInclude Include="..\ConvolutionalNeuralNetwork\layer.hpp">
       <Filter>Header Files\nn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\digit_interpreter.hpp">
+      <Filter>Source Files\nn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\interpreter.hpp">
+      <Filter>Source Files\nn</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

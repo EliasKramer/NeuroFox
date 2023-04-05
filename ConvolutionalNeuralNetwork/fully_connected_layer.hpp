@@ -15,8 +15,8 @@ private:
 public:
 	//constructor
 	fully_connected_layer(
-		int number_of_neurons,
 		matrix* given_input,
+		int number_of_neurons,
 		e_activation_t activation_function
 	);
 

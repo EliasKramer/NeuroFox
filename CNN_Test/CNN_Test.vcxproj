@@ -158,7 +158,9 @@
   <ItemGroup>
     <ClCompile Include="..\ConvolutionalNeuralNetwork\convolutional_layer.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\conv_kernel.cpp" />
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\digit_interpreter.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\fully_connected_layer.cpp" />
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\interpreter.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\layer.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\math_functions.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\matrix.cpp" />
@@ -166,6 +168,7 @@
     <ClCompile Include="..\ConvolutionalNeuralNetwork\pooling_layer.cpp" />
     <ClCompile Include="CNN_Test.cpp" />
     <ClCompile Include="convolutional_layer_test.cpp" />
+    <ClCompile Include="digit_interpreter_test.cpp" />
     <ClCompile Include="fc_layer_test.cpp" />
     <ClCompile Include="layer_test.cpp" />
     <ClCompile Include="math_test.cpp" />
@@ -180,7 +183,9 @@
   <ItemGroup>
     <ClInclude Include="..\ConvolutionalNeuralNetwork\convolutional_layer.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\conv_kernel.hpp" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\digit_interpreter.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\fully_connected_layer.hpp" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\interpreter.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\layer.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\math_functions.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\matrix.hpp" />

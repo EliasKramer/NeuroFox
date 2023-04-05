@@ -140,5 +140,44 @@ namespace CNNTest
 			delete m1;
 			delete m2;
 		}
+		TEST_METHOD(hash_test)
+		{
+			// Test 1: Two identical matrices
+			matrix* m1 = create_matrix(2, 4, 2);
+			matrix* m2 = create_matrix(2, 4, 2);
+			set_all(*m1, 3);
+			set_all(*m2, 3);
+			Assert::AreEqual(matrix_hash(*m1), matrix_hash(*m2));
+			delete m1;
+			delete m2;
+
+			// Test 2: Two matrices with one different value
+			m1 = create_matrix(2, 4, 2);
+			m2 = create_matrix(2, 4, 2);
+			set_all(*m1, 3);
+			set_all(*m2, 3);
+			set_at(*m2, 0, 0, 0, 4);
+			Assert::AreNotEqual(matrix_hash(*m1), matrix_hash(*m2));
+			delete m1;
+			delete m2;
+
+			// Test 3: Two matrices with different sizes
+			m1 = create_matrix(2, 4, 2);
+			m2 = create_matrix(2, 3, 2);
+			set_all(*m1, 0);
+			set_all(*m2, 0);
+			Assert::AreNotEqual(matrix_hash(*m1), matrix_hash(*m2));
+			delete m1;
+			delete m2;
+
+			// Test 4: Two matrices with all different values
+			m1 = create_matrix(3, 3, 2);
+			m2 = create_matrix(3, 3, 2);
+			set_all(*m1, 1);
+			set_all(*m2, 0);
+			Assert::AreNotEqual(matrix_hash(*m1), matrix_hash(*m2));
+			delete m1;
+			delete m2;
+		}
 	};
 }

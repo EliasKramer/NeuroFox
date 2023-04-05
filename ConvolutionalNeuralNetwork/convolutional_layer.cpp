@@ -30,7 +30,7 @@ convolutional_layer::convolutional_layer(
 void convolutional_layer::forward_propagation()
 {
 	const int kernel_size = kernels[0].weights.width;
-	const int number_of_kernels = kernels.size();
+	const size_t number_of_kernels = kernels.size();
 	const int output_width = activations.width;
 	const int output_height = activations.height;
 	const int input_depth = input->depth;

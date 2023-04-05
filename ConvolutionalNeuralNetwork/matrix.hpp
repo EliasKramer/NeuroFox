@@ -13,6 +13,8 @@ struct _matrix {
 
 matrix* create_matrix(int width, int height, int depth);
 
+size_t matrix_hash(const matrix& m);
+
 void resize_matrix(matrix& m, int width, int height, int depth);
 void resize_matrix(matrix& resizing_matrix, const matrix& source);
 
@@ -20,7 +22,8 @@ bool matrix_equal_format(const matrix& a, const matrix& b);
 
 void set_all(matrix& m, float value);
 
-std::string get_matrix_string(const matrix& m);
+std::vector<float>& matrix_flat(matrix& m);
+const std::vector<float>& matrix_flat_readonly(const matrix& m);
 
 //setter
 void set_at(matrix& m, int x, int y, int z, float value);
@@ -37,3 +40,5 @@ void matrix_add(const matrix& a, const matrix& b, matrix& result);
 void matrix_apply_activation(matrix& m, e_activation_t activation_fn);
 
 bool are_equal(const matrix& a, const matrix& b);
+
+std::string get_matrix_string(const matrix& m);

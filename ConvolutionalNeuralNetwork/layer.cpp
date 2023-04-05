@@ -49,3 +49,8 @@ const matrix& layer::get_activations() const
 {
 	return activations;
 }
+
+matrix* layer::get_activations_p()
+{
+	return &activations;
+}

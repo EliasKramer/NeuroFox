@@ -16,6 +16,18 @@
     <Filter Include="source\layer">
       <UniqueIdentifier>{9aba3599-d721-45cc-8853-a31eb9c906f2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="header\interpreter">
+      <UniqueIdentifier>{4493d712-00a9-4ea2-b6c3-a30ee1625692}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\interpreter">
+      <UniqueIdentifier>{a8678af0-4071-4bc7-bca1-39971005b21b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="header\interpreter\implementations">
+      <UniqueIdentifier>{73df8bb2-4295-41ba-a441-eef1e14f0e35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\interpreter\implementations">
+      <UniqueIdentifier>{a5912895-bee8-405d-b7d0-99774f63d28d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="neural_network.cpp">
@@ -45,7 +57,15 @@
     <ClCompile Include="conv_kernel.cpp">
       <Filter>source\layer</Filter>
     </ClCompile>
-    <ClCompile Include="layer.cpp" />
+    <ClCompile Include="layer.cpp">
+      <Filter>source\layer</Filter>
+    </ClCompile>
+    <ClCompile Include="interpreter.cpp">
+      <Filter>source\interpreter</Filter>
+    </ClCompile>
+    <ClCompile Include="digit_interpreter.cpp">
+      <Filter>source\interpreter\implementations</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="neural_network.hpp">
@@ -68,6 +88,12 @@
     </ClInclude>
     <ClInclude Include="layer.hpp">
       <Filter>header\layer</Filter>
+    </ClInclude>
+    <ClInclude Include="interpreter.hpp">
+      <Filter>header\interpreter</Filter>
+    </ClInclude>
+    <ClInclude Include="digit_interpreter.hpp">
+      <Filter>header\interpreter\implementations</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

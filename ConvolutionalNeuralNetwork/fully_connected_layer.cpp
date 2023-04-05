@@ -1,12 +1,13 @@
 #include "fully_connected_layer.hpp"
 
 fully_connected_layer::fully_connected_layer(
-	int number_of_neurons,
 	matrix* given_input,
+	int number_of_neurons,
 	e_activation_t activation_function
 )
 	:layer(given_input, e_layer_type_t::fully_connected)
 {
+	//REMOVE SOON - not necessary when flatting the input
 	if (given_input->width != 1 || given_input->depth != 1)
 	{
 		throw std::invalid_argument("Input matrix must be a vector (width and depth must be 1)");

@@ -28,6 +28,7 @@ public:
 	void set_error_right(matrix* error_right);
 
 	const matrix& get_activations() const;
+	matrix* get_activations_p();
 
 	virtual void forward_propagation() = 0;
 	virtual void back_propagation() = 0;
