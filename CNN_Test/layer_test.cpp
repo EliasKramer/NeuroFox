@@ -14,7 +14,7 @@ namespace CNNTest
 		TEST_METHOD(layer_gets_right_type_in_constructor)
 		{
 			matrix* input = create_matrix(1, 1, 1);
-			fully_connected_layer fc(input, 1, e_activation_t::relu_fn);
+			fully_connected_layer fc(input, *input, 1, e_activation_t::relu_fn);
 			convolutional_layer c(input, 2, 2, 2, e_activation_t::sigmoid_fn);
 			pooling_layer p(input, 2, 2, e_pooling_type_t::max_pooling);
 

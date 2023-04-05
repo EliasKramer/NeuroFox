@@ -12,6 +12,7 @@ struct _matrix {
 } typedef matrix;
 
 matrix* create_matrix(int width, int height, int depth);
+matrix get_matrix(int width, int height, int depth);
 
 size_t matrix_hash(const matrix& m);
 
@@ -33,10 +34,14 @@ void set_at(matrix& m, int x, int y, int value);
 //getter
 float matrix_get_at(const matrix& m, int x, int y, int z);
 //getting value where z = 0
-float matrix_get_at(const matrix& m, int x, int z);
+float matrix_get_at(const matrix& m, int x, int y);
 
 void matrix_dot(const matrix& a, const matrix& b, matrix& result);
+void matrix_dot_flat(const matrix& a, const matrix& flat, matrix& result_flat);
+
 void matrix_add(const matrix& a, const matrix& b, matrix& result);
+void matrix_add_flat(const matrix& a, const matrix& b, matrix& result);
+
 void matrix_apply_activation(matrix& m, e_activation_t activation_fn);
 
 bool are_equal(const matrix& a, const matrix& b);

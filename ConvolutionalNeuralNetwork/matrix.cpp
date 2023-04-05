@@ -14,6 +14,13 @@ matrix* create_matrix(int width, int height, int depth)
 	return m;
 }
 
+matrix get_matrix(int width, int height, int depth)
+{
+	matrix m;
+	resize_matrix(m, width, height, depth);
+	return m;
+}
+
 size_t matrix_hash(const matrix& m)
 {
 	return std::accumulate(m.data.begin(), m.data.end(), 0,
@@ -73,9 +80,9 @@ float matrix_get_at(const matrix& m, int x, int y, int z)
 	return m.data[get_idx(m, x, y, z)];
 }
 
-float matrix_get_at(const matrix& m, int x, int z)
+float matrix_get_at(const matrix& m, int x, int y)
 {
-	return matrix_get_at(m, x, 0, z);
+	return matrix_get_at(m, x, y, 0);
 }
 
 void matrix_dot(const matrix& a, const matrix& b, matrix& result)
@@ -106,6 +113,25 @@ void matrix_dot(const matrix& a, const matrix& b, matrix& result)
 	}
 }
 
+void matrix_dot_flat(const matrix& a, const matrix& flat, matrix& result_flat)
+{
+	if (a.width != flat.data.size() ||
+		a.height != result_flat.data.size() ||
+		a.depth != 1 ||
+		result_flat.depth != 1)
+	{
+		throw std::invalid_argument("dot product could not be performed. input matrices are in the wrong format");
+	}
+
+	for (int x = 0; x < a.width; x++)
+	{
+		for (int y = 0; y < a.height; y++)
+		{
+			result_flat.data[y] += matrix_get_at(a, x, y) * flat.data[x];
+		}
+	}
+}
+
 void matrix_add(const matrix& a, const matrix& b, matrix& result)
 {
 	if (a.width != b.width || a.height != b.height || a.depth != b.depth)
@@ -115,6 +141,19 @@ void matrix_add(const matrix& a, const matrix& b, matrix& result)
 	if (result.width != a.width || result.height != a.height || result.depth != a.depth)
 	{
 		throw std::invalid_argument("addition could not be performed. result matrix is not the correct size");
+	}
+
+	for (int i = 0; i < a.data.size(); i++)
+	{
+		result.data[i] = a.data[i] + b.data[i];
+	}
+}
+
+void matrix_add_flat(const matrix& a, const matrix& b, matrix& result)
+{
+	if (a.data.size() != b.data.size())
+	{
+		throw std::invalid_argument("addition could not be performed. input matrices are not the same size");
 	}
 
 	for (int i = 0; i < a.data.size(); i++)
@@ -133,20 +172,7 @@ void matrix_apply_activation(matrix& m, e_activation_t activation_fn)
 
 bool are_equal(const matrix& a, const matrix& b)
 {
-	if (a.width != b.width || a.height != b.height || a.depth != b.depth)
-	{
-		return false;
-	}
-
-	for (int i = 0; i < a.data.size(); i++)
-	{
-		if (a.data[i] != b.data[i])
-		{
-			return false;
-		}
-	}
-
-	return true;
+	return matrix_hash(a) == matrix_hash(b);
 }
 
 std::string get_matrix_string(matrix& m)

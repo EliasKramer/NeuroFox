@@ -32,6 +32,7 @@ private:
 	layer* get_last_layer();
 
 	matrix* get_last_layer_output();
+	matrix* get_last_layer_format();
 
 	void add_layer(std::unique_ptr<layer>&& given_layer);
 
@@ -48,6 +49,8 @@ public:
 	void add_fully_connected_layer(int num_neurons, e_activation_t activation_fn);
 	void add_convolutional_layer(int kernel_size, int number_of_kernels, int stride, e_activation_t activation_fn);
 	void add_pooling_layer(int kernel_size, int stride, e_pooling_type_t pooling_type);
+	
+	void add_last_fully_connected_layer(e_activation_t activation_fn);
 
 	void set_interpreter(std::unique_ptr<interpreter>&& given_interpreter);
 	const interpreter* get_interpreter() const;

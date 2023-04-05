@@ -13,7 +13,13 @@ void neural_network::set_input(matrix* input)
 		throw "Could not set Input. Input format is not set or does not match the input format.";
 	}
 
+	if (layers.empty())
+	{
+		throw "Could not set Input. No layers have been added yet.";
+	}
+
 	this->input_p = input;
+	layers.front()->set_input(input);
 }
 
 layer* neural_network::get_last_layer()
@@ -27,10 +33,26 @@ matrix* neural_network::get_last_layer_output()
 {
 	//the input for the new layer is the output of the last layer
 	//or the input of the neural network if there is no last layer
-	return
-		get_last_layer() == nullptr ?
-		input_p :
-		get_last_layer()->get_activations_p();
+	layer* last_layer = get_last_layer();
+
+	if(last_layer != nullptr)
+		return last_layer->get_activations_p();
+	return nullptr;
+}
+
+matrix* neural_network::get_last_layer_format()
+{
+	if (get_last_layer() == nullptr)
+	{
+		if (!input_format_set)
+			throw std::runtime_error("You have to set an input format before adding a layer.");
+		else
+			return &input_format;
+	}
+	else 
+	{
+		return get_last_layer()->get_activations_p();
+	}
 }
 
 neural_network::neural_network()
@@ -63,6 +85,8 @@ const matrix& neural_network::get_output() const
 
 void neural_network::add_layer(std::unique_ptr<layer>&& given_layer)
 {
+	//TODO set error right
+
 	//the input for the new layer is the output of the last layer
 	given_layer.get()->set_input(get_last_layer_output());
 	//putting the new layer into the vector of layers
@@ -71,13 +95,25 @@ void neural_network::add_layer(std::unique_ptr<layer>&& given_layer)
 
 void neural_network::add_fully_connected_layer(int num_neurons, e_activation_t activation_fn)
 {
-	layer* last_layer = get_last_layer();
 	matrix* input_for_new_layer = get_last_layer_output();
+
 
 	//TODO check if the input format is correct
 
-	std::unique_ptr<fully_connected_layer> new_layer = 
-		std::make_unique<fully_connected_layer>(input_for_new_layer, num_neurons, activation_fn);
+	std::unique_ptr<fully_connected_layer> new_layer =
+		std::make_unique<fully_connected_layer>(input_for_new_layer, *get_last_layer_format(), num_neurons, activation_fn);
+
+	add_layer(std::move(new_layer));
+}
+
+void neural_network::add_last_fully_connected_layer(e_activation_t activation_fn)
+{
+	layer* last_layer = get_last_layer();
+
+	matrix* input_for_new_layer = get_last_layer_output();
+
+	std::unique_ptr<fully_connected_layer> new_layer =
+		std::make_unique<fully_connected_layer>(input_for_new_layer, *get_last_layer_format(), output_format, activation_fn);
 
 	add_layer(std::move(new_layer));
 }
@@ -104,9 +140,9 @@ void neural_network::forward_propagation(matrix* input)
 {
 	set_input(input);
 	//std::vector<std::unique_ptr<layer>>::iterator::value_type
-	for (auto& layer : layers)
+	for (auto& l : layers)
 	{
-		layer->forward_propagation();
+		l->forward_propagation();
 	}
 }
 

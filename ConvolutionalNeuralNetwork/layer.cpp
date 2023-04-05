@@ -21,14 +21,6 @@ const matrix* layer::get_input_p() const
 
 void layer::set_input(matrix* input)
 {
-	if (!input)
-	{
-		throw "Input matrix cannot be null";
-	}
-	if (input->width != 1 || input->depth != 1)
-	{
-		throw "Input matrix must be a vector (width and depth must be 1)";
-	}
 	this->input = input;
 }
 
