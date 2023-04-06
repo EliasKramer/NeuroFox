@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="convolutional_layer.cpp" />
     <ClCompile Include="conv_kernel.cpp" />
+    <ClCompile Include="digit_data.cpp" />
     <ClCompile Include="digit_interpreter.cpp" />
     <ClCompile Include="fully_connected_layer.cpp" />
     <ClCompile Include="layer.cpp" />
@@ -23,11 +24,14 @@
     <ClCompile Include="interpreter.cpp" />
     <ClCompile Include="pooling_layer.cpp" />
     <ClCompile Include="pooling_layer.hpp" />
+    <ClCompile Include="nn_data.cpp" />
+    <ClCompile Include="digit_training_data.cpp" />
     <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="convolutional_layer.hpp" />
     <ClInclude Include="conv_kernel.hpp" />
+    <ClInclude Include="digit_data.hpp" />
     <ClInclude Include="digit_interpreter.hpp" />
     <ClInclude Include="fully_connected_layer.hpp" />
     <ClInclude Include="layer.hpp" />
@@ -35,11 +39,14 @@
     <ClInclude Include="matrix.hpp" />
     <ClInclude Include="neural_network.hpp" />
     <ClInclude Include="interpreter.hpp" />
+    <ClInclude Include="nn_data.hpp" />
+    <ClInclude Include="digit_training_data.hpp" />
     <ClInclude Include="util.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{48535A13-B99F-4D97-8066-3C121550564E}</ProjectGuid>
     <RootNamespace>ConvolutionalNeuralNetwork</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -74,6 +81,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;WIN64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

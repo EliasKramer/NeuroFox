@@ -28,6 +28,24 @@
     <Filter Include="source\interpreter\implementations">
       <UniqueIdentifier>{a5912895-bee8-405d-b7d0-99774f63d28d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="header\training">
+      <UniqueIdentifier>{92c55fbc-6f90-47d4-bb0f-5d41ffb8cb0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\training">
+      <UniqueIdentifier>{969ceefe-1c70-4fd6-88fb-41e2b0bae323}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\training\implementations">
+      <UniqueIdentifier>{2e858b0a-339e-4e7b-8a3b-63a9fa1a116d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="header\training\implementations">
+      <UniqueIdentifier>{1e7706b8-0b06-4be1-9541-858ad6e86e3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\training\implementations\digit_recognition">
+      <UniqueIdentifier>{de6a9ad8-14bc-45de-9674-289f29f71116}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="header\training\implementations\digit_recognition">
+      <UniqueIdentifier>{e91720dc-231c-4258-a36b-dcd822ef0161}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="neural_network.cpp">
@@ -69,6 +87,15 @@
     <ClCompile Include="util.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="nn_data.cpp">
+      <Filter>source\training</Filter>
+    </ClCompile>
+    <ClCompile Include="digit_data.cpp">
+      <Filter>source\training\implementations\digit_recognition</Filter>
+    </ClCompile>
+    <ClCompile Include="digit_training_data.cpp">
+      <Filter>source\training\implementations\digit_recognition</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="neural_network.hpp">
@@ -100,6 +127,15 @@
     </ClInclude>
     <ClInclude Include="util.hpp">
       <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="nn_data.hpp">
+      <Filter>header\training</Filter>
+    </ClInclude>
+    <ClInclude Include="digit_data.hpp">
+      <Filter>header\training\implementations\digit_recognition</Filter>
+    </ClInclude>
+    <ClInclude Include="digit_training_data.hpp">
+      <Filter>header\training\implementations\digit_recognition</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

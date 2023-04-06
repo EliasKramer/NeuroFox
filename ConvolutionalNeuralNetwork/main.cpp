@@ -1,10 +1,13 @@
 #include <iostream>
 #include "neural_network.hpp"
 #include "digit_interpreter.hpp"
+#include "digit_data.hpp"
 int main()
 {
 	std::cout << "Hello World!" << std::endl;
 	
+	std::vector<digit_data> training_data = digit_data::get_digit_testing_data();
+
 	matrix* input = create_matrix(28, 28, 1);
 	set_all(*input, 1);
 	matrix* output = create_matrix(1, 10, 1);

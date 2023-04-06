@@ -78,7 +78,6 @@ const std::vector<float>& matrix_flat_readonly(const matrix& m)
 	return m.data;
 }
 
-
 void set_at(matrix& m, int x, int y, int z, float value)
 {
 	m.data[get_idx(m, x, y, z)] = value;
