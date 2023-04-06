@@ -64,8 +64,7 @@ digit_image_collection_t load_mnist_data(std::string data_file_path, std::string
 	if (!std::filesystem::exists(std::filesystem::path(full_data_path)) ||
 		!std::filesystem::exists(std::filesystem::path(full_label_path)))
 	{
-		std::cerr << "A file does not exist" << std::endl;
-		exit(1);
+		throw std::runtime_error("A file does not exist");
 	}
 
 	//Open the data file and read the magic number and number of images
@@ -103,8 +102,7 @@ digit_image_collection_t load_mnist_data(std::string data_file_path, std::string
 
 	// Check that the magic numbers and number of items match
 	if (magic_number != 2051 || label_magic_number != 2049 || num_images != num_labels) {
-		std::cerr << "Error: Invalid MNIST data files" << std::endl;
-		exit(1);
+		throw std::runtime_error("Invalid MNIST data files");
 	}
 
 	//read all pixel values and labels at once, 
@@ -151,13 +149,11 @@ batch_handler_t& get_new_batch_handler(const digit_image_collection_t& collectio
 {
 	if (batch_size <= 0)
 	{
-		std::cerr << "Batch size must be greater than 0" << std::endl;
-		exit(1);
+		throw std::runtime_error("Batch size must be greater than 0");
 	}
 	if (collection.size() == 0)
 	{
-		std::cerr << "Batch handler cannot handle an empty collection" << std::endl;
-		exit(1);
+		throw std::runtime_error("Collection must not be empty");
 	}
 
 	batch_handler_t* handler = new batch_handler_t;
