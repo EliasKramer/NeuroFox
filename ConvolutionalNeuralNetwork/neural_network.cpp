@@ -19,7 +19,6 @@ void neural_network::set_input(matrix* input)
 		throw "Could not set Input. No layers have been added yet.";
 	}
 
-	this->input_p = input;
 	layers.front()->set_input(input);
 }
 
@@ -130,6 +129,17 @@ void neural_network::add_last_fully_connected_layer(e_activation_t activation_fn
 
 void neural_network::add_convolutional_layer(int kernel_size, int number_of_kernels, int stride, e_activation_t activation_fn)
 {
+	matrix* input_for_new_layer = get_last_layer_output();
+	//TODO check if the input format is correct
+	std::unique_ptr<convolutional_layer> new_layer =
+		std::make_unique<convolutional_layer>(
+			input_for_new_layer, 
+			*get_last_layer_format(), 
+			kernel_size, 
+			number_of_kernels, 
+			stride, 
+			activation_fn);
+	add_layer(std::move(new_layer));
 }
 
 void neural_network::add_pooling_layer(int kernel_size, int stride, e_pooling_type_t pooling_type)
@@ -172,6 +182,11 @@ void neural_network::mutate(float range)
 	layers[layer_idx]->mutate(range);
 }
 
+float neural_network::test(std::vector<nn_data>& test_data)
+{
+	return 0.0f;
+}
+
 void neural_network::forward_propagation(matrix* input)
 {
 	set_input(input);
@@ -180,6 +195,10 @@ void neural_network::forward_propagation(matrix* input)
 	{
 		l->forward_propagation();
 	}
+}
+
+void neural_network::learn(std::vector<nn_data>& training_data)
+{
 }
 
 void neural_network::back_propagation(const matrix& expected_output)

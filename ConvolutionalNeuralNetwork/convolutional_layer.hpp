@@ -15,6 +15,7 @@ public:
 	//constructor
 	convolutional_layer(
 		matrix* input,
+		const matrix& input_format,
 		int kernel_size,
 		int number_of_kernels,
 		int stride,

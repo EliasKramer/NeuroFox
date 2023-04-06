@@ -2,6 +2,7 @@
 
 convolutional_layer::convolutional_layer(
 	matrix* input, 
+	const matrix& input_format,
 	int kernel_size, 
 	int number_of_kernels, 
 	int stride, 
@@ -13,9 +14,9 @@ convolutional_layer::convolutional_layer(
 	kernel_deltas(),
 	activation_fn(activation_function)
 {
-	const int input_depth = input->depth;
-	const int output_width = (input->width - kernel_size) / stride + 1;
-	const int output_height = (input->height - kernel_size) / stride + 1;
+	const int input_depth = input_format.depth;
+	const int output_width = (input_format.width - kernel_size) / stride + 1;
+	const int output_height = (input_format.height - kernel_size) / stride + 1;
 
 	for (int i = 0; i < number_of_kernels; i++)
 	{

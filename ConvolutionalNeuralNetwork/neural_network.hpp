@@ -5,9 +5,10 @@
 #include "fully_connected_layer.hpp"
 #include "convolutional_layer.hpp"
 #include "interpreter.hpp"
+#include "nn_data.hpp"
+
 class neural_network {
 private:
-	matrix* input_p = nullptr;
 	matrix* output_p = nullptr;
 
 	//the input format is the width, height and depth of the input
@@ -39,7 +40,6 @@ private:
 
 	void add_layer(std::unique_ptr<layer>&& given_layer);
 
-
 public:
 	neural_network();
 
@@ -66,6 +66,9 @@ public:
 	//add a random value between range and -range to one weight or bias 
 	void mutate(float range);
 
+	float test(std::vector<nn_data>& test_data);
 	void forward_propagation(matrix* input);
+	
+	void learn(std::vector<nn_data>& training_data);
 	void back_propagation(const matrix& expected_output);
 };

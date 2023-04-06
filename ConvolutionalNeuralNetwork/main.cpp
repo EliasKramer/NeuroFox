@@ -6,7 +6,7 @@ int main()
 {
 	std::cout << "Hello World!" << std::endl;
 	
-	std::vector<digit_data> training_data = digit_data::get_digit_testing_data();
+	std::vector<digit_data> training_data = digit_data::get_digit_testing_data("..\\data\\digit_recognition");
 
 	matrix* input = create_matrix(28, 28, 1);
 	set_all(*input, 1);

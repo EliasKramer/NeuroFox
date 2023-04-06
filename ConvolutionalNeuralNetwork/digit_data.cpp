@@ -17,11 +17,11 @@ digit_data::digit_data(const digit_image_t& data, const std::string& label)
 	set_at(this->label, 0, std::stoi(label), 0, 1);
 }
 
-std::vector<digit_data> digit_data::get_digit_training_data()
+std::vector<digit_data> digit_data::get_digit_training_data(std::string path)
 {
 	digit_image_collection_t training_data_mnist = load_mnist_data(
-		"/data/digit_recognition/train-images.idx3-ubyte",
-		"/data/digit_recognition/train-labels.idx1-ubyte");
+		path + "/train-images.idx3-ubyte",
+		path + "/train-labels.idx1-ubyte");
 
 	std::vector<digit_data> training_data;
 	for each (digit_image_t curr in training_data_mnist)
@@ -33,11 +33,11 @@ std::vector<digit_data> digit_data::get_digit_training_data()
 	return training_data;
 }
 
-std::vector<digit_data> digit_data::get_digit_testing_data()
+std::vector<digit_data> digit_data::get_digit_testing_data(std::string path)
 {
 	digit_image_collection_t testing_data_mnist = load_mnist_data(
-		"/data/digit_recognition/t10k-images.idx3-ubyte",
-		"/data/digit_recognition/t10k-labels.idx1-ubyte");
+		path + "/t10k-images.idx3-ubyte",
+		path + "/t10k-labels.idx1-ubyte");
 
 	std::vector<digit_data> testing_data;
 	for each (digit_image_t curr in testing_data_mnist)

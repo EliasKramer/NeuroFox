@@ -45,17 +45,13 @@ void print_digit_image(const digit_image_t& data)
 digit_image_collection_t load_mnist_data(std::string data_file_path, std::string label_file_path) {
 	digit_image_collection_t mnist_data;
 
-	//get the path where the program is executed
-	std::filesystem::path path = std::filesystem::current_path();
-	//go to folder where the data directory is located
-	path = path.parent_path();
+	std::filesystem::path path1 = std::filesystem::current_path();
+	path1 = path1.lexically_normal() / data_file_path;
+	std::filesystem::path path2 = std::filesystem::current_path();
+	path2 = path2.lexically_normal() / label_file_path;
 
-	//replace all backslashes with forward slashes
-	std::string base_path = path.string();
-	std::replace(base_path.begin(), base_path.end(), '\\', '/');
-
-	std::string full_data_path = base_path + data_file_path;
-	std::string full_label_path = base_path + label_file_path;
+	std::string full_data_path = path1.string();
+	std::string full_label_path = path2.string();
 
 	std::cout << "reading images from " << full_data_path << std::endl;
 	std::cout << "reading labels from " << full_label_path << std::endl;
