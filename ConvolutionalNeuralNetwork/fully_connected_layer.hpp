@@ -49,6 +49,13 @@ public:
 	matrix& get_weights_ref();
 	matrix& get_biases_ref();
 
+	//set all weights and biases to that value
+	void set_all_parameter(float value) override;
+	//a random value to the current weights and biases between -value and value
+	void apply_noise(float range) override;
+	//add a random value between range and -range to one weight or bias 
+	void mutate(float range) override;
+
 	void forward_propagation() override;
 	void back_propagation() override;
 };

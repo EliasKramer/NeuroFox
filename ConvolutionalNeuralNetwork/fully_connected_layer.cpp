@@ -61,6 +61,29 @@ matrix& fully_connected_layer::get_biases_ref()
 	return biases;
 }
 
+void fully_connected_layer::set_all_parameter(float value)
+{
+	set_all(biases, value);
+	set_all(weights, value);
+}
+
+void fully_connected_layer::apply_noise(float range)
+{
+	matrix_apply_noise(biases, range);
+}
+
+void fully_connected_layer::mutate(float range)
+{
+	if (biased_coin_toss(weights.data.size(), biases.data.size()))
+	{
+		matrix_mutate(weights, range);
+	}
+	else 
+	{
+		matrix_mutate(biases, range);
+	}
+}
+
 void fully_connected_layer::forward_propagation()
 {
 	//TODO - straighten out the input matrix

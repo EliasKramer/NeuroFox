@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#include "util.hpp"
 #include "math_functions.hpp"
 
 struct _matrix {
@@ -22,6 +23,8 @@ void resize_matrix(matrix& resizing_matrix, const matrix& source);
 bool matrix_equal_format(const matrix& a, const matrix& b);
 
 void set_all(matrix& m, float value);
+void matrix_apply_noise(matrix& m, float range);
+void matrix_mutate(matrix& m, float range);
 
 std::vector<float>& matrix_flat(matrix& m);
 const std::vector<float>& matrix_flat_readonly(const matrix& m);

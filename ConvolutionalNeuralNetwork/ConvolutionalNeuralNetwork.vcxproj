@@ -23,6 +23,7 @@
     <ClCompile Include="interpreter.cpp" />
     <ClCompile Include="pooling_layer.cpp" />
     <ClCompile Include="pooling_layer.hpp" />
+    <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="convolutional_layer.hpp" />
@@ -34,6 +35,7 @@
     <ClInclude Include="matrix.hpp" />
     <ClInclude Include="neural_network.hpp" />
     <ClInclude Include="interpreter.hpp" />
+    <ClInclude Include="util.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{48535A13-B99F-4D97-8066-3C121550564E}</ProjectGuid>

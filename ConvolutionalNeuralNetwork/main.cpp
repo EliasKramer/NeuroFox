@@ -1,5 +1,6 @@
 #include <iostream>
 #include "neural_network.hpp"
+#include "digit_interpreter.hpp"
 int main()
 {
 	std::cout << "Hello World!" << std::endl;
@@ -15,6 +16,13 @@ int main()
 	nn.set_output_format(*output);
 	nn.add_last_fully_connected_layer(sigmoid_fn);
 
+	nn.set_interpreter(
+		std::make_unique<digit_interpreter>(nn.get_output())
+	);
+
 	nn.forward_propagation(input);
+
+
+	std::cout << nn.get_interpreter()->get_string_interpretation() << std::endl;
 	return 0;
 }

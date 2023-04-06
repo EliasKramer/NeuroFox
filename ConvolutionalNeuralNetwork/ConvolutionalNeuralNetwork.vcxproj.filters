@@ -66,6 +66,9 @@
     <ClCompile Include="digit_interpreter.cpp">
       <Filter>source\interpreter\implementations</Filter>
     </ClCompile>
+    <ClCompile Include="util.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="neural_network.hpp">
@@ -94,6 +97,9 @@
     </ClInclude>
     <ClInclude Include="digit_interpreter.hpp">
       <Filter>header\interpreter\implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="util.hpp">
+      <Filter>header</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

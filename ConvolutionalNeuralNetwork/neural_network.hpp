@@ -21,6 +21,9 @@ private:
 	bool output_format_set = false;
 
 	std::vector<std::unique_ptr<layer>> layers;
+	//saves the indices of all layers tha have parameter
+	//convolutional and fully connected 
+	std::vector<int> parameter_layer_indices;
 
 	//the hash of the last input matrix that propagated forward
 	size_t last_processed_input_hash = 0;
@@ -35,6 +38,7 @@ private:
 	matrix* get_last_layer_format();
 
 	void add_layer(std::unique_ptr<layer>&& given_layer);
+
 
 public:
 	neural_network();
@@ -54,6 +58,13 @@ public:
 
 	void set_interpreter(std::unique_ptr<interpreter>&& given_interpreter);
 	const interpreter* get_interpreter() const;
+
+	//set all weights and biases to that value
+	void set_all_parameter(float value);
+	//a random value to the current weights and biases between -value and value
+	void apply_noise(float range);
+	//add a random value between range and -range to one weight or bias 
+	void mutate(float range);
 
 	void forward_propagation(matrix* input);
 	void back_propagation(const matrix& expected_output);

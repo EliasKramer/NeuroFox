@@ -55,10 +55,24 @@ void set_all(matrix& m, float value)
 	}
 }
 
+void matrix_apply_noise(matrix& m, float range)
+{
+	for (int i = 0; i < m.data.size(); i++)
+	{
+		m.data[i] += random_float_incl(-range, range);
+	}
+}
+
+void matrix_mutate(matrix& m, float range)
+{
+	m.data[random_idx(m.data.size())] += random_float_incl(-range, range);
+}
+
 std::vector<float>& matrix_flat(matrix& m)
 {
 	return m.data;
 }
+
 const std::vector<float>& matrix_flat_readonly(const matrix& m)
 {
 	return m.data;

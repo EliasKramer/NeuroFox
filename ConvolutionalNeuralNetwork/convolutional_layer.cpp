@@ -27,6 +27,44 @@ convolutional_layer::convolutional_layer(
 	resize_matrix(activations, output_width, output_height, number_of_kernels);
 }
 
+void convolutional_layer::set_all_parameter(float value)
+{
+	for (neural_kernel_t& kernel : kernels)
+	{
+		set_all(kernel.weights, value);
+		kernel.bias = value;
+	}
+}
+
+void convolutional_layer::apply_noise(float range)
+{
+	for (neural_kernel_t& kernel : kernels)
+	{
+		matrix_apply_noise(kernel.weights, range);
+		kernel.bias += random_float_incl(-range, range);
+	}
+}
+
+void convolutional_layer::mutate(float range)
+{
+	//choose a random kernel
+	int random_kernel_idx = random_idx(kernels.size());
+	//choose if a weight or a bias is mutated
+	if (biased_coin_toss(kernels[0].weights.data.size(), 1))
+	{
+		//choose a random weight to mutate
+		int random_weight_idx = random_idx(kernels[0].weights.data.size());
+		//mutate the weight
+		kernels[random_kernel_idx].weights.data[random_weight_idx] += 
+			random_float_incl(-range, range);
+	}
+	else
+	{
+		//mutate the bias
+		kernels[random_kernel_idx].bias += random_float_incl(-range, range);
+	}
+}
+
 void convolutional_layer::forward_propagation()
 {
 	const int kernel_size = kernels[0].weights.width;

@@ -1,4 +1,5 @@
 #include "neural_network.hpp"
+#include "util.hpp"
 
 void neural_network::set_input(matrix* input)
 {
@@ -85,6 +86,14 @@ const matrix& neural_network::get_output() const
 
 void neural_network::add_layer(std::unique_ptr<layer>&& given_layer)
 {
+	//add the index of the layer to the vector of parameter layers
+	//if the layer is not a pooling layer
+	//because pooling layers do not have parameters
+	if (given_layer->get_layer_type() != e_layer_type_t::pooling)
+	{
+		parameter_layer_indices.push_back(layers.size());
+	}
+
 	//TODO set error right
 
 	//the input for the new layer is the output of the last layer
@@ -114,6 +123,7 @@ void neural_network::add_last_fully_connected_layer(e_activation_t activation_fn
 
 	std::unique_ptr<fully_connected_layer> new_layer =
 		std::make_unique<fully_connected_layer>(input_for_new_layer, *get_last_layer_format(), output_format, activation_fn);
+	output_p = new_layer->get_activations_p();
 
 	add_layer(std::move(new_layer));
 }
@@ -134,6 +144,32 @@ void neural_network::set_interpreter(std::unique_ptr<interpreter>&& given_interp
 const interpreter* neural_network::get_interpreter() const
 {
 	return interpreter_p.get();
+}
+
+void neural_network::set_all_parameter(float value)
+{
+	for (auto& l : layers)
+	{
+		l->set_all_parameter(value);
+	}
+}
+
+void neural_network::apply_noise(float range)
+{
+	for (auto& l : layers)
+	{
+		l->apply_noise(range);
+	}
+}
+
+void neural_network::mutate(float range)
+{
+	if(parameter_layer_indices.empty())
+	{
+		throw std::runtime_error("Cannot mutate. No parameter layers have been added yet.");
+	}
+	int layer_idx = parameter_layer_indices[random_idx(parameter_layer_indices.size())];
+	layers[layer_idx]->mutate(range);
 }
 
 void neural_network::forward_propagation(matrix* input)

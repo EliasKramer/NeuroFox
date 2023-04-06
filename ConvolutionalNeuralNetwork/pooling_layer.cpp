@@ -44,6 +44,21 @@ e_pooling_type_t pooling_layer::get_pooling_fn() const
 	return pooling_fn;
 }
 
+void pooling_layer::set_all_parameter(float value)
+{
+	throw std::invalid_argument("pooling layer does not have any parameters");
+}
+
+void pooling_layer::apply_noise(float range)
+{
+	throw std::invalid_argument("pooling layer does not have any parameters");
+}
+
+void pooling_layer::mutate(float range)
+{
+	throw std::invalid_argument("pooling layer does not have any parameters");
+}
+
 void pooling_layer::forward_propagation()
 {
 

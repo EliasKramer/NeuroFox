@@ -27,6 +27,10 @@ public:
 	int get_stride() const;
 	e_pooling_type_t get_pooling_fn() const;
 
+	void set_all_parameter(float value) override;
+	void apply_noise(float range) override;
+	void mutate(float range) override;
+
 	void forward_propagation() override;
 	void back_propagation() override;
 };
