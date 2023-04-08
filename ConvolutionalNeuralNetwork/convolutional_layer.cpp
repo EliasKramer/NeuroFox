@@ -98,3 +98,8 @@ void convolutional_layer::back_propagation()
 {
 	//TODO
 }
+
+void convolutional_layer::apply_deltas(int number_of_inputs)
+{
+	//TODO
+}

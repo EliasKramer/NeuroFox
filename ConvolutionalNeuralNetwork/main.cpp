@@ -24,8 +24,12 @@ int main()
 	);
 
 	nn.forward_propagation(input);
-
-
 	std::cout << nn.get_interpreter()->get_string_interpretation() << std::endl;
+	
+	nn.back_propagation(&training_data[0]);
+
+	nn.forward_propagation(input);
+	std::cout << nn.get_interpreter()->get_string_interpretation() << std::endl;
+	
 	return 0;
 }

@@ -136,3 +136,8 @@ void pooling_layer::back_propagation()
 {
 	//TODO
 }
+
+void pooling_layer::apply_deltas(int number_of_inputs)
+{
+	throw std::invalid_argument("pooling layer does not have any parameters");
+}

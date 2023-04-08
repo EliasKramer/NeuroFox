@@ -12,23 +12,33 @@ class layer {
 
 protected:
 	e_layer_type_t type;
-
-	matrix* input;
+	
+	//the current matrix of neurons
 	matrix activations;
-	matrix* error_right;
+
+	//the format, that the previous layer has
+	matrix input_format;
+	//the pointer to the neurons of the previous layer
+	matrix* input = nullptr;
+
+	//the error has the same format as our neurons
 	matrix error;
+	//the passing error has the same format 
+	//as the neurons of the previous layer
+	matrix* passing_error = nullptr;
 
 public:
-	layer(matrix* input, e_layer_type_t given_layer_type);
+	layer(e_layer_type_t given_layer_type);
 
 	const e_layer_type_t get_layer_type() const;
 	const matrix* get_input_p() const;
 
 	void set_input(matrix* input);
-	void set_error_right(matrix* error_right);
+	void set_input_format(const matrix& input_format);
+	
+	void set_previous_layer(layer& previous_layer);
 
 	const matrix& get_activations() const;
-	matrix* get_activations_p();
 
 	//set all weights and biases to that value
 	virtual void set_all_parameter(float value) = 0;
@@ -39,4 +49,9 @@ public:
 
 	virtual void forward_propagation() = 0;
 	virtual void back_propagation() = 0;
+
+	//the deltas got calculated in the backprop function
+	//all the deltas got summed up. now we need to apply the
+	//average. this is done by dividing the deltas by the number of inputs
+	virtual void apply_deltas(int number_of_inputs) = 0;
 };

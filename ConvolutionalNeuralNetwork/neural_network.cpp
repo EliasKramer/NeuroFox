@@ -35,7 +35,7 @@ matrix* neural_network::get_last_layer_output()
 	//or the input of the neural network if there is no last layer
 	layer* last_layer = get_last_layer();
 
-	if(last_layer != nullptr)
+	if (last_layer != nullptr)
 		return last_layer->get_activations_p();
 	return nullptr;
 }
@@ -49,7 +49,7 @@ matrix* neural_network::get_last_layer_format()
 		else
 			return &input_format;
 	}
-	else 
+	else
 	{
 		return get_last_layer()->get_activations_p();
 	}
@@ -76,6 +76,7 @@ void neural_network::set_output_format(const matrix& given_output_format)
 		throw std::runtime_error("Cannot set output format twice.");
 
 	resize_matrix(this->output_format, given_output_format);
+	resize_matrix(this->cost_derivative, given_output_format);
 }
 
 const matrix& neural_network::get_output() const
@@ -93,12 +94,38 @@ void neural_network::add_layer(std::unique_ptr<layer>&& given_layer)
 		parameter_layer_indices.push_back(layers.size());
 	}
 
-	//TODO set error right
-
-	//the input for the new layer is the output of the last layer
-	given_layer.get()->set_input(get_last_layer_output());
+	if (layers.empty())
+	{
+		//if there are no layers yet, the input format of the first layer
+		//is the input format of the neural network
+		given_layer.get()->set_input_format(input_format);
+	}
+	else
+	{
+		//if there are already layers,
+		//set the previous layer of the new layer to the last layer
+		given_layer.get()->set_previous_layer(*get_last_layer());
+	}
 	//putting the new layer into the vector of layers
 	layers.push_back(std::move(given_layer));
+}
+
+void neural_network::calculate_cost_derivative(matrix* expected_output)
+{
+	if (expected_output == nullptr)
+	{
+		throw "Expected output is nullptr.";
+	}
+	if (output_format_set == false ||
+		matrix_equal_format(output_format, *expected_output) == false)
+	{
+		throw "Could not calculate cost derivative. Output format is not set or does not match the expected output format.";
+	}
+
+	//calculate the cost derivative
+	//cost_derivative = 2 * (output - expected_output)
+	matrix_subtract(*output_p, *expected_output, cost_derivative);
+	matrix_multiply(cost_derivative, 2);
 }
 
 void neural_network::add_fully_connected_layer(int num_neurons, e_activation_t activation_fn)
@@ -124,6 +151,9 @@ void neural_network::add_last_fully_connected_layer(e_activation_t activation_fn
 		std::make_unique<fully_connected_layer>(input_for_new_layer, *get_last_layer_format(), output_format, activation_fn);
 	output_p = new_layer->get_activations_p();
 
+
+	new_layer->set_error_right(&cost_derivative);
+
 	add_layer(std::move(new_layer));
 }
 
@@ -133,11 +163,11 @@ void neural_network::add_convolutional_layer(int kernel_size, int number_of_kern
 	//TODO check if the input format is correct
 	std::unique_ptr<convolutional_layer> new_layer =
 		std::make_unique<convolutional_layer>(
-			input_for_new_layer, 
-			*get_last_layer_format(), 
-			kernel_size, 
-			number_of_kernels, 
-			stride, 
+			input_for_new_layer,
+			*get_last_layer_format(),
+			kernel_size,
+			number_of_kernels,
+			stride,
 			activation_fn);
 	add_layer(std::move(new_layer));
 }
@@ -174,7 +204,7 @@ void neural_network::apply_noise(float range)
 
 void neural_network::mutate(float range)
 {
-	if(parameter_layer_indices.empty())
+	if (parameter_layer_indices.empty())
 	{
 		throw std::runtime_error("Cannot mutate. No parameter layers have been added yet.");
 	}
@@ -201,7 +231,31 @@ void neural_network::learn(std::vector<nn_data>& training_data)
 {
 }
 
-void neural_network::back_propagation(const matrix& expected_output)
+void neural_network::back_propagation(nn_data* training_data)
 {
-	//TODO
+	//checking for correct format
+	if (!matrix_equal_format(training_data->get_label(), output_format))
+	{
+		throw std::runtime_error(
+			"The expected output does not have the correct format.");
+	}
+	
+	//feeding the data through
+	forward_propagation(training_data->get_data_p());
+
+	//calculating the cost derivative
+	calculate_cost_derivative(training_data->get_label_p());
+
+	//back propagating
+	for (auto it = layers.rbegin(); it != layers.rend(); ++it)
+	{
+		(*it)->back_propagation();
+	}
+
+	//iterate over all parameter layers
+	for (auto& l : parameter_layer_indices)
+	{
+		//update the parameters
+		layers[l]->apply_deltas(1);
+	}
 }

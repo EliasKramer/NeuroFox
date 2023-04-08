@@ -31,4 +31,6 @@ public:
 
 	void forward_propagation() override;
 	void back_propagation() override;	
+
+	void apply_deltas(int number_of_inputs) override;
 };

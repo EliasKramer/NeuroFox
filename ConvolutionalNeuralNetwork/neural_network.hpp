@@ -10,6 +10,7 @@
 class neural_network {
 private:
 	matrix* output_p = nullptr;
+	matrix cost_derivative;
 
 	//the input format is the width, height and depth of the input
 	matrix input_format;
@@ -40,6 +41,7 @@ private:
 
 	void add_layer(std::unique_ptr<layer>&& given_layer);
 
+	void calculate_cost_derivative(matrix* expected_output);
 public:
 	neural_network();
 
@@ -70,5 +72,5 @@ public:
 	void forward_propagation(matrix* input);
 	
 	void learn(std::vector<nn_data>& training_data);
-	void back_propagation(const matrix& expected_output);
+	void back_propagation(nn_data* expected_output);
 };

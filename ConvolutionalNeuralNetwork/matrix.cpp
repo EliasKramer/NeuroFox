@@ -175,6 +175,29 @@ void matrix_add_flat(const matrix& a, const matrix& b, matrix& result)
 	}
 }
 
+void matrix_subtract(const matrix& a, const matrix& b, matrix& result)
+{
+	if (!matrix_equal_format(a, b) ||
+		!matrix_equal_format(b, result) ||
+		!matrix_equal_format(result, a))
+	{
+		throw std::invalid_argument("subtraction could not be performed. input matrices are in the wrong format");
+	}
+
+	for (int i = 0; i < a.data.size(); i++)
+	{
+		result.data[i] = a.data[i] - b.data[i];
+	}
+}
+
+void matrix_multiply(matrix& a, float b)
+{
+	for (int i = 0; i < a.data.size(); i++)
+	{
+		a.data[i] *= b;
+	}
+}
+
 void matrix_apply_activation(matrix& m, e_activation_t activation_fn)
 {
 	for (int i = 0; i < m.data.size(); i++)
