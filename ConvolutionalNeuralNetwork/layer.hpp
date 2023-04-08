@@ -40,6 +40,8 @@ public:
 
 	const matrix& get_activations() const;
 
+	void set_error_for_last_layer(const matrix& expected);
+
 	//set all weights and biases to that value
 	virtual void set_all_parameter(float value) = 0;
 	//a random value to the current weights and biases between -value and value

@@ -147,12 +147,10 @@ void neural_network::add_last_fully_connected_layer(e_activation_t activation_fn
 
 	matrix* input_for_new_layer = get_last_layer_output();
 
+	//CHECK IF THIS FUNCTION IS NECESSARY OR IF IT CAN BE REMOVED
+
 	std::unique_ptr<fully_connected_layer> new_layer =
 		std::make_unique<fully_connected_layer>(input_for_new_layer, *get_last_layer_format(), output_format, activation_fn);
-	output_p = new_layer->get_activations_p();
-
-
-	new_layer->set_error_right(&cost_derivative);
 
 	add_layer(std::move(new_layer));
 }
