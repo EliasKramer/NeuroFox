@@ -16,7 +16,11 @@ int main()
 	nn.add_last_fully_connected_layer(sigmoid_fn);
 	nn.set_interpreter<digit_interpreter>();
 
-	std::cout << get_matrix_string(training_data[0].get_label()) << std::endl;
+	const digit_interpreter* interpreter = nn.get_interpreter<digit_interpreter>();
+	std::cout << 
+		"\nlabel: \n" <<
+		interpreter->get_string_interpretation(training_data[0].get_label()) 
+		<< std::endl;
 	nn.apply_noise(0.1);
 
 	nn.forward_propagation(training_data[0].get_data_p());

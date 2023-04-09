@@ -1,7 +1,6 @@
 #include "digit_interpreter.hpp"
 
-digit_interpreter::digit_interpreter(const matrix& given_input)
-	: interpreter(given_input)
+void digit_interpreter::check_for_correct_input(const matrix& given_input) const
 {
 	matrix required_input_format;
 	resize_matrix(required_input_format, 1, 10, 1);
@@ -12,14 +11,27 @@ digit_interpreter::digit_interpreter(const matrix& given_input)
 	}
 }
 
+digit_interpreter::digit_interpreter(const matrix& given_input)
+	: interpreter(given_input)
+{
+	check_for_correct_input(given_input);
+}
+
 std::string digit_interpreter::get_string_interpretation() const
 {
+	return get_string_interpretation(input);
+}
+
+std::string digit_interpreter::get_string_interpretation(const matrix& given_input) const
+{
+	check_for_correct_input(given_input);
+
 	std::string output = "";
 	int curr_digit = 0;
 
 	float highest_activation = FLT_MIN;
 	int highest_digit = 0;
-	for each (const float curr_activation in matrix_flat_readonly(input))
+	for each (const float curr_activation in matrix_flat_readonly(given_input))
 	{
 		if (curr_activation > highest_activation)
 		{
