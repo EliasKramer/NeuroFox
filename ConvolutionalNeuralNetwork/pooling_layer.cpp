@@ -6,7 +6,7 @@ pooling_layer::pooling_layer(
 	int stride, 
 	e_pooling_type_t pooling_fn
 )
-	:layer(input, e_layer_type_t::pooling),
+	:layer(e_layer_type_t::pooling),
 	filter_size(filter_size),
 	stride(stride),
 	pooling_fn(pooling_fn)
@@ -27,6 +27,12 @@ pooling_layer::pooling_layer(
 		output_width,
 		output_height,
 		output_depth);
+}
+
+void pooling_layer::set_input_format(const matrix& input_format)
+{
+	layer::set_input_format(input_format);
+	//TODO
 }
 
 int pooling_layer::get_filter_size() const

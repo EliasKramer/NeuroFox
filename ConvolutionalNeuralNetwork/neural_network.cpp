@@ -29,32 +29,6 @@ layer* neural_network::get_last_layer()
 	return layers.empty() ? nullptr : layers.back().get();
 }
 
-matrix* neural_network::get_last_layer_output()
-{
-	//the input for the new layer is the output of the last layer
-	//or the input of the neural network if there is no last layer
-	layer* last_layer = get_last_layer();
-
-	if (last_layer != nullptr)
-		return last_layer->get_activations_p();
-	return nullptr;
-}
-
-matrix* neural_network::get_last_layer_format()
-{
-	if (get_last_layer() == nullptr)
-	{
-		if (!input_format_set)
-			throw std::runtime_error("You have to set an input format before adding a layer.");
-		else
-			return &input_format;
-	}
-	else
-	{
-		return get_last_layer()->get_activations_p();
-	}
-}
-
 neural_network::neural_network()
 {}
 
@@ -110,54 +84,26 @@ void neural_network::add_layer(std::unique_ptr<layer>&& given_layer)
 	layers.push_back(std::move(given_layer));
 }
 
-void neural_network::calculate_cost_derivative(matrix* expected_output)
-{
-	if (expected_output == nullptr)
-	{
-		throw "Expected output is nullptr.";
-	}
-	if (output_format_set == false ||
-		matrix_equal_format(output_format, *expected_output) == false)
-	{
-		throw "Could not calculate cost derivative. Output format is not set or does not match the expected output format.";
-	}
-
-	//calculate the cost derivative
-	//cost_derivative = 2 * (output - expected_output)
-	matrix_subtract(*output_p, *expected_output, cost_derivative);
-	matrix_multiply(cost_derivative, 2);
-}
-
 void neural_network::add_fully_connected_layer(int num_neurons, e_activation_t activation_fn)
 {
-	matrix* input_for_new_layer = get_last_layer_output();
-
-
-	//TODO check if the input format is correct
-
 	std::unique_ptr<fully_connected_layer> new_layer =
-		std::make_unique<fully_connected_layer>(input_for_new_layer, *get_last_layer_format(), num_neurons, activation_fn);
+		std::make_unique<fully_connected_layer>(num_neurons, activation_fn);
 
 	add_layer(std::move(new_layer));
 }
 
 void neural_network::add_last_fully_connected_layer(e_activation_t activation_fn)
 {
-	layer* last_layer = get_last_layer();
-
-	matrix* input_for_new_layer = get_last_layer_output();
-
-	//CHECK IF THIS FUNCTION IS NECESSARY OR IF IT CAN BE REMOVED
-
 	std::unique_ptr<fully_connected_layer> new_layer =
-		std::make_unique<fully_connected_layer>(input_for_new_layer, *get_last_layer_format(), output_format, activation_fn);
+		std::make_unique<fully_connected_layer>(output_format, activation_fn);
 
 	add_layer(std::move(new_layer));
+	output_p = get_last_layer()->get_activations_p();
 }
 
 void neural_network::add_convolutional_layer(int kernel_size, int number_of_kernels, int stride, e_activation_t activation_fn)
 {
-	matrix* input_for_new_layer = get_last_layer_output();
+	/*
 	//TODO check if the input format is correct
 	std::unique_ptr<convolutional_layer> new_layer =
 		std::make_unique<convolutional_layer>(
@@ -168,20 +114,11 @@ void neural_network::add_convolutional_layer(int kernel_size, int number_of_kern
 			stride,
 			activation_fn);
 	add_layer(std::move(new_layer));
+	*/
 }
 
 void neural_network::add_pooling_layer(int kernel_size, int stride, e_pooling_type_t pooling_type)
 {
-}
-
-void neural_network::set_interpreter(std::unique_ptr<interpreter>&& given_interpreter)
-{
-	interpreter_p = std::move(given_interpreter);
-}
-
-const interpreter* neural_network::get_interpreter() const
-{
-	return interpreter_p.get();
 }
 
 void neural_network::set_all_parameter(float value)
@@ -242,7 +179,8 @@ void neural_network::back_propagation(nn_data* training_data)
 	forward_propagation(training_data->get_data_p());
 
 	//calculating the cost derivative
-	calculate_cost_derivative(training_data->get_label_p());
+	//calculate_cost_derivative(training_data->get_label_p());
+	get_last_layer()->set_error_for_last_layer(training_data->get_label());
 
 	//back propagating
 	for (auto it = layers.rbegin(); it != layers.rend(); ++it)

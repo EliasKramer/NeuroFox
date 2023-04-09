@@ -36,12 +36,7 @@ private:
 
 	layer* get_last_layer();
 
-	matrix* get_last_layer_output();
-	matrix* get_last_layer_format();
-
 	void add_layer(std::unique_ptr<layer>&& given_layer);
-
-	void calculate_cost_derivative(matrix* expected_output);
 public:
 	neural_network();
 
@@ -55,11 +50,36 @@ public:
 	void add_fully_connected_layer(int num_neurons, e_activation_t activation_fn);
 	void add_convolutional_layer(int kernel_size, int number_of_kernels, int stride, e_activation_t activation_fn);
 	void add_pooling_layer(int kernel_size, int stride, e_pooling_type_t pooling_type);
-	
+
 	void add_last_fully_connected_layer(e_activation_t activation_fn);
 
-	void set_interpreter(std::unique_ptr<interpreter>&& given_interpreter);
-	const interpreter* get_interpreter() const;
+	template<typename interpreter_type>
+	void set_interpreter()
+	{
+		if (std::is_base_of<interpreter, interpreter_type>::value == false)
+		{
+			throw std::runtime_error(
+				"Cannot set interpreter. Interpreter type is not a child of interpreter.");
+		}
+		interpreter_p = std::make_unique<interpreter_type>(get_output());
+	}
+
+	template<typename interpreter_type>
+	const interpreter_type* get_interpreter() const
+	{
+		if (interpreter_p == nullptr)
+		{
+			throw std::runtime_error("Cannot get interpreter. Interpreter is not set yet.");
+		}
+
+		if (std::is_base_of<interpreter, interpreter_type>::value == false)
+		{
+			throw std::runtime_error(
+				"Cannot get interpreter. Interpreter type is not a child of interpreter.");
+		}
+
+		return dynamic_cast<interpreter_type*>(interpreter_p.get());
+	}
 
 	//set all weights and biases to that value
 	void set_all_parameter(float value);
@@ -70,7 +90,7 @@ public:
 
 	float test(std::vector<nn_data>& test_data);
 	void forward_propagation(matrix* input);
-	
+
 	void learn(std::vector<nn_data>& training_data);
 	void back_propagation(nn_data* expected_output);
 };

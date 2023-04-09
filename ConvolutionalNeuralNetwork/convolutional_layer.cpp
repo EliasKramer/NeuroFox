@@ -8,7 +8,7 @@ convolutional_layer::convolutional_layer(
 	int stride, 
 	e_activation_t activation_function
 )
-	:layer(input, e_layer_type_t::convolution),
+	:layer(e_layer_type_t::convolution),
 	stride(stride),
 	kernels(),
 	kernel_deltas(),
@@ -26,6 +26,12 @@ convolutional_layer::convolutional_layer(
 	}
 
 	resize_matrix(activations, output_width, output_height, number_of_kernels);
+}
+
+void convolutional_layer::set_input_format(const matrix& input_format)
+{
+	layer::set_input_format(input_format);
+	//TODO
 }
 
 void convolutional_layer::set_all_parameter(float value)

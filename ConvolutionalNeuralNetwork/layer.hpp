@@ -34,11 +34,12 @@ public:
 	const matrix* get_input_p() const;
 
 	void set_input(matrix* input);
-	void set_input_format(const matrix& input_format);
+	virtual void set_input_format(const matrix& input_format);
 	
 	void set_previous_layer(layer& previous_layer);
 
 	const matrix& get_activations() const;
+	matrix* get_activations_p();
 
 	void set_error_for_last_layer(const matrix& expected);
 

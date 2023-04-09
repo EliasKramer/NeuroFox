@@ -15,10 +15,10 @@ digit_interpreter::digit_interpreter(const matrix& given_input)
 std::string digit_interpreter::get_string_interpretation() const
 {
 	std::string output = "";
-	int curr_digit = 1;
+	int curr_digit = 0;
 
 	float highest_activation = FLT_MIN;
-	int highest_digit = 1;
+	int highest_digit = 0;
 	for each (const float curr_activation in matrix_flat_readonly(input))
 	{
 		if (curr_activation > highest_activation)

@@ -19,8 +19,8 @@ private:
 	float get_weight_delta_at(int input_layer_idx, int current_activation_idx) const;
 	void set_weight_delta_at(int input_layer_idx, int current_activation_idx, float value);
 
-	float get_error_at(int input_layer_idx) const;
-	void set_error_at(int input_layer_idx, float value);
+	float get_passing_error_at(int input_layer_idx) const;
+	void set_passing_error_at(int input_layer_idx, float value);
 
 public:
 
@@ -33,8 +33,6 @@ public:
 	/// <param name="number_of_neurons">number of neurons this layer will have</param>
 	/// <param name="activation_function">the activation function that will be used</param>
 	fully_connected_layer(
-		matrix* given_input,
-		const matrix& input_format,
 		int number_of_neurons,
 		e_activation_t activation_function
 	);
@@ -48,11 +46,11 @@ public:
 	/// <param name="activation_format">the format, that the output will have</param>
 	/// <param name="activation_function">the activation function that will be used</param>
 	fully_connected_layer(
-		matrix* given_input,
-		const matrix& input_format,
 		const matrix& activation_format,
 		e_activation_t activation_function
 	);
+
+	void set_input_format(const matrix& input_format) override;
 
 	const matrix& get_weights() const;
 	const matrix& get_biases() const;

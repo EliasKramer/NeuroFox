@@ -211,7 +211,7 @@ bool are_equal(const matrix& a, const matrix& b)
 	return matrix_hash(a) == matrix_hash(b);
 }
 
-std::string get_matrix_string(matrix& m)
+std::string get_matrix_string(const matrix& m)
 {
 	std::string ret_val = "";
 

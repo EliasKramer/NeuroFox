@@ -21,6 +21,7 @@ public:
 		int stride,
 		e_activation_t activation_function
 	);
+	void set_input_format(const matrix& input_format) override;
 
 	//set all weights and biases to that value
 	void set_all_parameter(float value) override;

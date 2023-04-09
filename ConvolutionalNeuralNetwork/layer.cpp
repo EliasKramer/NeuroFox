@@ -28,13 +28,20 @@ void layer::set_input_format(const matrix& input_format)
 void layer::set_previous_layer(layer& previous_layer)
 {
 	input = &previous_layer.activations;
-	input_format = previous_layer.activations;
+	//we are using a function here, because
+	//some implementations might want to know if the input format has changed
+	set_input_format(previous_layer.activations);
 	passing_error = &previous_layer.error;
 }
 
 const matrix& layer::get_activations() const
 {
 	return activations;
+}
+
+matrix* layer::get_activations_p()
+{
+	return &activations;
 }
 
 void layer::set_error_for_last_layer(const matrix& expected)
