@@ -18,12 +18,12 @@ const matrix& nn_data::get_label() const
 	return label;
 }
 
-matrix* nn_data::get_data_p()
+const matrix* nn_data::get_data_p() const
 {
 	return &data;
 }
 
-matrix* nn_data::get_label_p()
+const matrix* nn_data::get_label_p() const
 {
 	return &label;
 }

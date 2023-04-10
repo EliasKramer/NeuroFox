@@ -1,6 +1,6 @@
 #include "digit_training_data.hpp"
 
-int swap_endian(int value) {
+static int swap_endian(int value) {
 	int result = 0;
 	result |= (value & 0xFF) << 24;
 	result |= ((value >> 8) & 0xFF) << 16;
@@ -9,7 +9,7 @@ int swap_endian(int value) {
 	return result;
 }
 //determins wether the system is little endian or big endian
-bool is_little_endian()
+static bool is_little_endian()
 {
 	int num = 1;
 	return (*(char*)&num == 1);

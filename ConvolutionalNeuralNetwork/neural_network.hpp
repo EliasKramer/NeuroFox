@@ -32,11 +32,16 @@ private:
 
 	std::unique_ptr<interpreter> interpreter_p = 0;
 
-	void set_input(matrix* input);
+	void set_input(const matrix* input);
 
 	layer* get_last_layer();
 
 	void add_layer(std::unique_ptr<layer>&& given_layer);
+
+	//we need the training_data_count for 
+	//calculating the average of the deltas
+	void apply_deltas(int training_data_count);
+
 public:
 	neural_network();
 
@@ -45,7 +50,7 @@ public:
 	//sets the output matrix to a certain format
 	void set_output_format(const matrix& given_output_format);
 
-	const matrix& get_output() const;
+	const matrix* get_output() const;
 
 	void add_fully_connected_layer(int num_neurons, e_activation_t activation_fn);
 	void add_convolutional_layer(int kernel_size, int number_of_kernels, int stride, e_activation_t activation_fn);
@@ -89,8 +94,8 @@ public:
 	void mutate(float range);
 
 	float test(std::vector<nn_data>& test_data);
-	void forward_propagation(matrix* input);
+	void forward_propagation(const matrix* input);
 
-	void learn(std::vector<nn_data>& training_data);
-	void back_propagation(nn_data* expected_output);
+	void learn(const std::vector<std::unique_ptr<nn_data>>& training_data);
+	void learn_once(const std::unique_ptr<nn_data>& expected_output, bool apply_changes = true);
 };

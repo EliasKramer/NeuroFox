@@ -1,7 +1,7 @@
 #include "neural_network.hpp"
 #include "util.hpp"
 
-void neural_network::set_input(matrix* input)
+void neural_network::set_input(const matrix* input)
 {
 	if (input == nullptr)
 	{
@@ -53,9 +53,9 @@ void neural_network::set_output_format(const matrix& given_output_format)
 	resize_matrix(this->cost_derivative, given_output_format);
 }
 
-const matrix& neural_network::get_output() const
+const matrix* neural_network::get_output() const
 {
-	return *output_p;
+	return output_p;
 }
 
 void neural_network::add_layer(std::unique_ptr<layer>&& given_layer)
@@ -82,6 +82,16 @@ void neural_network::add_layer(std::unique_ptr<layer>&& given_layer)
 	}
 	//putting the new layer into the vector of layers
 	layers.push_back(std::move(given_layer));
+}
+
+void neural_network::apply_deltas(int training_data_count)
+{
+	//iterate over all parameter layers
+	for (auto& l : parameter_layer_indices)
+	{
+		//update the parameters
+		layers[l]->apply_deltas(1);
+	}
 }
 
 void neural_network::add_fully_connected_layer(int num_neurons, e_activation_t activation_fn)
@@ -123,17 +133,19 @@ void neural_network::add_pooling_layer(int kernel_size, int stride, e_pooling_ty
 
 void neural_network::set_all_parameter(float value)
 {
-	for (auto& l : layers)
+	//for parameter layers
+	for (auto& l : parameter_layer_indices)
 	{
-		l->set_all_parameter(value);
+		layers[l]->set_all_parameter(value);
 	}
 }
 
 void neural_network::apply_noise(float range)
 {
-	for (auto& l : layers)
+	//for parameter layers
+	for (auto& l : parameter_layer_indices)
 	{
-		l->apply_noise(range);
+		layers[l]->apply_noise(range);
 	}
 }
 
@@ -152,7 +164,7 @@ float neural_network::test(std::vector<nn_data>& test_data)
 	return 0.0f;
 }
 
-void neural_network::forward_propagation(matrix* input)
+void neural_network::forward_propagation(const matrix* input)
 {
 	set_input(input);
 	//std::vector<std::unique_ptr<layer>>::iterator::value_type
@@ -162,25 +174,37 @@ void neural_network::forward_propagation(matrix* input)
 	}
 }
 
-void neural_network::learn(std::vector<nn_data>& training_data)
+void neural_network::learn(const std::vector<std::unique_ptr<nn_data>>& training_data)
 {
+	int allowed_cycels = 100;
+	int cycles = 0;
+	for each (const auto& curr_data in training_data)
+	{
+		cycles++;
+		learn_once(curr_data, false);
+		if (cycles >= allowed_cycels)
+			break;
+	}
+	apply_deltas(allowed_cycels);
+	//apply_deltas(training_data.size());
 }
 
-void neural_network::back_propagation(nn_data* training_data)
+void neural_network::learn_once(const std::unique_ptr<nn_data>& training_data, bool apply_changes)
 {
 	//checking for correct format
-	if (!matrix_equal_format(training_data->get_label(), output_format))
+	if (!matrix_equal_format(training_data.get()->get_label(), output_format))
 	{
 		throw std::runtime_error(
 			"The expected output does not have the correct format.");
 	}
 	
 	//feeding the data through
-	forward_propagation(training_data->get_data_p());
+	forward_propagation(training_data.get()->get_data_p());
 
 	//calculating the cost derivative
 	//calculate_cost_derivative(training_data->get_label_p());
-	get_last_layer()->set_error_for_last_layer(training_data->get_label());
+	get_last_layer()->set_error_for_last_layer(
+		training_data.get()->get_label());
 
 	//back propagating
 	for (auto it = layers.rbegin(); it != layers.rend(); ++it)
@@ -188,10 +212,10 @@ void neural_network::back_propagation(nn_data* training_data)
 		(*it)->back_propagation();
 	}
 
-	//iterate over all parameter layers
-	for (auto& l : parameter_layer_indices)
+	//if we only train on one training data piece
+	//we can apply the changes right away
+	if (apply_changes)
 	{
-		//update the parameters
-		layers[l]->apply_deltas(1);
+		apply_deltas(1);
 	}
 }

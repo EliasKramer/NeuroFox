@@ -19,7 +19,7 @@ protected:
 	//the format, that the previous layer has
 	matrix input_format;
 	//the pointer to the neurons of the previous layer
-	matrix* input = nullptr;
+	const matrix* input = nullptr;
 
 	//the error has the same format as our neurons
 	matrix error;
@@ -33,7 +33,7 @@ public:
 	const e_layer_type_t get_layer_type() const;
 	const matrix* get_input_p() const;
 
-	void set_input(matrix* input);
+	void set_input(const matrix* input);
 	virtual void set_input_format(const matrix& input_format);
 	
 	void set_previous_layer(layer& previous_layer);

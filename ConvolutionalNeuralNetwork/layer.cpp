@@ -15,7 +15,7 @@ const matrix* layer::get_input_p() const
 	return input;
 }
 
-void layer::set_input(matrix* input)
+void layer::set_input(const matrix* input)
 {
 	this->input = input;
 }

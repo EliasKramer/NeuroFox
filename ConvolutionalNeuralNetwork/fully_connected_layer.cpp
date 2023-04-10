@@ -99,6 +99,7 @@ void fully_connected_layer::set_all_parameter(float value)
 void fully_connected_layer::apply_noise(float range)
 {
 	matrix_apply_noise(biases, range);
+	matrix_apply_noise(weights, range);
 }
 
 void fully_connected_layer::mutate(float range)
@@ -130,7 +131,7 @@ void fully_connected_layer::back_propagation()
 
 	for (int current_neuron_idx = 0; current_neuron_idx < activations.data.size(); current_neuron_idx++)
 	{
-		float error_right_value = matrix_flat_readonly(error)[current_neuron_idx];
+		float error_value = matrix_flat_readonly(error)[current_neuron_idx];
 		//clear the error
 		matrix_flat(error)[current_neuron_idx] = 0;
 
@@ -140,19 +141,19 @@ void fully_connected_layer::back_propagation()
 		float activation_derivative = DERIVATIVE[activation_fn](unactivated_activation);
 
 		//bias change
-		float bias_change = error_right_value * activation_derivative;
+		float bias_change = error_value * activation_derivative;
 		matrix_flat(bias_deltas)[current_neuron_idx] += bias_change;
 
 		//iterate input layer
 		for (int current_input_idx = 0; current_input_idx < matrix_flat_readonly(*input).size(); current_input_idx++)
 		{
-			float current_previous_activation = matrix_flat(*input)[current_input_idx];
-			//TODO check if that is right
+			float current_previous_activation = matrix_flat_readonly(*input)[current_input_idx];
+
 			//this weight connects the current input node to the current neuron
 			float current_weight = get_weight_at(current_input_idx, current_neuron_idx);
 
-			float weight_change = error_right_value * activation_derivative * current_previous_activation;
-			float new_passing_error = error_right_value * activation_derivative * current_weight;
+			float weight_change = error_value * activation_derivative * current_previous_activation;
+			float new_passing_error = error_value * activation_derivative * current_weight;
 
 			float current_weight_change = get_weight_delta_at(current_input_idx, current_neuron_idx);
 			set_weight_delta_at(current_input_idx, current_neuron_idx, current_weight_change + weight_change);
