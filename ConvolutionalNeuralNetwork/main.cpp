@@ -19,8 +19,8 @@ int main()
 	neural_network nn;
 
 	nn.set_input_format(get_matrix(28, 28, 1));
-	nn.add_fully_connected_layer(16, sigmoid_fn);
-	nn.add_fully_connected_layer(16, sigmoid_fn);
+	nn.add_fully_connected_layer(25, sigmoid_fn);
+	nn.add_fully_connected_layer(25, sigmoid_fn);
 	nn.set_output_format(get_matrix(1, 10, 1));
 	nn.add_last_fully_connected_layer(sigmoid_fn);
 	nn.set_interpreter<digit_interpreter>();
