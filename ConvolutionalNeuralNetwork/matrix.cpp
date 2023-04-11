@@ -83,7 +83,7 @@ void set_at(matrix& m, int x, int y, int z, float value)
 	m.data[get_idx(m, x, y, z)] = value;
 }
 
-void set_at(matrix& m, int x, int y, int value)
+void set_at(matrix& m, int x, int y, float value)
 {
 	set_at(m, x, y, 0, value);
 }

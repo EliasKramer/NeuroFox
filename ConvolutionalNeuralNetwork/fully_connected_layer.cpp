@@ -135,7 +135,6 @@ void fully_connected_layer::back_propagation()
 		//clear the error
 		matrix_flat(error)[current_neuron_idx] = 0;
 
-		//TODO
 		float current_activation_value = matrix_flat_readonly(activations)[current_neuron_idx];
 		float unactivated_activation = INVERSE[activation_fn](current_activation_value);
 		float activation_derivative = DERIVATIVE[activation_fn](unactivated_activation);
@@ -173,16 +172,16 @@ void fully_connected_layer::apply_deltas(int number_of_inputs)
 	for (int i = 0; i < biases.data.size(); i++)
 	{
 		float current_bias = matrix_flat(biases)[i];
-		float current_bias_delta = matrix_flat(bias_deltas)[i];
-		matrix_flat(biases)[i] = current_bias - current_bias_delta / number_of_inputs;
+		float avg_bias_delta = matrix_flat(bias_deltas)[i] / number_of_inputs;
+		matrix_flat(biases)[i] = current_bias - avg_bias_delta;
 		matrix_flat(bias_deltas)[i] = 0;
 	}
 
 	for (int i = 0; i < weights.data.size(); i++)
 	{
 		float current_weight = matrix_flat(weights)[i];
-		float current_weight_delta = matrix_flat(weight_deltas)[i];
-		matrix_flat(weights)[i] = current_weight - current_weight_delta / number_of_inputs;
+		float avg_weight_delta = matrix_flat(weight_deltas)[i] / number_of_inputs;
+		matrix_flat(weights)[i] = current_weight - avg_weight_delta;
 		matrix_flat(weight_deltas)[i] = 0;
 	}
 }

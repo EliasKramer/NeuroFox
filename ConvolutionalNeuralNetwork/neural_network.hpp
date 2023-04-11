@@ -1,4 +1,5 @@
 #pragma once
+#include <chrono>
 #include "matrix.hpp"
 #include "math_functions.hpp"
 #include "pooling_layer.hpp"
@@ -6,6 +7,8 @@
 #include "convolutional_layer.hpp"
 #include "interpreter.hpp"
 #include "nn_data.hpp"
+#include "batch_handler.hpp"
+#include "test_result.hpp"
 
 class neural_network {
 private:
@@ -42,6 +45,7 @@ private:
 	//calculating the average of the deltas
 	void apply_deltas(int training_data_count);
 
+	float calculate_cost(const matrix& expected_output);
 public:
 	neural_network();
 
@@ -93,9 +97,9 @@ public:
 	//add a random value between range and -range to one weight or bias 
 	void mutate(float range);
 
-	float test(std::vector<nn_data>& test_data);
+	test_result test(const std::vector<std::unique_ptr<nn_data>>& training_data);
 	void forward_propagation(const matrix* input);
 
-	void learn(const std::vector<std::unique_ptr<nn_data>>& training_data);
+	void learn(const std::vector<std::unique_ptr<nn_data>>& training_data, int batch_size, int epochs);
 	void learn_once(const std::unique_ptr<nn_data>& expected_output, bool apply_changes = true);
 };

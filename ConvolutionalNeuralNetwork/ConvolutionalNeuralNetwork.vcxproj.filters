@@ -46,6 +46,12 @@
     <Filter Include="header\training\implementations\digit_recognition">
       <UniqueIdentifier>{e91720dc-231c-4258-a36b-dcd822ef0161}</UniqueIdentifier>
     </Filter>
+    <Filter Include="header\testing">
+      <UniqueIdentifier>{0f7eb64a-22c6-48ca-80fc-69ae81bc4595}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\testing">
+      <UniqueIdentifier>{be512c61-7789-413f-bd35-a745055b82c1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="neural_network.cpp">
@@ -96,6 +102,12 @@
     <ClCompile Include="digit_training_data.cpp">
       <Filter>source\training\implementations\digit_recognition</Filter>
     </ClCompile>
+    <ClCompile Include="test_result.cpp">
+      <Filter>source\testing</Filter>
+    </ClCompile>
+    <ClCompile Include="batch_handler.cpp">
+      <Filter>source\training</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="neural_network.hpp">
@@ -136,6 +148,12 @@
     </ClInclude>
     <ClInclude Include="digit_training_data.hpp">
       <Filter>header\training\implementations\digit_recognition</Filter>
+    </ClInclude>
+    <ClInclude Include="test_result.hpp">
+      <Filter>header\testing</Filter>
+    </ClInclude>
+    <ClInclude Include="batch_handler.hpp">
+      <Filter>header\training</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -49,3 +49,32 @@ std::string digit_interpreter::get_string_interpretation(const matrix* given_inp
 
 	return output;
 }
+
+bool digit_interpreter::same_result(const matrix& a, const matrix& b) const
+{
+	if(matrix_equal_format(a, b) == false)
+		throw std::invalid_argument("Matrices are not the same format.");
+
+	int highest_activation_a = 0;
+	int highest_activation_b = 0;
+
+	float highest_activation_value_a = FLT_MIN;
+	float highest_activation_value_b = FLT_MIN;
+
+	for (int i = 0; i < a.data.size(); i++)
+	{
+		if (a.data[i] > highest_activation_value_a)
+		{
+			highest_activation_value_a = a.data[i];
+			highest_activation_a = i;
+		}
+
+		if (b.data[i] > highest_activation_value_b)
+		{
+			highest_activation_value_b = b.data[i];
+			highest_activation_b = i;
+		}
+	}
+
+	return highest_activation_a == highest_activation_b;
+}

@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="batch_handler.cpp" />
     <ClCompile Include="convolutional_layer.cpp" />
     <ClCompile Include="conv_kernel.cpp" />
     <ClCompile Include="digit_data.cpp" />
@@ -26,9 +27,11 @@
     <ClCompile Include="pooling_layer.hpp" />
     <ClCompile Include="nn_data.cpp" />
     <ClCompile Include="digit_training_data.cpp" />
+    <ClCompile Include="test_result.cpp" />
     <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="batch_handler.hpp" />
     <ClInclude Include="convolutional_layer.hpp" />
     <ClInclude Include="conv_kernel.hpp" />
     <ClInclude Include="digit_data.hpp" />
@@ -41,6 +44,7 @@
     <ClInclude Include="interpreter.hpp" />
     <ClInclude Include="nn_data.hpp" />
     <ClInclude Include="digit_training_data.hpp" />
+    <ClInclude Include="test_result.hpp" />
     <ClInclude Include="util.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

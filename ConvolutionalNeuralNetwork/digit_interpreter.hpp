@@ -10,4 +10,6 @@ public:
 
 	std::string get_string_interpretation() const override;
 	std::string get_string_interpretation(const matrix* given_input) const override;
+
+	bool same_result(const matrix& a, const matrix& b) const override;
 };

@@ -33,7 +33,13 @@ digit_data::digit_data(const digit_image_t& data, const std::string& label)
 	}
 
 	set_all(this->label, 0);
-	set_at(this->label, 0, std::stoi(label), 0, 1);
+	int_label = std::stoi(label);
+	set_at(this->label, 0, int_label, 0, 1);
+}
+
+const int digit_data::get_int_label() const
+{
+	return int_label;
 }
 
 std::vector<std::unique_ptr<nn_data>>

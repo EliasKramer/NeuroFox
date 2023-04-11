@@ -8,4 +8,6 @@ public:
 
 	virtual std::string get_string_interpretation() const = 0;
 	virtual std::string get_string_interpretation(const matrix* given_input) const = 0;
+
+	virtual bool same_result(const matrix& a, const matrix& b) const = 0;
 };

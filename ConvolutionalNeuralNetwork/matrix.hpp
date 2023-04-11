@@ -32,7 +32,7 @@ const std::vector<float>& matrix_flat_readonly(const matrix& m);
 //setter
 void set_at(matrix& m, int x, int y, int z, float value);
 //setting value where z = 0
-void set_at(matrix& m, int x, int y, int value);
+void set_at(matrix& m, int x, int y, float value);
 
 //getter
 float matrix_get_at(const matrix& m, int x, int y, int z);

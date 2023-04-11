@@ -90,8 +90,31 @@ void neural_network::apply_deltas(int training_data_count)
 	for (auto& l : parameter_layer_indices)
 	{
 		//update the parameters
-		layers[l]->apply_deltas(1);
+		layers[l]->apply_deltas(training_data_count);
 	}
+}
+
+float neural_network::calculate_cost(const matrix& expected_output)
+{
+	if (get_output() == nullptr)
+	{
+		throw std::runtime_error("Output is nullptr.");
+	}
+	if (matrix_equal_format(*get_output(), expected_output) == false)
+	{
+		throw std::runtime_error("Output format does not match expected output format.");
+	}
+
+	const matrix& output = *get_output();
+
+	float cost = 0.0f;
+	for (int i = 0; i < expected_output.data.size(); i++)
+	{
+		float expected = matrix_flat_readonly(expected_output)[i];
+		float actual = matrix_flat_readonly(output)[i];
+		cost += ((actual - expected) * (actual - expected));
+	}
+	return cost;
 }
 
 void neural_network::add_fully_connected_layer(int num_neurons, e_activation_t activation_fn)
@@ -159,9 +182,31 @@ void neural_network::mutate(float range)
 	layers[layer_idx]->mutate(range);
 }
 
-float neural_network::test(std::vector<nn_data>& test_data)
+test_result neural_network::test(const std::vector<std::unique_ptr<nn_data>>& test_data)
 {
-	return 0.0f;
+	test_result result;
+	result.data_count = test_data.size();
+	int correct_predictions = 0;
+	float cost_sum = 0.0f;
+	auto start = std::chrono::high_resolution_clock::now();
+
+	for (auto& curr_data : test_data)
+	{
+		forward_propagation(curr_data.get()->get_data_p());
+		if (get_interpreter<interpreter>()->same_result(*get_output(), curr_data.get()->get_label()))
+		{
+			correct_predictions++;
+		}
+		cost_sum += calculate_cost(curr_data.get()->get_label());
+	}
+
+	auto end = std::chrono::high_resolution_clock::now();
+
+	result.time_in_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+	result.accuracy = (float)correct_predictions / (float)result.data_count;
+	result.avg_cost = cost_sum / (float)result.data_count;
+
+	return result;
 }
 
 void neural_network::forward_propagation(const matrix* input)
@@ -174,19 +219,24 @@ void neural_network::forward_propagation(const matrix* input)
 	}
 }
 
-void neural_network::learn(const std::vector<std::unique_ptr<nn_data>>& training_data)
+void neural_network::learn(
+	const std::vector<std::unique_ptr<nn_data>>& training_data, 
+	int batch_size, 
+	int epochs)
 {
-	int allowed_cycels = 100;
-	int cycles = 0;
-	for each (const auto& curr_data in training_data)
+	batch_handler batch(training_data, batch_size);
+
+	for (int i = 0; i < epochs; i++)
 	{
-		cycles++;
-		learn_once(curr_data, false);
-		if (cycles >= allowed_cycels)
-			break;
+		//std::cout << "Epoch " << i << std::endl;
+		int x = 0;
+		for (auto curr_data = batch.get_batch_start(); curr_data != batch.get_batch_end(); ++curr_data)
+		{
+			learn_once(*curr_data, false);
+			apply_deltas(batch_size);
+		}
+		batch.calculate_new_batch();
 	}
-	apply_deltas(allowed_cycels);
-	//apply_deltas(training_data.size());
 }
 
 void neural_network::learn_once(const std::unique_ptr<nn_data>& training_data, bool apply_changes)
@@ -197,7 +247,7 @@ void neural_network::learn_once(const std::unique_ptr<nn_data>& training_data, b
 		throw std::runtime_error(
 			"The expected output does not have the correct format.");
 	}
-	
+
 	//feeding the data through
 	forward_propagation(training_data.get()->get_data_p());
 
