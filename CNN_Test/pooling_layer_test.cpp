@@ -12,6 +12,9 @@ namespace CNNTest
 		{
 			matrix* input = create_matrix(2, 2, 1);
 			pooling_layer pooling(input , 1, 1, max_pooling);
+			pooling.set_input_format(*input);
+			pooling.set_input(input);
+
 			Assert::AreEqual(2, pooling.get_activations().height);
 			Assert::AreEqual(2, pooling.get_activations().width);
 			Assert::AreEqual(1, pooling.get_activations().depth);
@@ -27,6 +30,9 @@ namespace CNNTest
 		{
 			matrix* input = create_matrix(6, 6, 2);
 			pooling_layer pooling(input, 2, 2, average_pooling);
+			pooling.set_input_format(*input);
+			pooling.set_input(input);
+
 			Assert::AreEqual(3, pooling.get_activations().height);
 			Assert::AreEqual(3, pooling.get_activations().width);
 			Assert::AreEqual(2, pooling.get_activations().depth);
@@ -84,6 +90,9 @@ namespace CNNTest
 			set_at(*input, 0, 0, 0, 0);
 			
 			pooling_layer pooling(input, 2, 2, min_pooling);
+			pooling.set_input_format(*input);
+			pooling.set_input(input);
+
 			pooling.forward_propagation();
 			Assert::AreEqual(3, pooling.get_activations().height);
 			Assert::AreEqual(3, pooling.get_activations().width);

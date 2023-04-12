@@ -10,9 +10,11 @@ namespace CNNTest
 		TEST_METHOD(creating_fully_connected_layer_simple)
 		{
 			matrix* input = create_matrix(1, 1, 1);
-			fully_connected_layer fc_layer(input, *input, 5, relu_fn);
-			matrix output = fc_layer.get_activations();
+			fully_connected_layer fc_layer(5, relu_fn);
+			fc_layer.set_input_format(*input);
+			fc_layer.set_input(input);
 
+			matrix output = fc_layer.get_activations();
 
 			Assert::AreEqual(5, output.height);
 
@@ -21,8 +23,9 @@ namespace CNNTest
 		TEST_METHOD(creating_fully_connected_layer_with_multiple_inputs)
 		{
 			matrix* input = create_matrix(1, 4, 1);
-			const fully_connected_layer fc_layer(input, *input, 5, relu_fn);
-
+			fully_connected_layer fc_layer(5, relu_fn);
+			fc_layer.set_input_format(*input);
+			fc_layer.set_input(input);
 
 			Assert::AreEqual(5, fc_layer.get_activations().height);
 
@@ -37,7 +40,9 @@ namespace CNNTest
 		{
 			matrix* input = create_matrix(1, 1, 1);
 			input->data[0] = 2;
-			fully_connected_layer fc_layer(input, *input, 1, relu_fn);
+			fully_connected_layer fc_layer(1, relu_fn);
+			fc_layer.set_input_format(*input);
+			fc_layer.set_input(input);
 
 			//CONTINUE HERE
 			fc_layer.get_weights_ref().data[0] = 3;
@@ -57,7 +62,10 @@ namespace CNNTest
 			input->data[2] = 4;
 			input->data[3] = 5;
 			input->data[4] = 6;
-			fully_connected_layer fc_layer(input, *input, 3, relu_fn);
+			fully_connected_layer fc_layer(3, relu_fn);
+			fc_layer.set_input_format(*input);
+			fc_layer.set_input(input);
+
 			set_all(fc_layer.get_weights_ref(), 2);
 			set_all(fc_layer.get_biases_ref(), 1);
 

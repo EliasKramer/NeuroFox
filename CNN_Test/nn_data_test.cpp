@@ -18,12 +18,6 @@ namespace CNNTest
 			Assert::IsTrue(matrix_equal_format(d.get_data(), data));
 			Assert::IsTrue(matrix_equal_format(d.get_label(), label));
 
-			// test if the data can be set through pointer
-			d.get_data_p()->data[0] = 2.0f;
-			Assert::AreEqual(d.get_data().data[0], 2.0f);
-			d.get_data_p()->data[0] = 1.0f;
-			Assert::AreEqual(d.get_data().data[0], 1.0f);
-
 			// test if the label can be set through setter
 			matrix new_data = get_matrix(1, 2, 1);
 			matrix new_label = get_matrix(1, 2, 1);

@@ -157,6 +157,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\batch_handler.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\convolutional_layer.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\conv_kernel.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\digit_data.cpp" />
@@ -170,6 +171,7 @@
     <ClCompile Include="..\ConvolutionalNeuralNetwork\neural_network.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\nn_data.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\pooling_layer.cpp" />
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\test_result.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\util.cpp" />
     <ClCompile Include="CNN_Test.cpp" />
     <ClCompile Include="convolutional_layer_test.cpp" />
@@ -188,6 +190,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\batch_handler.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\convolutional_layer.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\conv_kernel.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\digit_data.hpp" />
@@ -201,6 +204,7 @@
     <ClInclude Include="..\ConvolutionalNeuralNetwork\neural_network.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\nn_data.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\pooling_layer.hpp" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\test_result.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\util.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

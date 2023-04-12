@@ -18,22 +18,22 @@ namespace CNNTest
 
 			set_at(input, 0, 4, 0, 11);
 
-			digit_interpreter interpreter(input);
+			digit_interpreter interpreter(&input);
 			std::string output = interpreter.get_string_interpretation();
 
 			Assert::AreEqual(
-				output, 
-				std::string("1: 0.000000\n") + 
-				std::string("2: 1.000000\n") +
-				std::string("3: 2.000000\n") +
-				std::string("4: 3.000000\n") +
-				std::string("5: 11.000000\n") +
-				std::string("6: 5.000000\n") +
-				std::string("7: 6.000000\n") +
-				std::string("8: 7.000000\n") +
-				std::string("9: 8.000000\n") +
-				std::string("10: 9.000000\n") +
-				std::string("result: 5\n"));
+				std::string("0: 0.000000\n") +
+				std::string("1: 1.000000\n") +
+				std::string("2: 2.000000\n") +
+				std::string("3: 3.000000\n") +
+				std::string("4: 11.000000\n") +
+				std::string("5: 5.000000\n") +
+				std::string("6: 6.000000\n") +
+				std::string("7: 7.000000\n") +
+				std::string("8: 8.000000\n") +
+				std::string("9: 9.000000\n") +
+				std::string("result: 4\n"),
+				output);
 		}
 	};
 }
