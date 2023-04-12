@@ -14,12 +14,10 @@ int main()
 
 	std::cout << std::endl << "data loaded" << std::endl << std::endl;
 
-	//small traing data for testing
-
 	neural_network nn;
 
 	nn.set_input_format(get_matrix(28, 28, 1));
-	//nn.add_convolutional_layer(3, 1, 3, sigmoid_fn);
+	nn.add_convolutional_layer(14, 1, 14, sigmoid_fn);
 	nn.add_fully_connected_layer(25, sigmoid_fn);
 	nn.add_fully_connected_layer(25, sigmoid_fn);
 	nn.set_output_format(get_matrix(1, 10, 1));
@@ -29,20 +27,11 @@ int main()
 	nn.set_all_parameter(0);
 	nn.apply_noise(0.1);
 
-	std::cout << "start testing...\n";
-	test_result result_before = nn.test(testing_data);
-	std::cout << "result before training: \n" << result_before.to_string() << std::endl;
+	nn.forward_propagation(testing_data[0].get()->get_data_p());
 
-	while (true)
-	{
-		std::cout << "start training...\n";
-		nn.learn(training_data, 60, 100);
-		std::cout << "training done \n\n";
-
-		std::cout << "start testing...\n";
-		test_result result_after = nn.test(testing_data);
-		std::cout << "result after training: \n" << result_after.to_string() << std::endl;
-	}
-
+	std::cout << "guessed_label" << std::endl
+		<< nn.get_interpreter<digit_interpreter>()->get_string_interpretation(nn.get_output())
+		<< std::endl;
+	
 	return 0;
 }

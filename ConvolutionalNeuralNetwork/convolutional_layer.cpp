@@ -1,8 +1,6 @@
 #include "convolutional_layer.hpp"
 
 convolutional_layer::convolutional_layer(
-	matrix* input, 
-	const matrix& input_format,
 	int kernel_size, 
 	int number_of_kernels, 
 	int stride, 
@@ -10,28 +8,35 @@ convolutional_layer::convolutional_layer(
 )
 	:layer(e_layer_type_t::convolution),
 	stride(stride),
+	kernel_size(kernel_size),
 	kernels(),
 	kernel_deltas(),
 	activation_fn(activation_function)
 {
-	const int input_depth = input_format.depth;
-	const int output_width = (input_format.width - kernel_size) / stride + 1;
-	const int output_height = (input_format.height - kernel_size) / stride + 1;
-
 	for (int i = 0; i < number_of_kernels; i++)
 	{
 		neural_kernel_t kernel;
-		resize_matrix(kernel.weights, kernel_size, kernel_size, input_depth);
+		resize_matrix(kernel.weights, kernel_size, kernel_size, 0);
 		kernels.push_back(kernel);
 	}
 
-	resize_matrix(activations, output_width, output_height, number_of_kernels);
+	resize_matrix(activations, 0, 0, 0);
 }
 
 void convolutional_layer::set_input_format(const matrix& input_format)
 {
 	layer::set_input_format(input_format);
-	//TODO
+
+	const int input_depth = input_format.depth;
+	const int output_width = (input_format.width - kernel_size) / stride + 1;
+	const int output_height = (input_format.height - kernel_size) / stride + 1;
+
+	for (int i = 0; i < kernels.size(); i++)
+	{
+		resize_matrix(kernels[i].weights, kernel_size, kernel_size, input_depth);
+	}
+
+	resize_matrix(activations, output_width, output_height, kernels.size());
 }
 
 void convolutional_layer::set_all_parameter(float value)

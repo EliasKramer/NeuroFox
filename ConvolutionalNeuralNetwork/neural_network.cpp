@@ -80,6 +80,7 @@ void neural_network::add_layer(std::unique_ptr<layer>&& given_layer)
 		//set the previous layer of the new layer to the last layer
 		given_layer.get()->set_previous_layer(*get_last_layer());
 	}
+
 	//putting the new layer into the vector of layers
 	layers.push_back(std::move(given_layer));
 }
@@ -136,18 +137,14 @@ void neural_network::add_last_fully_connected_layer(e_activation_t activation_fn
 
 void neural_network::add_convolutional_layer(int kernel_size, int number_of_kernels, int stride, e_activation_t activation_fn)
 {
-	/*
-	//TODO check if the input format is correct
 	std::unique_ptr<convolutional_layer> new_layer =
 		std::make_unique<convolutional_layer>(
-			input_for_new_layer,
-			*get_last_layer_format(),
 			kernel_size,
 			number_of_kernels,
 			stride,
 			activation_fn);
+	
 	add_layer(std::move(new_layer));
-	*/
 }
 
 void neural_network::add_pooling_layer(int kernel_size, int stride, e_pooling_type_t pooling_type)

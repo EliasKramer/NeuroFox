@@ -9,18 +9,19 @@ private:
 	std::vector<neural_kernel_t> kernels;
 	std::vector<neural_kernel_t> kernel_deltas;
 
+	int kernel_size;
 	int stride;
+
 	e_activation_t activation_fn;
 public:
 	//constructor
 	convolutional_layer(
-		matrix* input,
-		const matrix& input_format,
 		int kernel_size,
 		int number_of_kernels,
 		int stride,
 		e_activation_t activation_function
 	);
+
 	void set_input_format(const matrix& input_format) override;
 
 	//set all weights and biases to that value
