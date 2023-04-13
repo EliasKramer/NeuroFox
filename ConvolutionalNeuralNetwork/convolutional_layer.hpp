@@ -3,14 +3,18 @@
 #include "math_functions.hpp"
 #include "conv_kernel.hpp"
 #include "layer.hpp"
+#include <memory>
+#include <vector>
 
 class convolutional_layer : public layer {
 private:
 	std::vector<neural_kernel_t> kernels;
-	std::vector<neural_kernel_t> kernel_deltas;
 
 	int kernel_size;
 	int stride;
+
+	//if i uncomment this it will crash when deleting
+	//std::vector<neural_kernel_t> kernel_delta;
 
 	e_activation_t activation_fn;
 public:

@@ -1,16 +1,14 @@
 #include "convolutional_layer.hpp"
 
 convolutional_layer::convolutional_layer(
-	int kernel_size, 
-	int number_of_kernels, 
-	int stride, 
+	int kernel_size,
+	int number_of_kernels,
+	int stride,
 	e_activation_t activation_function
 )
 	:layer(e_layer_type_t::convolution),
 	stride(stride),
 	kernel_size(kernel_size),
-	kernels(),
-	kernel_deltas(),
 	activation_fn(activation_function)
 {
 	for (int i = 0; i < number_of_kernels; i++)
@@ -18,6 +16,10 @@ convolutional_layer::convolutional_layer(
 		neural_kernel_t kernel;
 		resize_matrix(kernel.weights, kernel_size, kernel_size, 0);
 		kernels.push_back(kernel);
+
+		//neural_kernel_t kernel_delta;
+		//resize_matrix(kernel_delta.weights, kernel_size, kernel_size, 0);
+		//kernel_deltas.push_back(kernel_delta);
 	}
 
 	resize_matrix(activations, 0, 0, 0);
@@ -34,6 +36,7 @@ void convolutional_layer::set_input_format(const matrix& input_format)
 	for (int i = 0; i < kernels.size(); i++)
 	{
 		resize_matrix(kernels[i].weights, kernel_size, kernel_size, input_depth);
+		//resize_matrix(kernel_deltas[i].weights, kernel_size, kernel_size, input_depth);
 	}
 
 	resize_matrix(activations, output_width, output_height, kernels.size());
@@ -67,7 +70,7 @@ void convolutional_layer::mutate(float range)
 		//choose a random weight to mutate
 		int random_weight_idx = random_idx(kernels[0].weights.data.size());
 		//mutate the weight
-		kernels[random_kernel_idx].weights.data[random_weight_idx] += 
+		kernels[random_kernel_idx].weights.data[random_weight_idx] +=
 			random_float_incl(-range, range);
 	}
 	else

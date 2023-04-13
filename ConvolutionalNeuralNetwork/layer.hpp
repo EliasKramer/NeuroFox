@@ -12,7 +12,6 @@ class layer {
 
 protected:
 	e_layer_type_t type;
-	
 	//the current matrix of neurons
 	matrix activations;
 
