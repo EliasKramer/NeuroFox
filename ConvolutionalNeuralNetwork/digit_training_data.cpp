@@ -121,7 +121,7 @@ digit_image_collection_t load_mnist_data(std::string data_file_path, std::string
 				//why is this "reading invalid data from image_buffer" ?
 				unsigned char pixel = image_buffer[pixel_idx];
 
-				current_image.image_matrix[j][k] = (float)pixel / 255.0;
+				current_image.image_matrix[j][k] = (float)pixel / 255.0f;
 			}
 		}
 

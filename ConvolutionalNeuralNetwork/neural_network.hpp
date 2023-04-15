@@ -39,7 +39,7 @@ private:
 
 	layer* get_last_layer();
 
-	void add_layer(layer* given_layer);
+	void add_layer(std::unique_ptr<layer>&& given_layer);
 
 	//we need the training_data_count for 
 	//calculating the average of the deltas

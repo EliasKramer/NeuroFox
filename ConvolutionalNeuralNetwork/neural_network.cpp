@@ -82,7 +82,7 @@ void neural_network::add_layer(std::unique_ptr<layer>&& given_layer)
 	}
 
 	//putting the new layer into the vector of layers
-	layers.push_back(given_layer);
+	layers.push_back(std::move(given_layer));
 }
 
 void neural_network::apply_deltas(int training_data_count)
