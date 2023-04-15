@@ -1,104 +1,113 @@
 #include "matrix.hpp"
 #include <numeric>
 
-static int get_idx(const matrix& m, int x, int y, int z)
+
+int matrix::get_idx(int x, int y, int z) const
 {
-	return x + y * m.width + z * m.width * m.height;
+	return x + y * width + z * width * height;
 }
 
-matrix* create_matrix(int width, int height, int depth)
-{
-	matrix* m = new matrix;
-	resize_matrix(*m, width, height, depth);
+matrix::matrix()
+	:matrix(0, 0, 0)
+{}
 
-	return m;
+matrix::matrix(int width, int height, int depth)
+{
+	this->width = width;
+	this->height = height;
+	this->depth = depth;
+	this->data = std::vector<float>(width * height * depth);
 }
 
-matrix get_matrix(int width, int height, int depth)
+size_t matrix::matrix_hash() const
 {
-	matrix m;
-	resize_matrix(m, width, height, depth);
-	return m;
-}
-
-size_t matrix_hash(const matrix& m)
-{
-	return std::accumulate(m.data.begin(), m.data.end(), 0,
+	return std::accumulate(data.begin(), data.end(), 0,
 		[](size_t h, float f) {
 			return h + std::hash<float>()(f);
 		});
 }
 
-void resize_matrix(matrix& m, int width, int height, int depth)
+void matrix::resize_matrix(int width, int height, int depth)
 {
-	m.width = width;
-	m.height = height;
-	m.depth = depth;
-	m.data.resize(width * height * depth);
+	this->width = width;
+	this->height = height;
+	this->depth = depth;
+
+	data.resize(width * height * depth);
 }
 
-void resize_matrix(matrix& resizing_matrix, const matrix& source)
+void matrix::resize_matrix(const matrix& source)
 {
-	resize_matrix(resizing_matrix, source.width, source.height, source.depth);
+	resize_matrix(source.width, source.height, source.depth);
 }
 
-bool matrix_equal_format(const matrix& a, const matrix& b)
+void matrix::set_all(float value)
 {
-	return a.width == b.width && a.height == b.height && a.depth == b.depth;
-}
-
-void set_all(matrix& m, float value)
-{
-	for (int i = 0; i < m.data.size(); i++)
+	for (int i = 0; i < data.size(); i++)
 	{
-		m.data[i] = value;
+		data[i] = value;
 	}
 }
 
-void matrix_apply_noise(matrix& m, float range)
+void matrix::matrix_apply_noise(float range)
 {
-	for (int i = 0; i < m.data.size(); i++)
+	for (int i = 0; i < data.size(); i++)
 	{
-		m.data[i] += random_float_incl(-range, range);
+		data[i] += random_float_incl(-range, range);
 	}
 }
 
-void matrix_mutate(matrix& m, float range)
+void matrix::matrix_mutate(float range)
 {
-	m.data[random_idx(m.data.size())] += random_float_incl(-range, range);
+	data[random_idx(data.size())] += random_float_incl(-range, range);
 }
 
-std::vector<float>& matrix_flat(matrix& m)
+int matrix::get_width() const
 {
-	return m.data;
+	return width;
 }
 
-const std::vector<float>& matrix_flat_readonly(const matrix& m)
+int matrix::get_height() const
 {
-	return m.data;
+	return height;
 }
 
-void set_at(matrix& m, int x, int y, int z, float value)
+int matrix::get_depth() const
 {
-	m.data[get_idx(m, x, y, z)] = value;
+	return depth;
 }
 
-void set_at(matrix& m, int x, int y, float value)
+std::vector<float>& matrix::matrix_flat()
 {
-	set_at(m, x, y, 0, value);
+	return data;
 }
 
-float matrix_get_at(const matrix& m, int x, int y, int z)
+const std::vector<float>& matrix::matrix_flat_readonly() const
 {
-	return m.data[get_idx(m, x, y, z)];
+	return data;
 }
 
-float matrix_get_at(const matrix& m, int x, int y)
+void matrix::set_at(int x, int y, int z, float value)
 {
-	return matrix_get_at(m, x, y, 0);
+	data[get_idx(x, y, z)] = value;
 }
 
-void matrix_dot(const matrix& a, const matrix& b, matrix& result)
+void matrix::set_at(int x, int y, float value)
+{
+	set_at(x, y, 0, value);
+}
+
+float matrix::matrix_get_at(int x, int y, int z) const
+{
+	return data[get_idx(x, y, z)];
+}
+
+float matrix::matrix_get_at(int x, int y) const
+{
+	return matrix_get_at(x, y, 0);
+}
+
+void matrix::matrix_dot(const matrix& a, const matrix& b, matrix& result)
 {
 	if (a.width != b.height || a.depth != b.depth)
 	{
@@ -118,15 +127,15 @@ void matrix_dot(const matrix& a, const matrix& b, matrix& result)
 				float sum = 0;
 				for (int i = 0; i < a.width; i++)
 				{
-					sum += matrix_get_at(a, i, y, z) * matrix_get_at(b, x, i, z);
+					sum += a.matrix_get_at(i, y, z) * b.matrix_get_at(x, i, z);
 				}
-				set_at(result, x, y, z, sum);
+				result.set_at(x, y, z, sum);
 			}
 		}
 	}
 }
 
-void matrix_dot_flat(const matrix& a, const matrix& flat, matrix& result_flat)
+void matrix::matrix_dot_flat(const matrix& a, const matrix& flat, matrix& result_flat)
 {
 	if (a.width != flat.data.size() ||
 		a.height != result_flat.data.size() ||
@@ -140,12 +149,12 @@ void matrix_dot_flat(const matrix& a, const matrix& flat, matrix& result_flat)
 	{
 		for (int y = 0; y < a.height; y++)
 		{
-			result_flat.data[y] += matrix_get_at(a, x, y) * flat.data[x];
+			result_flat.data[y] += a.matrix_get_at(x, y) * flat.data[x];
 		}
 	}
 }
 
-void matrix_add(const matrix& a, const matrix& b, matrix& result)
+void matrix::matrix_add(const matrix& a, const matrix& b, matrix& result)
 {
 	if (a.width != b.width || a.height != b.height || a.depth != b.depth)
 	{
@@ -162,7 +171,7 @@ void matrix_add(const matrix& a, const matrix& b, matrix& result)
 	}
 }
 
-void matrix_add_flat(const matrix& a, const matrix& b, matrix& result)
+void matrix::matrix_add_flat(const matrix& a, const matrix& b, matrix& result)
 {
 	if (a.data.size() != b.data.size())
 	{
@@ -175,7 +184,7 @@ void matrix_add_flat(const matrix& a, const matrix& b, matrix& result)
 	}
 }
 
-void matrix_subtract(const matrix& a, const matrix& b, matrix& result)
+void matrix::matrix_subtract(const matrix& a, const matrix& b, matrix& result)
 {
 	if (!matrix_equal_format(a, b) ||
 		!matrix_equal_format(b, result) ||
@@ -190,38 +199,43 @@ void matrix_subtract(const matrix& a, const matrix& b, matrix& result)
 	}
 }
 
-void matrix_multiply(matrix& a, float b)
+bool matrix::are_equal(const matrix& a, const matrix& b)
 {
-	for (int i = 0; i < a.data.size(); i++)
+	return a.matrix_hash() == b.matrix_hash();
+}
+
+bool matrix::matrix_equal_format(const matrix& a, const matrix& b)
+{
+	return a.width == b.width && a.height == b.height && a.depth == b.depth;
+}
+
+void matrix::matrix_multiply(float a)
+{
+	for (int i = 0; i < data.size(); i++)
 	{
-		a.data[i] *= b;
+		data[i] *= a;
 	}
 }
 
-void matrix_apply_activation(matrix& m, e_activation_t activation_fn)
+void matrix::matrix_apply_activation(e_activation_t activation_fn)
 {
-	for (int i = 0; i < m.data.size(); i++)
+	for (int i = 0; i < data.size(); i++)
 	{
-		m.data[i] = ACTIVATION[activation_fn](m.data[i]);
+		data[i] = ACTIVATION[activation_fn](data[i]);
 	}
 }
 
-bool are_equal(const matrix& a, const matrix& b)
-{
-	return matrix_hash(a) == matrix_hash(b);
-}
-
-std::string get_matrix_string(const matrix& m)
+std::string matrix::get_matrix_string() const
 {
 	std::string ret_val = "";
 
-	for (int z = 0; z < m.depth; z++)
+	for (int z = 0; z < depth; z++)
 	{
-		for (int y = 0; y < m.height; y++)
+		for (int y = 0; y < height; y++)
 		{
-			for (int x = 0; x < m.width; x++)
+			for (int x = 0; x < width; x++)
 			{
-				ret_val += std::to_string(matrix_get_at(m, x, y, z)) + " ";
+				ret_val += std::to_string(matrix_get_at(x, y, z)) + " ";
 			}
 			ret_val += "\n";
 		}

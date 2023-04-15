@@ -21,20 +21,19 @@ digit_data::get_mnist_digit_data(std::string image_path, std::string label_path)
 
 digit_data::digit_data(const digit_image_t& data, const std::string& label)
 {
-	resize_matrix(this->data, IMAGE_SIZE_X, IMAGE_SIZE_Y, 1);
-	resize_matrix(this->label, 1, 10, 1);
+	this->data = matrix(IMAGE_SIZE_X, IMAGE_SIZE_Y, 1);
+	this->label = matrix(1, 10, 1);
 
 	for (int y = 0; y < IMAGE_SIZE_Y; y++)
 	{
 		for (int x = 0; x < IMAGE_SIZE_X; x++)
 		{
-			set_at(this->data, x, y, 0, data.matrix[y][x]);
+			this->data.set_at(x, y, 0, data.image_matrix[y][x]);
 		}
 	}
-
-	set_all(this->label, 0);
+	this->label.set_all(0);
 	int_label = std::stoi(label);
-	set_at(this->label, 0, int_label, 0, 1);
+	this->label.set_at(0, int_label, 0, 1);
 }
 
 const int digit_data::get_int_label() const

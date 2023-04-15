@@ -7,14 +7,23 @@
 #include <vector>
 
 class convolutional_layer : public layer {
+
 private:
-	std::vector<neural_kernel_t> kernels;
+	//std::vector<conv_kernel> kernels;
 
 	int kernel_size;
 	int stride;
 
-	//if i uncomment this it will crash when deleting
-	//std::vector<neural_kernel_t> kernel_delta;
+	std::vector<float> a;
+	std::vector<float> a1;
+	std::vector<float> a11;
+	std::vector<float> a22;
+	std::vector<float> b2;
+	//if i add this it crashes
+	std::vector<float> c;
+	std::vector<float> cd;
+	std::vector<float> cdd;
+	std::vector<float> cddd;
 
 	e_activation_t activation_fn;
 public:

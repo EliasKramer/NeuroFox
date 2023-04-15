@@ -23,11 +23,11 @@ void print_digit_image(const digit_image_t& data)
 	{
 		for (int x = 0; x < IMAGE_SIZE_X; x++)
 		{
-			if (data.matrix[y][x] == 0)
+			if (data.image_matrix[y][x] == 0)
 			{
 				std::cout << "  ";
 			}
-			else if (data.matrix[y][x] < 0.5)
+			else if (data.image_matrix[y][x] < 0.5)
 			{
 				std::cout << ". ";
 			}
@@ -121,7 +121,7 @@ digit_image_collection_t load_mnist_data(std::string data_file_path, std::string
 				//why is this "reading invalid data from image_buffer" ?
 				unsigned char pixel = image_buffer[pixel_idx];
 
-				current_image.matrix[j][k] = (float)pixel / 255.0;
+				current_image.image_matrix[j][k] = (float)pixel / 255.0;
 			}
 		}
 

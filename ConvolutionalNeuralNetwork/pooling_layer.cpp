@@ -1,9 +1,9 @@
 #include "pooling_layer.hpp"
 
 pooling_layer::pooling_layer(
-	matrix* input, 
-	int filter_size, 
-	int stride, 
+	matrix* input,
+	int filter_size,
+	int stride,
 	e_pooling_type_t pooling_fn
 )
 	:layer(e_layer_type_t::pooling),
@@ -18,12 +18,11 @@ pooling_layer::pooling_layer(
 	if (stride <= 0)
 		throw std::invalid_argument("stride must be greater than 0");
 
-	int output_width = (input->width - filter_size) / stride + 1;
-	int output_height = (input->height - filter_size) / stride + 1;
-	int output_depth = input->depth;
+	int output_width = (input->get_width() - filter_size) / stride + 1;
+	int output_height = (input->get_height() - filter_size) / stride + 1;
+	int output_depth = input->get_depth();
 
-	resize_matrix(
-		activations,
+	activations.resize_matrix(
 		output_width,
 		output_height,
 		output_depth);
@@ -69,16 +68,16 @@ void pooling_layer::forward_propagation()
 {
 
 	//iterate over each depth
-	for (int d = 0; d < activations.depth; d++)
+	for (int d = 0; d < activations.get_depth(); d++)
 	{
 		//iterate over each row of the output
-		for (int y = 0; y < activations.height; y++)
+		for (int y = 0; y < activations.get_height(); y++)
 		{
 			//calculate the start and end index of the filter on the y axis
 			const int start_idx_y = y * stride;
 			const int end_idx_y = start_idx_y + filter_size;
 
-			for (int x = 0; x < activations.width; x++)
+			for (int x = 0; x < activations.get_width(); x++)
 			{
 				//calculate the start and end index of the filter on the x axis
 				const int start_idx_x = x * stride;
@@ -93,16 +92,16 @@ void pooling_layer::forward_propagation()
 				//iterate over the filter
 				for (int i = start_idx_y; i <= end_idx_y; i++)
 				{
-					if (i >= input->height)
+					if (i >= input->get_height())
 						break;
 
 					for (int j = start_idx_x; j <= end_idx_x; j++)
 					{
-						if (j >= input->width)
+						if (j >= input->get_width())
 							break;
 
 						//get the value of the input at the current index
-						const float curr_val = matrix_get_at(*input, j, i, d);
+						const float curr_val = input->matrix_get_at(j, i, d);
 
 						//if the current value is greater than the max value
 						//set the max value to the current value
@@ -121,13 +120,13 @@ void pooling_layer::forward_propagation()
 				switch (pooling_fn)
 				{
 				case max_pooling:
-					set_at(activations, x, y, d, max);
+					activations.set_at(x, y, d, max);
 					break;
 				case min_pooling:
-					set_at(activations, x, y, d, min);
+					activations.set_at(x, y, d, min);
 					break;
 				case average_pooling:
-					set_at(activations, x, y, d, sum / (filter_size * filter_size));
+					activations.set_at(x, y, d, sum / (filter_size * filter_size));
 					break;
 				default:
 					throw std::runtime_error("Invalid pooling type");

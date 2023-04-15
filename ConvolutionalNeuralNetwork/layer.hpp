@@ -33,7 +33,7 @@ public:
 	const matrix* get_input_p() const;
 
 	void set_input(const matrix* input);
-	virtual void set_input_format(const matrix& input_format);
+	virtual void set_input_format(const matrix& given_input_format);
 	
 	void set_previous_layer(layer& previous_layer);
 

@@ -13,76 +13,86 @@ convolutional_layer::convolutional_layer(
 {
 	for (int i = 0; i < number_of_kernels; i++)
 	{
-		neural_kernel_t kernel;
-		resize_matrix(kernel.weights, kernel_size, kernel_size, 0);
-		kernels.push_back(kernel);
-
-		//neural_kernel_t kernel_delta;
-		//resize_matrix(kernel_delta.weights, kernel_size, kernel_size, 0);
-		//kernel_deltas.push_back(kernel_delta);
+		//TODO delta
+		//kernels.push_back(conv_kernel(kernel_size));
 	}
 
-	resize_matrix(activations, 0, 0, 0);
+	activations = matrix(0, 0, 0);
 }
 
 void convolutional_layer::set_input_format(const matrix& input_format)
 {
 	layer::set_input_format(input_format);
 
-	const int input_depth = input_format.depth;
-	const int output_width = (input_format.width - kernel_size) / stride + 1;
-	const int output_height = (input_format.height - kernel_size) / stride + 1;
+	const int input_depth = input_format.get_depth();
+	const int output_width = (input_format.get_width() - kernel_size) / stride + 1;
+	const int output_height = (input_format.get_height() - kernel_size) / stride + 1;
 
+	/*
 	for (int i = 0; i < kernels.size(); i++)
 	{
-		resize_matrix(kernels[i].weights, kernel_size, kernel_size, input_depth);
-		//resize_matrix(kernel_deltas[i].weights, kernel_size, kernel_size, input_depth);
+		kernels[i].set_kernel_depth(input_depth);
+		//resize delta
 	}
+	*/
 
-	resize_matrix(activations, output_width, output_height, kernels.size());
+	//resize_matrix(activations, output_width, output_height, (int)kernels.size());
 }
 
 void convolutional_layer::set_all_parameter(float value)
 {
-	for (neural_kernel_t& kernel : kernels)
+	/*
+	for (conv_kernel& kernel : kernels)
 	{
-		set_all(kernel.weights, value);
-		kernel.bias = value;
+		set_all(kernel.get_weights(), value);
 	}
+	*/
 }
 
 void convolutional_layer::apply_noise(float range)
 {
-	for (neural_kernel_t& kernel : kernels)
+	/*
+	for (conv_kernel& kernel : kernels)
 	{
-		matrix_apply_noise(kernel.weights, range);
-		kernel.bias += random_float_incl(-range, range);
+		matrix_apply_noise(kernel.get_weights(), range);
+
+		kernel.set_bias(
+			kernel.get_bias() +
+			random_float_incl(-range, range));
 	}
+	*/
 }
 
 void convolutional_layer::mutate(float range)
 {
+	/*
 	//choose a random kernel
-	int random_kernel_idx = random_idx(kernels.size());
+	int random_kernel_idx = random_idx((int)kernels.size());
 	//choose if a weight or a bias is mutated
-	if (biased_coin_toss(kernels[0].weights.data.size(), 1))
+	if (biased_coin_toss((float)kernels[0].get_weights_readonly().data.size(), 1))
 	{
 		//choose a random weight to mutate
-		int random_weight_idx = random_idx(kernels[0].weights.data.size());
+		int random_weight_idx = random_idx((int)kernels[0].get_weights_readonly().data.size());
 		//mutate the weight
-		kernels[random_kernel_idx].weights.data[random_weight_idx] +=
+
+		kernels[random_kernel_idx].get_weights().data[random_weight_idx] +=
 			random_float_incl(-range, range);
 	}
 	else
 	{
 		//mutate the bias
-		kernels[random_kernel_idx].bias += random_float_incl(-range, range);
+
+		kernels[random_kernel_idx].set_bias(
+			kernels[random_kernel_idx].get_bias() +
+			random_float_incl(-range, range));
 	}
+	*/
 }
 
 void convolutional_layer::forward_propagation()
 {
-	const int kernel_size = kernels[0].weights.width;
+	/*
+	const size_t kernel_size = kernels[0].get_kernel_size();
 	const size_t number_of_kernels = kernels.size();
 	const int output_width = activations.width;
 	const int output_height = activations.height;
@@ -90,22 +100,22 @@ void convolutional_layer::forward_propagation()
 
 	for (int depth = 0; depth < number_of_kernels; depth++)
 	{
-		neural_kernel_t& kernel = kernels[depth];
+		conv_kernel& kernel = kernels[depth];
 		for (int y = 0; y < output_height; y++)
 		{
 			for (int x = 0; x < output_width; x++)
 			{
-				float value = lay_kernel_over_matrix(
+				float value = kernel.lay_kernel_over_matrix(
 					*input,
-					kernel,
 					x * stride,
 					y * stride,
-					kernel_size);
+					(int)kernel_size);
 				set_at(activations, x, y, depth, value);
 			}
 		}
 	}
 	matrix_apply_activation(activations, activation_fn);
+	*/
 }
 
 void convolutional_layer::back_propagation()

@@ -5,10 +5,9 @@ void digit_interpreter::check_for_correct_input(const matrix* given_input) const
 	if (given_input == nullptr)
 		throw std::invalid_argument("Input is nullptr.");
 
-	matrix required_input_format;
-	resize_matrix(required_input_format, 1, 10, 1);
+	matrix required_input_format(1, 10, 1);
 
-	if (matrix_equal_format(required_input_format, *given_input) == false)
+	if (matrix::matrix_equal_format(required_input_format, *given_input) == false)
 	{
 		throw std::invalid_argument("Input format is not correct.");
 	}
@@ -34,7 +33,7 @@ std::string digit_interpreter::get_string_interpretation(const matrix* given_inp
 
 	float highest_activation = FLT_MIN;
 	int highest_digit = 0;
-	for each (const float curr_activation in matrix_flat_readonly(*given_input))
+	for each (const float curr_activation in given_input->matrix_flat_readonly())
 	{
 		if (curr_activation > highest_activation)
 		{
@@ -52,7 +51,7 @@ std::string digit_interpreter::get_string_interpretation(const matrix* given_inp
 
 bool digit_interpreter::same_result(const matrix& a, const matrix& b) const
 {
-	if(matrix_equal_format(a, b) == false)
+	if(matrix::matrix_equal_format(a, b) == false)
 		throw std::invalid_argument("Matrices are not the same format.");
 
 	int highest_activation_a = 0;
@@ -61,17 +60,17 @@ bool digit_interpreter::same_result(const matrix& a, const matrix& b) const
 	float highest_activation_value_a = FLT_MIN;
 	float highest_activation_value_b = FLT_MIN;
 
-	for (int i = 0; i < a.data.size(); i++)
+	for (int i = 0; i < a.matrix_flat_readonly().size(); i++)
 	{
-		if (a.data[i] > highest_activation_value_a)
+		if (a.matrix_flat_readonly()[i] > highest_activation_value_a)
 		{
-			highest_activation_value_a = a.data[i];
+			highest_activation_value_a = a.matrix_flat_readonly()[i];
 			highest_activation_a = i;
 		}
 
-		if (b.data[i] > highest_activation_value_b)
+		if (b.matrix_flat_readonly()[i] > highest_activation_value_b)
 		{
-			highest_activation_value_b = b.data[i];
+			highest_activation_value_b = b.matrix_flat_readonly()[i];
 			highest_activation_b = i;
 		}
 	}
