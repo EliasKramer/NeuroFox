@@ -9,31 +9,27 @@
 class convolutional_layer : public layer {
 
 private:
-	//std::vector<conv_kernel> kernels;
+	std::vector<conv_kernel> kernels;
+	std::vector<conv_kernel> kernel_deltas;
 
 	int kernel_size;
 	int stride;
-
-	std::vector<float> a;
-	std::vector<float> a1;
-	std::vector<float> a11;
-	std::vector<float> a22;
-	std::vector<float> b2;
-	//if i add this it crashes
-	std::vector<float> c;
-	std::vector<float> cd;
-	std::vector<float> cdd;
-	std::vector<float> cddd;
 
 	e_activation_t activation_fn;
 public:
 	//constructor
 	convolutional_layer(
-		int kernel_size,
 		int number_of_kernels,
+		int kernel_size,
 		int stride,
 		e_activation_t activation_function
 	);
+
+	//getters
+	const std::vector<conv_kernel>& get_kernels_readonly() const;
+	std::vector<conv_kernel>& get_kernels();
+	int get_kernel_size() const;
+	int get_stride() const;
 
 	void set_input_format(const matrix& input_format) override;
 

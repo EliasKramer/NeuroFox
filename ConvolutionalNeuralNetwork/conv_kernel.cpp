@@ -34,7 +34,7 @@ size_t conv_kernel::get_kernel_size() const
 	return weights.get_width();
 }
 
-float conv_kernel::lay_kernel_over_matrix(const matrix& input_matrix, int start_x, int start_y, int kernel_size)
+float conv_kernel::lay_kernel_over_matrix(const matrix& input_matrix, int start_x, int start_y)
 {
 	//could be done with a matrix dot product,
 	//but copying the input data into a matrix is too slow
@@ -42,9 +42,9 @@ float conv_kernel::lay_kernel_over_matrix(const matrix& input_matrix, int start_
 	for (int z = 0; z < input_matrix.get_depth(); z++)
 	{
 		//we add all the values at each depth
-		for (int x = 0; x < kernel_size; x++)
+		for (int x = 0; x < get_kernel_size(); x++)
 		{
-			for (int y = 0; y < kernel_size; y++)
+			for (int y = 0; y < get_kernel_size(); y++)
 			{
 				sum +=
 					input_matrix.matrix_get_at(start_x + x, start_y + y, z) *

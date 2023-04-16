@@ -30,6 +30,5 @@ public:
 	float lay_kernel_over_matrix(
 		const matrix& input_matrix,
 		int start_x,
-		int start_y,
-		int kernel_size);
+		int start_y);
 };
