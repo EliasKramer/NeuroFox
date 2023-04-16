@@ -1,7 +1,6 @@
 #include "pooling_layer.hpp"
 
 pooling_layer::pooling_layer(
-	matrix* input,
 	int filter_size,
 	int stride,
 	e_pooling_type_t pooling_fn
@@ -11,27 +10,24 @@ pooling_layer::pooling_layer(
 	stride(stride),
 	pooling_fn(pooling_fn)
 {
-	if (!input)
-		throw std::invalid_argument("input cannot be null");
 	if (filter_size <= 0)
 		throw std::invalid_argument("filter size must be greater than 0");
 	if (stride <= 0)
 		throw std::invalid_argument("stride must be greater than 0");
-
-	int output_width = (input->get_width() - filter_size) / stride + 1;
-	int output_height = (input->get_height() - filter_size) / stride + 1;
-	int output_depth = input->get_depth();
-
-	activations.resize_matrix(
-		output_width,
-		output_height,
-		output_depth);
 }
 
 void pooling_layer::set_input_format(const matrix& input_format)
 {
 	layer::set_input_format(input_format);
-	//TODO
+	
+	int output_width = (input_format.get_width() - filter_size) / stride + 1;
+	int output_height = (input_format.get_height() - filter_size) / stride + 1;
+	int output_depth = input_format.get_depth();
+
+	activations.resize_matrix(
+		output_width,
+		output_height,
+		output_depth);
 }
 
 int pooling_layer::get_filter_size() const

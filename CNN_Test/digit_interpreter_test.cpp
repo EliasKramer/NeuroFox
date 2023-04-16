@@ -9,14 +9,14 @@ namespace CNNTest
 	public:
 		TEST_METHOD(testing_expected_behaviour)
 		{
-			matrix input;
-			resize_matrix(input, 1, 10, 1);
+			matrix input(1,10,1);
+
 			for (int i = 0; i < 10; i++)
 			{
-				set_at(input, 0, i, 0, i);
+				input.set_at(0, i, 0, i);
 			}
 
-			set_at(input, 0, 4, 0, 11);
+			input.set_at( 0, 4, 0, 11);
 
 			digit_interpreter interpreter(&input);
 			std::string output = interpreter.get_string_interpretation();

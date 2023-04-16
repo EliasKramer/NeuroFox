@@ -17,7 +17,6 @@ private:
 public:
 	//constructor
 	pooling_layer(
-		matrix* input,
 		int filter_size,
 		int stride,
 		e_pooling_type_t pooling_fn
