@@ -6,7 +6,7 @@ conv_kernel::conv_kernel(int kernel_size)
 
 void conv_kernel::set_kernel_depth(int depth)
 {
-	weights.resize_matrix(get_kernel_size(), get_kernel_size(), depth);
+	weights.resize(get_kernel_size(), get_kernel_size(), depth);
 }
 
 matrix& conv_kernel::get_weights()
@@ -47,8 +47,8 @@ float conv_kernel::lay_kernel_over_matrix(const matrix& input_matrix, int start_
 			for (int y = 0; y < get_kernel_size(); y++)
 			{
 				sum +=
-					input_matrix.matrix_get_at(start_x + x, start_y + y, z) *
-					weights.matrix_get_at(x, y, z);
+					input_matrix.get_at(start_x + x, start_y + y, z) *
+					weights.get_at(x, y, z);
 			}
 		}
 	}

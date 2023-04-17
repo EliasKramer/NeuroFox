@@ -9,7 +9,7 @@ void neural_network::set_input(const matrix* input)
 	}
 
 	if (input_format_set == false ||
-		matrix::matrix_equal_format(input_format, *input) == false)
+		matrix::equal_format(input_format, *input) == false)
 	{
 		throw "Could not set Input. Input format is not set or does not match the input format.";
 	}
@@ -39,7 +39,7 @@ void neural_network::set_input_format(const matrix& given_input_format)
 	else
 		throw std::runtime_error("Cannot set input format twice.");
 
-	this->input_format.resize_matrix(given_input_format);
+	this->input_format.resize(given_input_format);
 }
 
 void neural_network::set_output_format(const matrix& given_output_format)
@@ -49,8 +49,8 @@ void neural_network::set_output_format(const matrix& given_output_format)
 	else
 		throw std::runtime_error("Cannot set output format twice.");
 
-	this->output_format.resize_matrix(given_output_format);
-	this->cost_derivative.resize_matrix(given_output_format);
+	this->output_format.resize(given_output_format);
+	this->cost_derivative.resize(given_output_format);
 }
 
 const matrix* neural_network::get_output() const
@@ -101,7 +101,7 @@ float neural_network::calculate_cost(const matrix& expected_output)
 	{
 		throw std::runtime_error("Output is nullptr.");
 	}
-	if (matrix::matrix_equal_format(*get_output(), expected_output) == false)
+	if (matrix::equal_format(*get_output(), expected_output) == false)
 	{
 		throw std::runtime_error("Output format does not match expected output format.");
 	}
@@ -109,10 +109,10 @@ float neural_network::calculate_cost(const matrix& expected_output)
 	const matrix& output = *get_output();
 
 	float cost = 0.0f;
-	for (int i = 0; i < expected_output.matrix_flat_readonly().size(); i++)
+	for (int i = 0; i < expected_output.flat_readonly().size(); i++)
 	{
-		float expected = expected_output.matrix_flat_readonly()[i];
-		float actual = output.matrix_flat_readonly()[i];
+		float expected = expected_output.flat_readonly()[i];
+		float actual = output.flat_readonly()[i];
 		cost += ((actual - expected) * (actual - expected));
 	}
 	return cost;
@@ -240,7 +240,7 @@ void neural_network::learn(
 void neural_network::learn_once(const std::unique_ptr<nn_data>& training_data, bool apply_changes)
 {
 	//checking for correct format
-	if (!matrix::matrix_equal_format(training_data.get()->get_label(), output_format))
+	if (!matrix::equal_format(training_data.get()->get_label(), output_format))
 	{
 		throw std::runtime_error(
 			"The expected output does not have the correct format.");

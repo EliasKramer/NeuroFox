@@ -24,7 +24,7 @@ void pooling_layer::set_input_format(const matrix& input_format)
 	int output_height = (input_format.get_height() - filter_size) / stride + 1;
 	int output_depth = input_format.get_depth();
 
-	activations.resize_matrix(
+	activations.resize(
 		output_width,
 		output_height,
 		output_depth);
@@ -97,7 +97,7 @@ void pooling_layer::forward_propagation()
 							break;
 
 						//get the value of the input at the current index
-						const float curr_val = input->matrix_get_at(j, i, d);
+						const float curr_val = input->get_at(j, i, d);
 
 						//if the current value is greater than the max value
 						//set the max value to the current value

@@ -54,7 +54,7 @@ void convolutional_layer::set_input_format(const matrix& input_format)
 		kernel_deltas[i].set_kernel_depth(input_depth);
 	}
 	
-	activations.resize_matrix(output_width, output_height, (int)kernels.size());
+	activations.resize(output_width, output_height, (int)kernels.size());
 }
 
 void convolutional_layer::set_all_parameter(float value)
@@ -69,7 +69,7 @@ void convolutional_layer::apply_noise(float range)
 {
 	for (conv_kernel& kernel : kernels)
 	{
-		kernel.get_weights().matrix_apply_noise( range);
+		kernel.get_weights().apply_noise( range);
 
 		kernel.set_bias(
 			kernel.get_bias() +
@@ -83,20 +83,20 @@ void convolutional_layer::mutate(float range)
 	int random_kernel_idx = random_idx((int)kernels.size());
 	//choose if a weight or a bias is mutated
 	if (biased_coin_toss(
-		(float)kernels[0].get_weights_readonly().matrix_flat_readonly().size(),
+		(float)kernels[0].get_weights_readonly().flat_readonly().size(),
 		1.0f))
 	{
 		//choose a random weight to mutate
 		int random_weight_idx = 
 			random_idx((int)kernels[0]
 				.get_weights_readonly()
-				.matrix_flat_readonly()
+				.flat_readonly()
 				.size());
 
 		//mutate the weight
 		kernels[random_kernel_idx]
 			.get_weights()
-			.matrix_flat()[random_weight_idx] +=
+			.flat()[random_weight_idx] +=
 				random_float_incl(-range, range);
 	}
 	else
@@ -132,7 +132,7 @@ void convolutional_layer::forward_propagation()
 			}
 		}
 	}
-	activations.matrix_apply_activation(activation_fn);
+	activations.apply_activation_function(activation_fn);
 	
 }
 

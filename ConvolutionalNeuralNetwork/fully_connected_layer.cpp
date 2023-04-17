@@ -2,7 +2,7 @@
 
 float fully_connected_layer::get_weight_at(int input_layer_idx, int current_activation_idx) const
 {
-	return weights.matrix_get_at(input_layer_idx, current_activation_idx);
+	return weights.get_at(input_layer_idx, current_activation_idx);
 }
 
 void fully_connected_layer::set_weight_at(int input_layer_idx, int current_activation_idx, float value)
@@ -12,7 +12,7 @@ void fully_connected_layer::set_weight_at(int input_layer_idx, int current_activ
 
 float fully_connected_layer::get_weight_delta_at(int input_layer_idx, int current_activation_idx) const
 {
-	return weight_deltas.matrix_get_at(input_layer_idx, current_activation_idx);
+	return weight_deltas.get_at(input_layer_idx, current_activation_idx);
 }
 
 void fully_connected_layer::set_weight_delta_at(int input_layer_idx, int current_activation_idx, float value)
@@ -22,12 +22,12 @@ void fully_connected_layer::set_weight_delta_at(int input_layer_idx, int current
 
 float fully_connected_layer::get_passing_error_at(int input_layer_idx) const
 {
-	return passing_error->matrix_flat_readonly()[input_layer_idx];
+	return passing_error->flat_readonly()[input_layer_idx];
 }
 
 void fully_connected_layer::set_passing_error_at(int input_layer_idx, float value)
 {
-	passing_error->matrix_flat()[input_layer_idx] = value;
+	passing_error->flat()[input_layer_idx] = value;
 }
 
 fully_connected_layer::fully_connected_layer(
@@ -45,19 +45,19 @@ fully_connected_layer::fully_connected_layer(
 )
 	:layer(e_layer_type_t::fully_connected)
 {
-	activations.resize_matrix(activation_format);
+	activations.resize(activation_format);
 
 	//the error is needed for every output (we need it for learning)
-	error.resize_matrix(activation_format);
+	error.resize(activation_format);
 
 	//weights and biases are the parameter values
-	biases.resize_matrix(activation_format);
-	weights.resize_matrix(0, 0, 0);
+	biases.resize(activation_format);
+	weights.resize(0, 0, 0);
 
 	//when training the network, we need to know how much the weights and biases need to change
-	bias_deltas.resize_matrix(activation_format);
+	bias_deltas.resize(activation_format);
 
-	weight_deltas.resize_matrix(0, 0, 0);
+	weight_deltas.resize(0, 0, 0);
 
 	//the activation function for making the output not linear
 	activation_fn = activation_function;
@@ -67,11 +67,11 @@ void fully_connected_layer::set_input_format(const matrix& input_format)
 {
 	layer::set_input_format(input_format);
 
-	weights.resize_matrix(
-		input_format.matrix_flat_readonly().size(),
-		activations.matrix_flat_readonly().size(),
+	weights.resize(
+		input_format.flat_readonly().size(),
+		activations.flat_readonly().size(),
 		1);
-	weight_deltas.resize_matrix(weights);
+	weight_deltas.resize(weights);
 }
 
 const matrix& fully_connected_layer::get_weights() const
@@ -102,57 +102,57 @@ void fully_connected_layer::set_all_parameter(float value)
 
 void fully_connected_layer::apply_noise(float range)
 {
-	biases.matrix_apply_noise(range);
-	weights.matrix_apply_noise(range);
+	biases.apply_noise(range);
+	weights.apply_noise(range);
 }
 
 void fully_connected_layer::mutate(float range)
 {
 	if (biased_coin_toss(
-		weights.matrix_flat_readonly().size(),
-		biases.matrix_flat_readonly().size()))
+		weights.flat_readonly().size(),
+		biases.flat_readonly().size()))
 	{
-		weights.matrix_mutate(range);
+		weights.mutate(range);
 	}
 	else
 	{
-		biases.matrix_mutate(range);
+		biases.mutate(range);
 	}
 }
 
 void fully_connected_layer::forward_propagation()
 {
 	//TODO - straighten out the input matrix
-	matrix::matrix_dot_flat(weights, *input, activations);
-	matrix::matrix_add_flat(activations, biases, activations);
-	activations.matrix_apply_activation(activation_fn);
+	matrix::dot_product_flat(weights, *input, activations);
+	matrix::add_flat(activations, biases, activations);
+	activations.apply_activation_function(activation_fn);
 }
 
 void fully_connected_layer::back_propagation()
 {
-	if (!matrix::matrix_equal_format(activations, error))
+	if (!matrix::equal_format(activations, error))
 	{
 		throw std::invalid_argument("activations and error_right have different format");
 	}
 
-	for (int current_neuron_idx = 0; current_neuron_idx < activations.matrix_flat_readonly().size(); current_neuron_idx++)
+	for (int current_neuron_idx = 0; current_neuron_idx < activations.flat_readonly().size(); current_neuron_idx++)
 	{
-		float error_value = error.matrix_flat_readonly()[current_neuron_idx];
+		float error_value = error.flat_readonly()[current_neuron_idx];
 		//clear the error
-		error.matrix_flat()[current_neuron_idx] = 0;
+		error.flat()[current_neuron_idx] = 0;
 
-		float current_activation_value = activations.matrix_flat_readonly()[current_neuron_idx];
+		float current_activation_value = activations.flat_readonly()[current_neuron_idx];
 		float unactivated_activation = INVERSE[activation_fn](current_activation_value);
 		float activation_derivative = DERIVATIVE[activation_fn](unactivated_activation);
 
 		//bias change
 		float bias_change = error_value * activation_derivative;
-		bias_deltas.matrix_flat()[current_neuron_idx] += bias_change;
+		bias_deltas.flat()[current_neuron_idx] += bias_change;
 
 		//iterate input layer
-		for (int current_input_idx = 0; current_input_idx < input->matrix_flat_readonly().size(); current_input_idx++)
+		for (int current_input_idx = 0; current_input_idx < input->flat_readonly().size(); current_input_idx++)
 		{
-			float current_previous_activation = input->matrix_flat_readonly()[current_input_idx];
+			float current_previous_activation = input->flat_readonly()[current_input_idx];
 
 			//this weight connects the current input node to the current neuron
 			float current_weight = get_weight_at(current_input_idx, current_neuron_idx);
@@ -175,19 +175,19 @@ void fully_connected_layer::back_propagation()
 
 void fully_connected_layer::apply_deltas(int number_of_inputs)
 {
-	for (int i = 0; i < biases.matrix_flat_readonly().size(); i++)
+	for (int i = 0; i < biases.flat_readonly().size(); i++)
 	{
-		float current_bias = biases.matrix_flat()[i];
-		float avg_bias_delta = bias_deltas.matrix_flat()[i] / number_of_inputs;
-		biases.matrix_flat()[i] = current_bias - avg_bias_delta;
-		bias_deltas.matrix_flat()[i] = 0;
+		float current_bias = biases.flat()[i];
+		float avg_bias_delta = bias_deltas.flat()[i] / number_of_inputs;
+		biases.flat()[i] = current_bias - avg_bias_delta;
+		bias_deltas.flat()[i] = 0;
 	}
 
-	for (int i = 0; i < weights.matrix_flat_readonly().size(); i++)
+	for (int i = 0; i < weights.flat_readonly().size(); i++)
 	{
-		float current_weight = weights.matrix_flat()[i];
-		float avg_weight_delta = weight_deltas.matrix_flat()[i] / number_of_inputs;
-		weights.matrix_flat()[i] = current_weight - avg_weight_delta;
-		weight_deltas.matrix_flat()[i] = 0;
+		float current_weight = weights.flat()[i];
+		float avg_weight_delta = weight_deltas.flat()[i] / number_of_inputs;
+		weights.flat()[i] = current_weight - avg_weight_delta;
+		weight_deltas.flat()[i] = 0;
 	}
 }

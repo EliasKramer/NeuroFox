@@ -14,7 +14,7 @@ namespace CNNTest
 			Assert::AreEqual(2, m.get_width());
 			Assert::AreEqual(3, m.get_height());
 			Assert::AreEqual(4, m.get_depth());
-			Assert::AreEqual(24, (int)m.matrix_flat_readonly().size());
+			Assert::AreEqual(24, (int)m.flat_readonly().size());
 		}
 		TEST_METHOD(setting_getting)
 		{
@@ -43,30 +43,30 @@ namespace CNNTest
 			m.set_at(1, 1, 3, 22);
 			m.set_at(0, 2, 3, 23);
 			m.set_at(1, 2, 3, 24);
-			Assert::AreEqual(2, (int)m.matrix_get_at(1, 0, 0));
-			Assert::AreEqual(1, (int)m.matrix_get_at(0, 0, 0));
-			Assert::AreEqual(3, (int)m.matrix_get_at(0, 1, 0));
-			Assert::AreEqual(4, (int)m.matrix_get_at(1, 1, 0));
-			Assert::AreEqual(5, (int)m.matrix_get_at(0, 2, 0));
-			Assert::AreEqual(6, (int)m.matrix_get_at(1, 2, 0));
-			Assert::AreEqual(7, (int)m.matrix_get_at(0, 0, 1));
-			Assert::AreEqual(8, (int)m.matrix_get_at(1, 0, 1));
-			Assert::AreEqual(9, (int)m.matrix_get_at(0, 1, 1));
-			Assert::AreEqual(10, (int)m.matrix_get_at(1, 1, 1));
-			Assert::AreEqual(11, (int)m.matrix_get_at(0, 2, 1));
-			Assert::AreEqual(12, (int)m.matrix_get_at(1, 2, 1));
-			Assert::AreEqual(13, (int)m.matrix_get_at(0, 0, 2));
-			Assert::AreEqual(14, (int)m.matrix_get_at(1, 0, 2));
-			Assert::AreEqual(15, (int)m.matrix_get_at(0, 1, 2));
-			Assert::AreEqual(16, (int)m.matrix_get_at(1, 1, 2));
-			Assert::AreEqual(17, (int)m.matrix_get_at(0, 2, 2));
-			Assert::AreEqual(18, (int)m.matrix_get_at(1, 2, 2));
-			Assert::AreEqual(19, (int)m.matrix_get_at(0, 0, 3));
-			Assert::AreEqual(20, (int)m.matrix_get_at(1, 0, 3));
-			Assert::AreEqual(21, (int)m.matrix_get_at(0, 1, 3));
-			Assert::AreEqual(22, (int)m.matrix_get_at(1, 1, 3));
-			Assert::AreEqual(23, (int)m.matrix_get_at(0, 2, 3));
-			Assert::AreEqual(24, (int)m.matrix_get_at(1, 2, 3));
+			Assert::AreEqual(2, (int)m.get_at(1, 0, 0));
+			Assert::AreEqual(1, (int)m.get_at(0, 0, 0));
+			Assert::AreEqual(3, (int)m.get_at(0, 1, 0));
+			Assert::AreEqual(4, (int)m.get_at(1, 1, 0));
+			Assert::AreEqual(5, (int)m.get_at(0, 2, 0));
+			Assert::AreEqual(6, (int)m.get_at(1, 2, 0));
+			Assert::AreEqual(7, (int)m.get_at(0, 0, 1));
+			Assert::AreEqual(8, (int)m.get_at(1, 0, 1));
+			Assert::AreEqual(9, (int)m.get_at(0, 1, 1));
+			Assert::AreEqual(10, (int)m.get_at(1, 1, 1));
+			Assert::AreEqual(11, (int)m.get_at(0, 2, 1));
+			Assert::AreEqual(12, (int)m.get_at(1, 2, 1));
+			Assert::AreEqual(13, (int)m.get_at(0, 0, 2));
+			Assert::AreEqual(14, (int)m.get_at(1, 0, 2));
+			Assert::AreEqual(15, (int)m.get_at(0, 1, 2));
+			Assert::AreEqual(16, (int)m.get_at(1, 1, 2));
+			Assert::AreEqual(17, (int)m.get_at(0, 2, 2));
+			Assert::AreEqual(18, (int)m.get_at(1, 2, 2));
+			Assert::AreEqual(19, (int)m.get_at(0, 0, 3));
+			Assert::AreEqual(20, (int)m.get_at(1, 0, 3));
+			Assert::AreEqual(21, (int)m.get_at(0, 1, 3));
+			Assert::AreEqual(22, (int)m.get_at(1, 1, 3));
+			Assert::AreEqual(23, (int)m.get_at(0, 2, 3));
+			Assert::AreEqual(24, (int)m.get_at(1, 2, 3));
 		}
 		TEST_METHOD(equal_test)
 		{
@@ -102,11 +102,11 @@ namespace CNNTest
 			m2.set_all(2);
 
 			matrix m3(3, 4, 1);
-			matrix::matrix_dot(m1, m2, m3);
+			matrix::dot_product(m1, m2, m3);
 
-			for (int i = 0; i < m3.matrix_flat_readonly().size(); i++)
+			for (int i = 0; i < m3.flat_readonly().size(); i++)
 			{
-				Assert::AreEqual(12, (int)m3.matrix_flat_readonly()[i]);
+				Assert::AreEqual(12, (int)m3.flat_readonly()[i]);
 			}
 		}
 		TEST_METHOD(dot_test_3D)
@@ -118,11 +118,11 @@ namespace CNNTest
 			m2.set_all(2);
 
 			matrix m3(3, 4, 2);
-			matrix::matrix_dot(m1, m2, m3);
+			matrix::dot_product(m1, m2, m3);
 
-			for (int i = 0; i < m3.matrix_flat_readonly().size(); i++)
+			for (int i = 0; i < m3.flat_readonly().size(); i++)
 			{
-				Assert::AreEqual(12, (int)m3.matrix_flat_readonly()[i]);
+				Assert::AreEqual(12, (int)m3.flat_readonly()[i]);
 			}
 		}
 		TEST_METHOD(hash_test)
@@ -132,7 +132,7 @@ namespace CNNTest
 			matrix m2(2, 4, 2);
 			m1.set_all(3);
 			m2.set_all(3);
-			Assert::AreEqual(m1.matrix_hash(), m2.matrix_hash());
+			Assert::AreEqual(m1.get_hash(), m2.get_hash());
 
 			// Test 2: Two matrices with one different value
 			m1 = matrix(2, 4, 2);
@@ -140,21 +140,21 @@ namespace CNNTest
 			m1.set_all(3);
 			m2.set_all(3);
 			m2.set_at(0, 0, 0, 4);
-			Assert::AreNotEqual(m1.matrix_hash(), m2.matrix_hash());
+			Assert::AreNotEqual(m1.get_hash(), m2.get_hash());
 
 			// Test 3: Two matrices with different sizes
 			m1 = matrix(2, 4, 2);
 			m2 = matrix(2, 3, 2);
 			m1.set_all(0);
 			m2.set_all(0);
-			Assert::AreNotEqual(m1.matrix_hash(), m2.matrix_hash());
+			Assert::AreNotEqual(m1.get_hash(), m2.get_hash());
 
 			// Test 4: Two matrices with all different values
 			m1 = matrix(3, 3, 2);
 			m2 = matrix(3, 3, 2);
 			m1.set_all( 1);
 			m2.set_all( 0);
-			Assert::AreNotEqual(m1.matrix_hash(), m2.matrix_hash());
+			Assert::AreNotEqual(m1.get_hash(), m2.get_hash());
 		}
 	};
 }

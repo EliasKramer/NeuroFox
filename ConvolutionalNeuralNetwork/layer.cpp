@@ -22,7 +22,7 @@ void layer::set_input(const matrix* input)
 
 void layer::set_input_format(const matrix& given_input_format)
 {
-	this->input_format.resize_matrix(given_input_format);
+	this->input_format.resize(given_input_format);
 }
 
 void layer::set_previous_layer(layer& previous_layer)
@@ -46,11 +46,11 @@ matrix* layer::get_activations_p()
 
 void layer::set_error_for_last_layer(const matrix& expected)
 {
-	if (!matrix::matrix_equal_format(activations, expected))
+	if (!matrix::equal_format(activations, expected))
 	{
 		throw std::runtime_error("setting error for the last layer could not be done. wrong expected matrix format");
 	}
 	//this calculates the const derivative
-	matrix::matrix_subtract(activations, expected, error);
-	error.matrix_multiply(2);
+	matrix::subtract(activations, expected, error);
+	error.scalar_multiplication(2);
 }

@@ -188,16 +188,16 @@ namespace CNNTest
 			*/
 			Assert::AreEqual(
 				ACTIVATION[sigmoid_fn](42.0f), 
-				layer.get_activations().matrix_get_at(0, 0));
+				layer.get_activations().get_at(0, 0));
 			Assert::AreEqual(
 				ACTIVATION[sigmoid_fn](72.0f),
-				layer.get_activations().matrix_get_at(1, 0));
+				layer.get_activations().get_at(1, 0));
 			Assert::AreEqual(
 				ACTIVATION[sigmoid_fn](52.0f),
-				layer.get_activations().matrix_get_at(0, 1));
+				layer.get_activations().get_at(0, 1));
 			Assert::AreEqual(
 				ACTIVATION[sigmoid_fn](82.0f),
-				layer.get_activations().matrix_get_at(1, 1));
+				layer.get_activations().get_at(1, 1));
 		}
 	};
 }

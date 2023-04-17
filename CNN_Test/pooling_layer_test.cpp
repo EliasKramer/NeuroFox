@@ -81,10 +81,10 @@ namespace CNNTest
 			Assert::AreEqual(3, pooling.get_activations().get_width());
 			Assert::AreEqual(2, pooling.get_activations().get_depth());
 
-			Assert::AreEqual(0.0f, pooling.get_activations().matrix_flat_readonly()[0]);
-			for (int i = 1; i < pooling.get_activations().matrix_flat_readonly().size(); i++)
+			Assert::AreEqual(0.0f, pooling.get_activations().flat_readonly()[0]);
+			for (int i = 1; i < pooling.get_activations().flat_readonly().size(); i++)
 			{
-				Assert::AreEqual(1.0f, pooling.get_activations().matrix_flat_readonly()[i]);
+				Assert::AreEqual(1.0f, pooling.get_activations().flat_readonly()[i]);
 			}
 		}
 	};
