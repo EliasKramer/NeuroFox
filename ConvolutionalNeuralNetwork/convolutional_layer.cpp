@@ -11,6 +11,16 @@ convolutional_layer::convolutional_layer(
 	kernel_size(kernel_size),
 	activation_fn(activation_function)
 {
+	if(number_of_kernels <= 0)
+		throw std::invalid_argument("number_of_kernels must be greater than 0");
+	if (kernel_size <= 0)
+		throw std::invalid_argument("kernel_size must be greater than 0");
+	if (stride <= 0)
+		throw std::invalid_argument("stride must be greater than 0");
+
+	if(stride > kernel_size)
+		throw std::invalid_argument("stride must be smaller or equal than the kernel_size");
+
 	for (int i = 0; i < number_of_kernels; i++)
 	{
 		kernels.push_back(conv_kernel(kernel_size));
@@ -45,16 +55,24 @@ void convolutional_layer::set_input_format(const matrix& input_format)
 	layer::set_input_format(input_format);
 
 	const int input_depth = input_format.get_depth();
-	const int output_width = (input_format.get_width() - kernel_size) / stride + 1;
-	const int output_height = (input_format.get_height() - kernel_size) / stride + 1;
 	
+	const float output_width = 
+		(input_format.get_width() - kernel_size) / (float)stride + 1;
+	
+	const float output_height = 
+		(input_format.get_height() - kernel_size) / (float)stride + 1;
+
+	if(!is_whole_number(output_width) || 
+		!is_whole_number(output_height))
+		throw std::invalid_argument("input format is not compatible with the kernel size and stride");
+
 	for (int i = 0; i < kernels.size(); i++)
 	{
 		kernels[i].set_kernel_depth(input_depth);
 		kernel_deltas[i].set_kernel_depth(input_depth);
 	}
 	
-	activations.resize(output_width, output_height, (int)kernels.size());
+	activations.resize((int)output_width, (int)output_height, (int)kernels.size());
 }
 
 void convolutional_layer::set_all_parameter(float value)

@@ -16,6 +16,45 @@ namespace CNNTest
 			Assert::AreEqual(2, layer.get_kernel_size());
 			Assert::AreEqual(1, layer.get_stride());
 		}
+		TEST_METHOD(invalid_constructor)
+		{
+			try
+			{
+				convolutional_layer layer(0, 2, 1, e_activation_t::relu_fn);
+				Assert::Fail();
+			}
+			catch (std::invalid_argument& e)
+			{
+				Assert::AreEqual("number_of_kernels must be greater than 0", e.what());
+			}
+			try
+			{
+				convolutional_layer layer(3, 0, 1, e_activation_t::relu_fn);
+				Assert::Fail();
+			}
+			catch (std::invalid_argument& e)
+			{
+				Assert::AreEqual("kernel_size must be greater than 0", e.what());
+			}
+			try
+			{
+				convolutional_layer layer(3, 2, 0, e_activation_t::relu_fn);
+				Assert::Fail();
+			}
+			catch (std::invalid_argument& e)
+			{
+				Assert::AreEqual("stride must be greater than 0", e.what());
+			}
+			try
+			{
+				convolutional_layer layer(3, 2, 3, e_activation_t::relu_fn);
+				Assert::Fail();
+			}
+			catch (std::invalid_argument& e)
+			{
+				Assert::AreEqual("stride must be smaller or equal than the kernel_size", e.what());
+			}
+		}
 		TEST_METHOD(set_input_format_test)
 		{
 			convolutional_layer layer(3, 2, 1, e_activation_t::relu_fn);

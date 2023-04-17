@@ -30,3 +30,7 @@ float random_float_incl(float min, float max)
     return dis(gen);
 }
 
+bool is_whole_number(float number)
+{
+    return number == (int)number;
+}

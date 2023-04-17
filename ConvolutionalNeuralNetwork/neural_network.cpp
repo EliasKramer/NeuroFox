@@ -65,7 +65,7 @@ void neural_network::add_layer(std::unique_ptr<layer>&& given_layer)
 	//because pooling layers do not have parameters
 	if (given_layer->get_layer_type() != e_layer_type_t::pooling)
 	{
-		parameter_layer_indices.push_back(layers.size());
+		parameter_layer_indices.push_back((int)layers.size());
 	}
 
 	if (layers.empty())
@@ -135,12 +135,16 @@ void neural_network::add_last_fully_connected_layer(e_activation_t activation_fn
 	output_p = get_last_layer()->get_activations_p();
 }
 
-void neural_network::add_convolutional_layer(int kernel_size, int number_of_kernels, int stride, e_activation_t activation_fn)
+void neural_network::add_convolutional_layer(
+	int number_of_kernels,
+	int kernel_size,
+	int stride,
+	e_activation_t activation_fn)
 {
 	std::unique_ptr<convolutional_layer> new_layer =
 		std::make_unique<convolutional_layer>(
-			kernel_size,
 			number_of_kernels,
+			kernel_size,
 			stride,
 			activation_fn);
 
@@ -176,7 +180,7 @@ void neural_network::mutate(float range)
 	{
 		throw std::runtime_error("Cannot mutate. No parameter layers have been added yet.");
 	}
-	int layer_idx = parameter_layer_indices[random_idx(parameter_layer_indices.size())];
+	int layer_idx = parameter_layer_indices[random_idx((int)parameter_layer_indices.size())];
 	layers[layer_idx]->mutate(range);
 }
 

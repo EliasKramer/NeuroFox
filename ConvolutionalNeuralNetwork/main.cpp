@@ -17,7 +17,7 @@ int main()
 	neural_network nn;
 
 	nn.set_input_format(matrix(28, 28, 1));
-	nn.add_convolutional_layer(14, 1, 14, sigmoid_fn);
+	nn.add_convolutional_layer(1, 7, 7, sigmoid_fn);
 	nn.add_fully_connected_layer(25, sigmoid_fn);
 	nn.add_fully_connected_layer(25, sigmoid_fn);
 	nn.set_output_format(matrix(1, 10, 1));
@@ -25,7 +25,7 @@ int main()
 	nn.set_interpreter<digit_interpreter>();
 
 	nn.set_all_parameter(0);
-	nn.apply_noise(0.1);
+	nn.apply_noise(0.1f);
 
 	nn.forward_propagation(testing_data[0].get()->get_data_p());
 

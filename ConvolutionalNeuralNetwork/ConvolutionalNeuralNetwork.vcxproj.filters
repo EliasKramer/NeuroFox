@@ -52,6 +52,12 @@
     <Filter Include="source\testing">
       <UniqueIdentifier>{be512c61-7789-413f-bd35-a745055b82c1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="header\layer\convolutional_layer">
+      <UniqueIdentifier>{84d5b0a1-3144-4633-b794-50d7a6ee7e4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="header\layer\base">
+      <UniqueIdentifier>{ee7c71c0-322b-4418-b786-6bba997d9d37}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="neural_network.cpp">
@@ -116,19 +122,10 @@
     <ClInclude Include="matrix.hpp">
       <Filter>header</Filter>
     </ClInclude>
-    <ClInclude Include="convolutional_layer.hpp">
-      <Filter>header\layer</Filter>
-    </ClInclude>
-    <ClInclude Include="conv_kernel.hpp">
-      <Filter>header\layer</Filter>
-    </ClInclude>
     <ClInclude Include="math_functions.hpp">
       <Filter>header</Filter>
     </ClInclude>
     <ClInclude Include="fully_connected_layer.hpp">
-      <Filter>header\layer</Filter>
-    </ClInclude>
-    <ClInclude Include="layer.hpp">
       <Filter>header\layer</Filter>
     </ClInclude>
     <ClInclude Include="interpreter.hpp">
@@ -154,6 +151,15 @@
     </ClInclude>
     <ClInclude Include="batch_handler.hpp">
       <Filter>header\training</Filter>
+    </ClInclude>
+    <ClInclude Include="conv_kernel.hpp">
+      <Filter>header\layer\convolutional_layer</Filter>
+    </ClInclude>
+    <ClInclude Include="convolutional_layer.hpp">
+      <Filter>header\layer\convolutional_layer</Filter>
+    </ClInclude>
+    <ClInclude Include="layer.hpp">
+      <Filter>header\layer\base</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
