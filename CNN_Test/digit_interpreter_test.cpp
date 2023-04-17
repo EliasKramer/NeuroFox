@@ -7,7 +7,7 @@ namespace CNNTest
 	TEST_CLASS(digit_interpreter_test)
 	{
 	public:
-		TEST_METHOD(testing_expected_behaviour)
+		TEST_METHOD(test_string_interpretation)
 		{
 			matrix input(1,10,1);
 
@@ -34,6 +34,55 @@ namespace CNNTest
 				std::string("9: 9.000000\n") +
 				std::string("result: 4\n"),
 				output);
+		}
+		TEST_METHOD(interpretion_test)
+		{
+			matrix input(1, 10, 1);
+
+			input.set_all(0);
+
+			input.set_at(0, 1, 0, .03f);
+
+			digit_interpreter interpreter(&input);
+			int output = interpreter.get_interpretation();
+
+			Assert::AreEqual(1, output);
+		}
+		TEST_METHOD(test_same_result)
+		{
+			matrix a(1, 10, 1);
+			matrix b(1, 10, 1);
+
+			for (int i = 0; i < 10; i++)
+			{
+				a.set_at(0, i, 0, i);
+				b.set_at(0, i, 0, i);
+			}
+
+			a.set_at(0, 1, 0, .03f);
+			b.set_at(0, 1, 0, .03f);
+
+			digit_interpreter interpreter(&a);
+			bool output = interpreter.same_result(a, b);
+
+			Assert::AreEqual(true, output);
+		}
+		TEST_METHOD(test_not_same_result)
+		{
+			matrix a(1, 10, 1);
+			matrix b(1, 10, 1);
+			a.set_all(0);
+			b.set_all(0);
+
+			a.set_at(0, 1, 0, .03f);
+
+			b.set_at(0, 1, 0, .02f);
+			b.set_at(0, 2, 0, .04f);
+
+			digit_interpreter interpreter;
+			bool output = interpreter.same_result(a, b);
+
+			Assert::AreEqual(false, output);
 		}
 	};
 }

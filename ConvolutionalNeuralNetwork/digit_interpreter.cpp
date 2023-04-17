@@ -1,5 +1,9 @@
 #include "digit_interpreter.hpp"
 
+digit_interpreter::digit_interpreter()
+	: interpreter()
+{}
+
 void digit_interpreter::check_for_correct_input(const matrix* given_input) const
 {
 	if (given_input == nullptr)
@@ -17,6 +21,31 @@ digit_interpreter::digit_interpreter(const matrix* given_input)
 	: interpreter(given_input)
 {
 	check_for_correct_input(given_input);
+}
+
+int digit_interpreter::get_interpretation() const
+{
+	return get_interpretation(input);
+}
+
+int digit_interpreter::get_interpretation(const matrix* given_input) const
+{
+	check_for_correct_input(given_input);
+
+	float highest_activation = FLT_MIN;
+	int highest_digit = 0;
+	int curr_digit = 0;
+	for each (const float curr_activation in given_input->flat_readonly())
+	{
+		if (curr_activation > highest_activation)
+		{
+			highest_activation = curr_activation;
+			highest_digit = curr_digit;
+		}
+		curr_digit++;
+	}
+
+	return highest_digit;
 }
 
 std::string digit_interpreter::get_string_interpretation() const
@@ -54,26 +83,5 @@ bool digit_interpreter::same_result(const matrix& a, const matrix& b) const
 	if(matrix::equal_format(a, b) == false)
 		throw std::invalid_argument("Matrices are not the same format.");
 
-	int highest_activation_a = 0;
-	int highest_activation_b = 0;
-
-	float highest_activation_value_a = FLT_MIN;
-	float highest_activation_value_b = FLT_MIN;
-
-	for (int i = 0; i < a.flat_readonly().size(); i++)
-	{
-		if (a.flat_readonly()[i] > highest_activation_value_a)
-		{
-			highest_activation_value_a = a.flat_readonly()[i];
-			highest_activation_a = i;
-		}
-
-		if (b.flat_readonly()[i] > highest_activation_value_b)
-		{
-			highest_activation_value_b = b.flat_readonly()[i];
-			highest_activation_b = i;
-		}
-	}
-
-	return highest_activation_a == highest_activation_b;
+	return get_interpretation(&a) == get_interpretation(&b);
 }

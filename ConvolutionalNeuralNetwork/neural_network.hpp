@@ -30,9 +30,6 @@ private:
 	//convolutional and fully connected 
 	std::vector<int> parameter_layer_indices;
 
-	//the hash of the last input matrix that propagated forward
-	size_t last_processed_input_hash = 0;
-
 	std::unique_ptr<interpreter> interpreter_p = 0;
 
 	void set_input(const matrix* input);
@@ -68,6 +65,7 @@ public:
 
 	template<typename interpreter_type>
 	void set_interpreter()
+	#pragma region set_interpreter
 	{
 		if (std::is_base_of<interpreter, interpreter_type>::value == false)
 		{
@@ -76,9 +74,11 @@ public:
 		}
 		interpreter_p = std::make_unique<interpreter_type>(get_output());
 	}
+	#pragma endregion
 
 	template<typename interpreter_type>
 	const interpreter_type* get_interpreter() const
+	#pragma region get_interpreter
 	{
 		if (interpreter_p == nullptr)
 		{
@@ -93,6 +93,7 @@ public:
 
 		return dynamic_cast<interpreter_type*>(interpreter_p.get());
 	}
+#pragma endregion
 
 	//set all weights and biases to that value
 	void set_all_parameter(float value);
