@@ -92,9 +92,19 @@ void matrix::set_at(int x, int y, int z, float value)
 	data[get_idx(x, y, z)] = value;
 }
 
+void matrix::add_at(int x, int y, int z, float value)
+{
+	data[get_idx(x, y, z)] += value;
+}
+
 void matrix::set_at(int x, int y, float value)
 {
 	set_at(x, y, 0, value);
+}
+
+void matrix::add_at(int x, int y, float value)
+{
+	add_at(x, y, 0, value);
 }
 
 float matrix::get_at(int x, int y, int z) const
@@ -105,6 +115,25 @@ float matrix::get_at(int x, int y, int z) const
 float matrix::get_at(int x, int y) const
 {
 	return get_at(x, y, 0);
+}
+
+const matrix& matrix::rotate180copy() const
+{
+	//NOT TESTED
+	//ALSO - this is a very inefficient way to do this. I should be able to do this in-place
+
+	matrix result(width, height, depth);
+	for (int z = 0; z < depth; z++)
+	{
+		for (int y = 0; y < height; y++)
+		{
+			for (int x = 0; x < width; x++)
+			{
+				result.set_at(x, y, z, get_at(width - x - 1, height - y - 1, z));
+			}
+		}
+	}
+	return result;
 }
 
 void matrix::dot_product(const matrix& a, const matrix& b, matrix& result)
@@ -207,6 +236,93 @@ bool matrix::are_equal(const matrix& a, const matrix& b)
 bool matrix::equal_format(const matrix& a, const matrix& b)
 {
 	return a.width == b.width && a.height == b.height && a.depth == b.depth;
+}
+
+void matrix::valid_cross_correlation(const matrix& input, const matrix& kernel, matrix& output)
+{
+	//this only works with a stride of one
+	const size_t input_size = input.get_width();
+	const size_t kernel_size = kernel.get_width();
+	const size_t output_size = output.get_width();
+	const size_t expected_output_size = input_size - kernel_size + 1;
+	
+	if (output_size != expected_output_size)
+	{
+		throw std::invalid_argument("cross correlation could not be performed. output matrix is not the correct size");
+	}
+	if (input.get_depth() != kernel.get_depth())
+	{
+		throw std::invalid_argument("cross correlation could not be performed. input matrices are in the wrong format");
+	}
+	if (output.get_depth() != 1)
+	{
+		throw std::invalid_argument("cross correlation could not be performed. output matrix is in the wrong format");
+	}
+
+	output.set_all(0);
+
+	for (int z = 0; z < output.depth; z++)
+	{
+		for (int y = 0; y < output.height; y++)
+		{
+			for (int x = 0; x < output.width; x++)
+			{
+				float sum = 0;
+				for (int i = 0; i < kernel_size; i++)
+				{
+					for (int j = 0; j < kernel_size; j++)
+					{
+						sum += input.get_at(x + i, y + j, z) * kernel.get_at(i, j, z);
+					}
+				}
+				//if we do this, the output of all depths will be added together
+				output.add_at(x, y, z, sum);
+			}
+		}
+	}
+}
+
+void matrix::valid_convolution(const matrix& input, const matrix& kernel, matrix& output)
+{
+	valid_cross_correlation(input, kernel.rotate180copy(), output);
+}
+
+void matrix::full_cross_correlation(const matrix& input, const matrix& kernel, matrix& output)
+{
+	//this only works with a stride of one
+	const size_t input_size = input.get_width();
+	const size_t kernel_size = kernel.get_width();
+	const size_t output_size = output.get_width();
+	const size_t expected_output_size = input_size + kernel_size - 1;
+	if (output_size != expected_output_size)
+	{
+		throw std::invalid_argument("cross correlation could not be performed. output matrix is not the correct size");
+	}
+	if (input.get_depth() != kernel.get_depth() || input.get_depth() != output.get_depth())
+	{
+		throw std::invalid_argument("cross correlation could not be performed. input matrices are in the wrong format");
+	}
+	for (int z = 0; z < output.depth; z++)
+	{
+		for (int y = 0; y < output.height; y++)
+		{
+			for (int x = 0; x < output.width; x++)
+			{
+				float sum = 0;
+				for (int i = 0; i < kernel_size; i++)
+				{
+					for (int j = 0; j < kernel_size; j++)
+					{
+						if (x - i >= 0 && x - i < input_size && y - j >= 0 && y - j < input_size)
+						{
+							sum += input.get_at(x - i, y - j, z) * kernel.get_at(i, j, z);
+						}
+					}
+				}
+				output.set_at(x, y, z, sum);
+			}
+		}
+	}
 }
 
 void matrix::scalar_multiplication(float a)

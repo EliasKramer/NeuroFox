@@ -17,7 +17,7 @@ int main()
 	neural_network nn;
 
 	nn.set_input_format(matrix(28, 28, 1));
-	nn.add_convolutional_layer(1, 7, 7, sigmoid_fn);
+	nn.add_convolutional_layer(1, 7, 1, sigmoid_fn);
 	nn.add_fully_connected_layer(25, sigmoid_fn);
 	nn.add_fully_connected_layer(25, sigmoid_fn);
 	nn.set_output_format(matrix(1, 10, 1));
