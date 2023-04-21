@@ -74,6 +74,85 @@ namespace CNNTest
 					.get_weights_readonly()
 					.get_depth());
 		}
+		TEST_METHOD(feed_forward_test)
+		{
+			convolutional_layer layer(1, 2, 1, e_activation_t::sigmoid_fn);
+			matrix input(3, 3, 1);
+			layer.set_input_format(input);
+			layer.set_input(&input);
 
+			/* weight matrix
+				+ - + - +
+				| 1 | 3 |
+				+ - + - +
+				| 2 | 4 |
+				+ - + - +
+			*/
+			layer.get_kernels()[0].get_weights().set_at(0, 0, 1.0f);
+			layer.get_kernels()[0].get_weights().set_at(0, 1, 2.0f);
+			layer.get_kernels()[0].get_weights().set_at(1, 0, 3.0f);
+			layer.get_kernels()[0].get_weights().set_at(1, 1, 4.0f);
+
+			/* bias matrix
+				+ - + - +
+				|-60|-60|
+				+ - + - +
+				|-60|-60|
+				+ - + - +
+			*/
+			layer.get_kernels()[0].get_bias().set_all(-60);
+
+			/* input matrix
+				+ - + - + - +
+				| 1 | 4 | 7 |
+				+ - + - + - +
+				| 2 | 5 | 8 |
+				+ - + - + - +
+				| 3 | 6 | 9 |
+				+ - + - + - +
+			*/
+			input.set_at(0, 0, 1);
+			input.set_at(0, 1, 2);
+			input.set_at(0, 2, 3);
+			input.set_at(1, 0, 4);
+			input.set_at(1, 1, 5);
+			input.set_at(1, 2, 6);
+			input.set_at(2, 0, 7);
+			input.set_at(2, 1, 8);
+			input.set_at(2, 2, 9);
+
+			layer.forward_propagation();
+
+			/* expected output matrix
+				+ -- + -- +
+				|-23 | 07 |
+				+ -- + -- +
+				|-13 | 17 |
+				+ -- + -- +
+			*/
+
+			//but the matrix did an activation function. in this case sigmoid
+			//so the output matrix is
+			/*
+					(+ -- + -- +)
+					(|-23 | 07 |)
+			sigmoid (+ -- + -- +)
+					(|-13 | 17 |)
+					(+ -- + -- +)
+			*/
+
+			Assert::AreEqual(
+				ACTIVATION[sigmoid_fn](-23.0f),
+				layer.get_activations().get_at(0, 0));
+			Assert::AreEqual(
+				ACTIVATION[sigmoid_fn](7.0f),
+				layer.get_activations().get_at(1, 0));
+			Assert::AreEqual(
+				ACTIVATION[sigmoid_fn](-13.0f),
+				layer.get_activations().get_at(0, 1));
+			Assert::AreEqual(
+				ACTIVATION[sigmoid_fn](17.0f),
+				layer.get_activations().get_at(1, 1));
+		}
 	};
 }

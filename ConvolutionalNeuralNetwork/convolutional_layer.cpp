@@ -155,7 +155,6 @@ void convolutional_layer::forward_propagation()
 		const conv_kernel& curr_kernel = kernels[output_depth];
 		const matrix& kernel_bias = kernels[output_depth].get_bias();
 
-		activations.set_all(0);
 		matrix::valid_cross_correlation(
 			*input, curr_kernel.get_weights_readonly(), activations);
 		matrix::add(activations, kernel_bias, activations);
