@@ -156,5 +156,67 @@ namespace CNNTest
 			m2.set_all( 0);
 			Assert::AreNotEqual(m1.get_hash(), m2.get_hash());
 		}
+		TEST_METHOD(valid_cross_correlation_test)
+		{
+			/* input matrix
+				+ - + - +
+				| 1 | 3 |
+				+ - + - +
+				| 2 | 4 |
+				+ - + - +
+			*/
+			matrix kernel(2,2,1);
+
+			kernel.set_at(0, 0, 1);
+			kernel.set_at(0, 1, 2);
+			kernel.set_at(1, 0, 3);
+			kernel.set_at(1, 1, 4);
+
+			matrix input(3, 3, 1);
+
+			/* input matrix
+				+ - + - + - +
+				| 1 | 4 | 7 |
+				+ - + - + - +
+				| 2 | 5 | 8 |
+				+ - + - + - +
+				| 3 | 6 | 9 |
+				+ - + - + - +
+			*/
+
+			input.set_at(0, 0, 1);
+			input.set_at(0, 1, 2);
+			input.set_at(0, 2, 3);
+			input.set_at(1, 0, 4);
+			input.set_at(1, 1, 5);
+			input.set_at(1, 2, 6);
+			input.set_at(2, 0, 7);
+			input.set_at(2, 1, 8);
+			input.set_at(2, 2, 9);
+
+			matrix output(2,2,1);
+			output.set_all(0);
+
+			//1*1 + 4*3 + 2*2 + 5*4 = 37 (0,0)
+			//1*4 + 3*7 + 2*5 + 4*8 = 67 (1,0)
+			//1*2 + 3*5 + 2*3 + 4*6 = 47 (0,1)
+			//1*5 + 3*8 + 2*6 + 4*9 = 77 (1,1)
+
+			//expected output 
+			/*
+				+ -- + -- +
+				| 37 | 67 |
+				+ -- + -- +
+				| 47 | 77 |
+				+ -- + -- +
+			*/
+
+			matrix::valid_cross_correlation(input, kernel, output);
+
+			Assert::AreEqual(37, (int)output.get_at(0, 0));
+			Assert::AreEqual(67, (int)output.get_at(1, 0));
+			Assert::AreEqual(47, (int)output.get_at(0, 1));
+			Assert::AreEqual(77, (int)output.get_at(1, 1));
+		}
 	};
 }
