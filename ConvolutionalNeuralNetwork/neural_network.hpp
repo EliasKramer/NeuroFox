@@ -10,6 +10,9 @@
 #include "batch_handler.hpp"
 #include "test_result.hpp"
 
+#include "cuda_runtime.h"
+#include "device_launch_parameters.h"
+
 class neural_network {
 private:
 	matrix* output_p = nullptr;
@@ -31,6 +34,8 @@ private:
 	std::vector<int> parameter_layer_indices;
 
 	std::unique_ptr<interpreter> interpreter_p = 0;
+
+	bool enabled_gpu = false;
 
 	void set_input(const matrix* input);
 
@@ -107,4 +112,7 @@ public:
 
 	void learn(const std::vector<std::unique_ptr<nn_data>>& training_data, int batch_size, int epochs);
 	void learn_once(const std::unique_ptr<nn_data>& expected_output, bool apply_changes = true);
+
+	void enable_gpu();
+	void disable_gpu();
 };

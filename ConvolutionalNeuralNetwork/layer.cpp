@@ -1,5 +1,4 @@
 #include "layer.hpp"
-#include "layer.hpp"
 
 layer::layer(e_layer_type_t given_layer_type)
 	:type(given_layer_type)

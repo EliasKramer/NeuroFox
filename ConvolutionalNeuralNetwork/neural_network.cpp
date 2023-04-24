@@ -271,3 +271,26 @@ void neural_network::learn_once(const std::unique_ptr<nn_data>& training_data, b
 		apply_deltas(1);
 	}
 }
+
+void neural_network::enable_gpu()
+{
+	int device_count = 0;
+	cudaError_t error = cudaGetDeviceCount(&device_count);
+
+	if (error != cudaSuccess)
+	{
+		throw std::runtime_error("CUDA error: " + std::string(cudaGetErrorString(error)));
+	}
+
+	if (device_count == 0)
+	{
+		throw std::runtime_error("No CUDA capable devices (GPUs) found.");
+	}
+
+	enabled_gpu = true;
+}
+
+void neural_network::disable_gpu()
+{
+	enabled_gpu = false;
+}
