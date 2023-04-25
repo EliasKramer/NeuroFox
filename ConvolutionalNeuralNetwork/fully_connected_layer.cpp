@@ -191,3 +191,50 @@ void fully_connected_layer::apply_deltas(int number_of_inputs)
 		weight_deltas.flat()[i] = 0;
 	}
 }
+
+void fully_connected_layer::enable_gpu()
+{
+	layer::enable_gpu();
+
+	cudaError_t cudaError = cudaMalloc(&gpu_biases, biases.flat_readonly().size() * sizeof(float));
+	if (cudaError != cudaSuccess)
+	{
+		throw std::runtime_error("failed to allocate gpu memory for biases");
+	}
+	cudaError = cudaMalloc(&gpu_weights, weights.flat_readonly().size() * sizeof(float));
+	if (cudaError != cudaSuccess)
+	{
+		throw std::runtime_error("failed to allocate gpu memory for weights");
+	}
+
+	cudaError = cudaMemcpy(gpu_biases, biases.flat_readonly().data(), biases.flat_readonly().size() * sizeof(float), cudaMemcpyHostToDevice);
+	if (cudaError != cudaSuccess)
+	{
+		throw std::runtime_error("failed to copy biases to gpu");
+	}
+
+	cudaError = cudaMemcpy(gpu_weights, weights.flat_readonly().data(), weights.flat_readonly().size() * sizeof(float), cudaMemcpyHostToDevice);
+	if (cudaError != cudaSuccess)
+	{
+		throw std::runtime_error("failed to copy weights to gpu");
+	}
+}
+
+void fully_connected_layer::disable_gpu()
+{
+	layer::disable_gpu();
+
+	cudaError_t cudaError = cudaFree(gpu_biases);
+	if (cudaError != cudaSuccess)
+	{
+		throw std::runtime_error("failed to free gpu memory for biases");
+	}
+	cudaError = cudaFree(gpu_weights);
+	if (cudaError != cudaSuccess)
+	{
+		throw std::runtime_error("failed to free gpu memory for weights");
+	}
+
+	gpu_biases = nullptr;
+	gpu_weights = nullptr;
+}

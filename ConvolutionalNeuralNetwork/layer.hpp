@@ -1,6 +1,9 @@
 #pragma once
 #include "matrix.hpp"
 
+#include "cuda_runtime.h"
+#include "device_launch_parameters.h"
+
 typedef enum _layer_type {
 	convolution,
 	pooling,
@@ -22,9 +25,14 @@ protected:
 
 	//the error has the same format as our neurons
 	matrix error;
-	//the passing error has the same format 
+	//the passing error has the same format
 	//as the neurons of the previous layer
 	matrix* passing_error = nullptr;
+
+	//GPU section
+	float* gpu_activations = nullptr;
+	float* gpu_error = nullptr;
+	float* gpu_passing_error = nullptr;
 
 public:
 	layer(e_layer_type_t given_layer_type);
@@ -56,4 +64,7 @@ public:
 	//all the deltas got summed up. now we need to apply the
 	//average. this is done by dividing the deltas by the number of inputs
 	virtual void apply_deltas(int number_of_inputs) = 0;
+
+	virtual void enable_gpu();
+	virtual void disable_gpu();
 };

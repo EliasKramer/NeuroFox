@@ -3,6 +3,9 @@
 #include "math_functions.hpp"
 #include "layer.hpp"
 
+#include "cuda_runtime.h"
+#include "device_launch_parameters.h"
+
 class fully_connected_layer : public layer {
 private:
 	matrix weights;
@@ -12,6 +15,10 @@ private:
 	matrix bias_deltas;
 
 	e_activation_t activation_fn;
+
+	//GPU Section
+	float* gpu_weights = nullptr;
+	float* gpu_biases = nullptr;
 
 	float get_weight_at(int input_layer_idx, int current_activation_idx) const;
 	void set_weight_at(int input_layer_idx, int current_activation_idx, float value);
@@ -52,4 +59,7 @@ public:
 	void back_propagation() override;
 
 	void apply_deltas(int number_of_inputs) override;
+
+	void enable_gpu() override;
+	void disable_gpu() override;
 };

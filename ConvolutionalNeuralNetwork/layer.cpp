@@ -53,3 +53,27 @@ void layer::set_error_for_last_layer(const matrix& expected)
 	matrix::subtract(activations, expected, error);
 	error.scalar_multiplication(2);
 }
+
+void layer::enable_gpu()
+{
+	//using the first gpu
+	cudaError_t cudaStatus = cudaSetDevice(0);
+
+	if (cudaStatus != cudaSuccess)
+	{
+		throw std::runtime_error("cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?");
+	}
+
+	//malloc activations
+	cudaError_t cudaError = cudaMalloc(&gpu_activations, activations.flat_readonly().size() * sizeof(float));
+	if (cudaError != cudaSuccess)
+	{
+		throw std::runtime_error("error while allocating cuda activations!");
+	}
+}
+
+void layer::disable_gpu()
+{
+	cudaFree(gpu_activations);
+	gpu_activations = nullptr;
+}
