@@ -30,6 +30,33 @@ void fully_connected_layer::set_passing_error_at(int input_layer_idx, float valu
 	passing_error->flat()[input_layer_idx] = value;
 }
 
+void fully_connected_layer::copy_values_to_gpu()
+{
+	layer::copy_values_to_gpu();
+
+	cudaError_t cudaError = cudaMemcpy(
+		gpu_weights, 
+		weights.flat_readonly().data(), 
+		weights.flat_readonly().size() * sizeof(float), 
+		cudaMemcpyHostToDevice);
+
+	if (cudaError != cudaSuccess)
+	{
+		throw std::runtime_error("copying values to gpu failed. cudaMemcpy failed");
+	}
+
+	cudaError = cudaMemcpy(
+		gpu_biases, 
+		biases.flat_readonly().data(), 
+		biases.flat_readonly().size() * sizeof(float), 
+		cudaMemcpyHostToDevice);
+
+	if (cudaError != cudaSuccess)
+	{
+		throw std::runtime_error("copying values to gpu failed. cudaMemcpy failed");
+	}
+}
+
 fully_connected_layer::fully_connected_layer(
 	int number_of_neurons,
 	e_activation_t activation_function

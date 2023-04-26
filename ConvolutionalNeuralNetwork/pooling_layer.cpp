@@ -1,5 +1,10 @@
 #include "pooling_layer.hpp"
 
+void pooling_layer::copy_values_to_gpu()
+{
+	throw std::runtime_error("pooling layer has no implementation of copy values to gpu");
+}
+
 pooling_layer::pooling_layer(
 	int filter_size,
 	int stride,
@@ -141,4 +146,14 @@ void pooling_layer::back_propagation()
 void pooling_layer::apply_deltas(int number_of_inputs)
 {
 	throw std::invalid_argument("pooling layer does not have any parameters");
+}
+
+void pooling_layer::enable_gpu()
+{
+	throw std::runtime_error("pooling layer has no implementation of enable gpu");
+}
+
+void pooling_layer::disable_gpu()
+{
+	throw std::runtime_error("pooling layer has no implementation of disable gpu");
 }

@@ -34,6 +34,8 @@ protected:
 	float* gpu_error = nullptr;
 	float* gpu_passing_error = nullptr;
 
+	virtual void copy_values_to_gpu();
+
 public:
 	layer(e_layer_type_t given_layer_type);
 

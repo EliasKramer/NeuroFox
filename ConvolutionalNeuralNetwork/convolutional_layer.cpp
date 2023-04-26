@@ -1,5 +1,10 @@
 #include "convolutional_layer.hpp"
 
+void convolutional_layer::copy_values_to_gpu()
+{
+	throw std::runtime_error("copying values to gpu failed. convolutional_layer::copy_values_to_gpu not implemented");
+}
+
 convolutional_layer::convolutional_layer(
 	int number_of_kernels,
 	int kernel_size,
@@ -171,4 +176,14 @@ void convolutional_layer::back_propagation()
 void convolutional_layer::apply_deltas(int number_of_inputs)
 {
 	//TODO
+}
+
+void convolutional_layer::enable_gpu()
+{
+	throw std::invalid_argument("gpu not supported for convolutional layer");
+}
+
+void convolutional_layer::disable_gpu()
+{
+	throw std::invalid_argument("gpu not supported for convolutional layer");
 }

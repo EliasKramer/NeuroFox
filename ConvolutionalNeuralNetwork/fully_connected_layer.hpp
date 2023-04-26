@@ -29,6 +29,8 @@ private:
 	float get_passing_error_at(int input_layer_idx) const;
 	void set_passing_error_at(int input_layer_idx, float value);
 
+	void copy_values_to_gpu() override;
+
 public:
 
 	fully_connected_layer(

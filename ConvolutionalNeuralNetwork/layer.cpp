@@ -1,5 +1,54 @@
 #include "layer.hpp"
 
+void layer::copy_values_to_gpu()
+{
+	if (gpu_activations == nullptr)
+	{
+		throw std::runtime_error("copying values to gpu failed. gpu_activations is nullptr");
+	}
+	if (gpu_error == nullptr)
+	{
+		throw std::runtime_error("copying values to gpu failed. gpu_error is nullptr");
+	}
+	if (gpu_passing_error == nullptr)
+	{
+		throw std::runtime_error("copying values to gpu failed. gpu_passing_error is nullptr");
+	}
+
+	cudaError_t cudaError = cudaMemcpy(
+		gpu_activations, 
+		activations.flat_readonly().data(), 
+		activations.flat_readonly().size() * sizeof(float), 
+		cudaMemcpyHostToDevice);
+
+	if (cudaError != cudaSuccess)
+	{
+		throw std::runtime_error("copying values to gpu failed. cudaMemcpy failed");
+	}
+
+	cudaError = cudaMemcpy(
+		gpu_error, 
+		error.flat_readonly().data(), 
+		error.flat_readonly().size() * sizeof(float), 
+		cudaMemcpyHostToDevice);
+
+	if (cudaError != cudaSuccess)
+	{
+		throw std::runtime_error("copying values to gpu failed. cudaMemcpy failed");
+	}
+	
+	cudaError = cudaMemcpy(
+		gpu_passing_error, 
+		passing_error->flat_readonly().data(), 
+		passing_error->flat_readonly().size() * sizeof(float), 
+		cudaMemcpyHostToDevice);
+
+	if (cudaError != cudaSuccess)
+	{
+		throw std::runtime_error("copying values to gpu failed. cudaMemcpy failed");
+	}
+}
+
 layer::layer(e_layer_type_t given_layer_type)
 	:type(given_layer_type)
 {}
@@ -61,7 +110,7 @@ void layer::enable_gpu()
 
 	if (cudaStatus != cudaSuccess)
 	{
-		throw std::runtime_error("cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?");
+		throw std::runtime_error("cudaSetDevice failed! Do you have a CUDA-capable GPU installed?");
 	}
 
 	//malloc activations

@@ -16,6 +16,8 @@ private:
 	int stride;
 
 	e_activation_t activation_fn;
+protected:
+	void copy_values_to_gpu() override;
 public:
 	//constructor
 	convolutional_layer(
@@ -44,4 +46,7 @@ public:
 	void back_propagation() override;	
 
 	void apply_deltas(int number_of_inputs) override;
+
+	void enable_gpu() override;
+	void disable_gpu() override;
 };
