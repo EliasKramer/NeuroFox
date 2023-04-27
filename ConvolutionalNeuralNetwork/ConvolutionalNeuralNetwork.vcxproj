@@ -17,6 +17,7 @@
     <ClCompile Include="digit_data.cpp" />
     <ClCompile Include="digit_interpreter.cpp" />
     <ClCompile Include="fully_connected_layer.cpp" />
+    <ClCompile Include="gpu_matrix.cu" />
     <ClCompile Include="layer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="math_functions.cpp" />
@@ -37,6 +38,7 @@
     <ClInclude Include="digit_data.hpp" />
     <ClInclude Include="digit_interpreter.hpp" />
     <ClInclude Include="fully_connected_layer.hpp" />
+    <ClInclude Include="gpu_matrix.hpp" />
     <ClInclude Include="layer.hpp" />
     <ClInclude Include="math_functions.hpp" />
     <ClInclude Include="matrix.hpp" />

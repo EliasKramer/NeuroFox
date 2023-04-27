@@ -58,6 +58,12 @@
     <Filter Include="header\layer\base">
       <UniqueIdentifier>{ee7c71c0-322b-4418-b786-6bba997d9d37}</UniqueIdentifier>
     </Filter>
+    <Filter Include="header\gpu">
+      <UniqueIdentifier>{416e848e-86b1-4d92-b278-77a91d946757}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\gpu">
+      <UniqueIdentifier>{563228e2-f328-47fe-b959-3be8bba7e3b6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="neural_network.cpp">
@@ -114,6 +120,9 @@
     <ClCompile Include="batch_handler.cpp">
       <Filter>source\training</Filter>
     </ClCompile>
+    <ClCompile Include="gpu_matrix.cu">
+      <Filter>source\gpu</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="neural_network.hpp">
@@ -160,6 +169,9 @@
     </ClInclude>
     <ClInclude Include="layer.hpp">
       <Filter>header\layer\base</Filter>
+    </ClInclude>
+    <ClInclude Include="gpu_matrix.hpp">
+      <Filter>header\gpu</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

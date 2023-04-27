@@ -49,6 +49,14 @@ void layer::copy_values_to_gpu()
 	}
 }
 
+bool layer::should_use_gpu()
+{
+	return 
+		gpu_activations != nullptr &&
+		gpu_error != nullptr &&
+		gpu_passing_error != nullptr;
+}
+
 layer::layer(e_layer_type_t given_layer_type)
 	:type(given_layer_type)
 {}
@@ -105,14 +113,6 @@ void layer::set_error_for_last_layer(const matrix& expected)
 
 void layer::enable_gpu()
 {
-	//using the first gpu
-	cudaError_t cudaStatus = cudaSetDevice(0);
-
-	if (cudaStatus != cudaSuccess)
-	{
-		throw std::runtime_error("cudaSetDevice failed! Do you have a CUDA-capable GPU installed?");
-	}
-
 	//malloc activations
 	cudaError_t cudaError = cudaMalloc(&gpu_activations, activations.flat_readonly().size() * sizeof(float));
 	if (cudaError != cudaSuccess)

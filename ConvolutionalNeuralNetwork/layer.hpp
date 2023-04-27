@@ -36,6 +36,8 @@ protected:
 
 	virtual void copy_values_to_gpu();
 
+	bool should_use_gpu();
+
 public:
 	layer(e_layer_type_t given_layer_type);
 

@@ -287,6 +287,11 @@ void neural_network::enable_gpu()
 		throw std::runtime_error("No CUDA capable devices (GPUs) found.");
 	}
 
+	for (auto& l : layers)
+	{
+		l->enable_gpu();
+	}
+
 	enabled_gpu = true;
 }
 

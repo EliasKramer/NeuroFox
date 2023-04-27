@@ -31,6 +31,12 @@ private:
 
 	void copy_values_to_gpu() override;
 
+	void forward_propagation_cpu();
+	void forward_propagation_gpu();
+
+	void back_propagation_cpu();
+	void back_propagation_gpu();
+
 public:
 
 	fully_connected_layer(
