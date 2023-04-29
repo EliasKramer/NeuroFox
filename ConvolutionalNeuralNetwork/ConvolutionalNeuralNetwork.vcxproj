@@ -16,18 +16,16 @@
     <ClCompile Include="conv_kernel.cpp" />
     <ClCompile Include="digit_data.cpp" />
     <ClCompile Include="digit_interpreter.cpp" />
+    <ClCompile Include="digit_training_data.cpp" />
     <ClCompile Include="fully_connected_layer.cpp" />
-    <ClCompile Include="gpu_matrix.cu" />
+    <ClCompile Include="interpreter.cpp" />
     <ClCompile Include="layer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="math_functions.cpp" />
     <ClCompile Include="matrix.cpp" />
     <ClCompile Include="neural_network.cpp" />
-    <ClCompile Include="interpreter.cpp" />
-    <ClCompile Include="pooling_layer.cpp" />
-    <ClCompile Include="pooling_layer.hpp" />
     <ClCompile Include="nn_data.cpp" />
-    <ClCompile Include="digit_training_data.cpp" />
+    <ClCompile Include="pooling_layer.cpp" />
     <ClCompile Include="test_result.cpp" />
     <ClCompile Include="util.cpp" />
   </ItemGroup>
@@ -37,20 +35,24 @@
     <ClInclude Include="conv_kernel.hpp" />
     <ClInclude Include="digit_data.hpp" />
     <ClInclude Include="digit_interpreter.hpp" />
+    <ClInclude Include="digit_training_data.hpp" />
     <ClInclude Include="fully_connected_layer.hpp" />
-    <ClInclude Include="gpu_matrix.hpp" />
+    <ClInclude Include="gpu_matrix.cuh" />
+    <ClInclude Include="interpreter.hpp" />
     <ClInclude Include="layer.hpp" />
     <ClInclude Include="math_functions.hpp" />
     <ClInclude Include="matrix.hpp" />
     <ClInclude Include="neural_network.hpp" />
-    <ClInclude Include="interpreter.hpp" />
     <ClInclude Include="nn_data.hpp" />
-    <ClInclude Include="digit_training_data.hpp" />
+    <ClInclude Include="pooling_layer.hpp" />
     <ClInclude Include="test_result.hpp" />
     <ClInclude Include="util.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="gpu_matrix.cu" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{48535A13-B99F-4D97-8066-3C121550564E}</ProjectGuid>
+    <ProjectGuid>{D8C885F6-007A-45AF-A38F-B60CE38A9F9D}</ProjectGuid>
     <RootNamespace>ConvolutionalNeuralNetwork</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>

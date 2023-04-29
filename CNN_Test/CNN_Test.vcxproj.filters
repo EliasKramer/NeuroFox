@@ -27,26 +27,8 @@
     <ClCompile Include="CNN_Test.cpp">
       <Filter>Source Files\test</Filter>
     </ClCompile>
-    <ClCompile Include="..\ConvolutionalNeuralNetwork\neural_network.cpp">
-      <Filter>Source Files\nn</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ConvolutionalNeuralNetwork\matrix.cpp">
-      <Filter>Source Files\nn</Filter>
-    </ClCompile>
     <ClCompile Include="matrix_test.cpp">
       <Filter>Source Files\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ConvolutionalNeuralNetwork\convolutional_layer.cpp">
-      <Filter>Source Files\nn</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ConvolutionalNeuralNetwork\fully_connected_layer.cpp">
-      <Filter>Source Files\nn</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ConvolutionalNeuralNetwork\math_functions.cpp">
-      <Filter>Source Files\nn</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ConvolutionalNeuralNetwork\pooling_layer.cpp">
-      <Filter>Source Files\nn</Filter>
     </ClCompile>
     <ClCompile Include="fc_layer_test.cpp">
       <Filter>Source Files\test</Filter>
@@ -57,32 +39,14 @@
     <ClCompile Include="pooling_layer_test.cpp">
       <Filter>Source Files\test</Filter>
     </ClCompile>
-    <ClCompile Include="..\ConvolutionalNeuralNetwork\conv_kernel.cpp">
-      <Filter>Source Files\nn</Filter>
-    </ClCompile>
     <ClCompile Include="convolutional_layer_test.cpp">
       <Filter>Source Files\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ConvolutionalNeuralNetwork\layer.cpp">
-      <Filter>Source Files\nn</Filter>
     </ClCompile>
     <ClCompile Include="layer_test.cpp">
       <Filter>Source Files\test</Filter>
     </ClCompile>
-    <ClCompile Include="..\ConvolutionalNeuralNetwork\digit_interpreter.cpp">
-      <Filter>Source Files\nn</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ConvolutionalNeuralNetwork\interpreter.cpp">
-      <Filter>Source Files\nn</Filter>
-    </ClCompile>
     <ClCompile Include="digit_interpreter_test.cpp">
       <Filter>Source Files\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ConvolutionalNeuralNetwork\util.cpp">
-      <Filter>Source Files\nn</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ConvolutionalNeuralNetwork\nn_data.cpp">
-      <Filter>Source Files\nn</Filter>
     </ClCompile>
     <ClCompile Include="nn_data_test.cpp">
       <Filter>Source Files\test</Filter>
@@ -90,24 +54,57 @@
     <ClCompile Include="model_test.cpp">
       <Filter>Source Files\test</Filter>
     </ClCompile>
-    <ClCompile Include="..\ConvolutionalNeuralNetwork\digit_data.cpp">
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\interpreter.cpp">
+      <Filter>Source Files\nn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\fully_connected_layer.cpp">
       <Filter>Source Files\nn</Filter>
     </ClCompile>
     <ClCompile Include="..\ConvolutionalNeuralNetwork\digit_training_data.cpp">
       <Filter>Source Files\nn</Filter>
     </ClCompile>
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\digit_interpreter.cpp">
+      <Filter>Source Files\nn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\digit_data.cpp">
+      <Filter>Source Files\nn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\convolutional_layer.cpp">
+      <Filter>Source Files\nn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\conv_kernel.cpp">
+      <Filter>Source Files\nn</Filter>
+    </ClCompile>
     <ClCompile Include="..\ConvolutionalNeuralNetwork\batch_handler.cpp">
+      <Filter>Source Files\nn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\layer.cpp">
+      <Filter>Source Files\nn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\math_functions.cpp">
+      <Filter>Source Files\nn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\matrix.cpp">
+      <Filter>Source Files\nn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\neural_network.cpp">
+      <Filter>Source Files\nn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\nn_data.cpp">
+      <Filter>Source Files\nn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\pooling_layer.cpp">
       <Filter>Source Files\nn</Filter>
     </ClCompile>
     <ClCompile Include="..\ConvolutionalNeuralNetwork\test_result.cpp">
       <Filter>Source Files\nn</Filter>
     </ClCompile>
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\util.cpp">
+      <Filter>Source Files\nn</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\ConvolutionalNeuralNetwork\neural_network.hpp">
-      <Filter>Header Files\nn</Filter>
-    </ClInclude>
-    <ClInclude Include="..\ConvolutionalNeuralNetwork\matrix.hpp">
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\batch_handler.hpp">
       <Filter>Header Files\nn</Filter>
     </ClInclude>
     <ClInclude Include="..\ConvolutionalNeuralNetwork\conv_kernel.hpp">
@@ -116,41 +113,52 @@
     <ClInclude Include="..\ConvolutionalNeuralNetwork\convolutional_layer.hpp">
       <Filter>Header Files\nn</Filter>
     </ClInclude>
-    <ClInclude Include="..\ConvolutionalNeuralNetwork\fully_connected_layer.hpp">
-      <Filter>Header Files\nn</Filter>
-    </ClInclude>
-    <ClInclude Include="..\ConvolutionalNeuralNetwork\math_functions.hpp">
-      <Filter>Header Files\nn</Filter>
-    </ClInclude>
-    <ClInclude Include="..\ConvolutionalNeuralNetwork\pooling_layer.hpp">
-      <Filter>Header Files\nn</Filter>
-    </ClInclude>
-    <ClInclude Include="..\ConvolutionalNeuralNetwork\layer.hpp">
-      <Filter>Header Files\nn</Filter>
-    </ClInclude>
-    <ClInclude Include="..\ConvolutionalNeuralNetwork\util.hpp">
-      <Filter>Header Files\nn</Filter>
-    </ClInclude>
-    <ClInclude Include="..\ConvolutionalNeuralNetwork\interpreter.hpp">
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\digit_data.hpp">
       <Filter>Header Files\nn</Filter>
     </ClInclude>
     <ClInclude Include="..\ConvolutionalNeuralNetwork\digit_interpreter.hpp">
       <Filter>Header Files\nn</Filter>
     </ClInclude>
-    <ClInclude Include="..\ConvolutionalNeuralNetwork\nn_data.hpp">
-      <Filter>Header Files\nn</Filter>
-    </ClInclude>
     <ClInclude Include="..\ConvolutionalNeuralNetwork\digit_training_data.hpp">
       <Filter>Header Files\nn</Filter>
     </ClInclude>
-    <ClInclude Include="..\ConvolutionalNeuralNetwork\digit_data.hpp">
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\fully_connected_layer.hpp">
+      <Filter>Header Files\nn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\interpreter.hpp">
+      <Filter>Header Files\nn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\layer.hpp">
+      <Filter>Header Files\nn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\math_functions.hpp">
+      <Filter>Header Files\nn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\matrix.hpp">
+      <Filter>Header Files\nn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\neural_network.hpp">
+      <Filter>Header Files\nn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\nn_data.hpp">
+      <Filter>Header Files\nn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\pooling_layer.hpp">
       <Filter>Header Files\nn</Filter>
     </ClInclude>
     <ClInclude Include="..\ConvolutionalNeuralNetwork\test_result.hpp">
       <Filter>Header Files\nn</Filter>
     </ClInclude>
-    <ClInclude Include="..\ConvolutionalNeuralNetwork\batch_handler.hpp">
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\util.hpp">
       <Filter>Header Files\nn</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\ConvolutionalNeuralNetwork\gpu_matrix.cu">
+      <Filter>Source Files\nn</Filter>
+    </None>
+    <None Include="..\ConvolutionalNeuralNetwork\gpu_matrix.cuh">
+      <Filter>Header Files\nn</Filter>
+    </None>
   </ItemGroup>
 </Project>

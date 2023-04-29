@@ -75,9 +75,6 @@
     <ClCompile Include="matrix.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="pooling_layer.hpp">
-      <Filter>header\layer</Filter>
-    </ClCompile>
     <ClCompile Include="pooling_layer.cpp">
       <Filter>source\layer</Filter>
     </ClCompile>
@@ -119,9 +116,6 @@
     </ClCompile>
     <ClCompile Include="batch_handler.cpp">
       <Filter>source\training</Filter>
-    </ClCompile>
-    <ClCompile Include="gpu_matrix.cu">
-      <Filter>source\gpu</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -170,8 +164,16 @@
     <ClInclude Include="layer.hpp">
       <Filter>header\layer\base</Filter>
     </ClInclude>
-    <ClInclude Include="gpu_matrix.hpp">
+    <ClInclude Include="gpu_matrix.cuh">
       <Filter>header\gpu</Filter>
     </ClInclude>
+    <ClInclude Include="pooling_layer.hpp">
+      <Filter>header\layer</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="gpu_matrix.cu">
+      <Filter>source\gpu</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>

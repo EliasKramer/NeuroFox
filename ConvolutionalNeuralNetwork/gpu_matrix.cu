@@ -1,4 +1,4 @@
-#include "gpu_matrix.hpp"
+#include "gpu_matrix.cuh"
 
 float* copy_to_gpu(const matrix& m)
 {
@@ -28,7 +28,7 @@ float* copy_to_gpu(const matrix& m)
 
 __global__ void gpu_add_matrices_kernel(const float* a, const float* b, float* result, unsigned int size)
 {
-	int index = blockIdx.x * blockDim.x + threadIdx.x;
+	unsigned int index = blockIdx.x * blockDim.x + threadIdx.x;
 	if (index < size)
 	{
 		result[index] = a[index] + b[index];
@@ -60,12 +60,13 @@ cudaError_t gpu_add_matrices(
 	//and as long as it is under 1024 - 1 thread will still work
 	unsigned int blocks = ((size - 1) / threads_per_block) + 1;
 
-	gpu_add_matrices_kernel << <blocks, threads_per_block >> > (
+	
+	gpu_add_matrices_kernel <<< blocks, threads_per_block >>> (
 		gpu_matrix_a,
 		gpu_matrix_b,
 		gpu_matrix_result,
 		size);
-
+		
 	cudaStatus = cudaGetLastError();
 	if (cudaStatus != cudaSuccess)
 	{

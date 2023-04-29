@@ -101,6 +101,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>cudart_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -206,6 +207,10 @@
     <ClInclude Include="..\ConvolutionalNeuralNetwork\pooling_layer.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\test_result.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\util.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\ConvolutionalNeuralNetwork\gpu_matrix.cu" />
+    <None Include="..\ConvolutionalNeuralNetwork\gpu_matrix.cuh" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

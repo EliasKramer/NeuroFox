@@ -17,8 +17,6 @@ private:
 public:
 	matrix();
 	matrix(int width, int height, int depth);
-	//matrix(int width, int height);
-	//matrix(int height);
 	size_t get_hash() const;
 
 	void resize(int width, int height, int depth);
