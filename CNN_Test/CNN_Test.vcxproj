@@ -185,6 +185,8 @@
     <ClCompile Include="model_test.cpp" />
     <ClCompile Include="nn_data_test.cpp" />
     <ClCompile Include="pooling_layer_test.cpp" />
+    <ClCompile Include="test_gpu.cpp" />
+    <ClCompile Include="test_util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ConvolutionalNeuralNetwork\ConvolutionalNeuralNetwork.vcxproj">
@@ -199,6 +201,8 @@
     <ClInclude Include="..\ConvolutionalNeuralNetwork\digit_interpreter.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\digit_training_data.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\fully_connected_layer.hpp" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\gpu_matrix.cuh" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\gpu_matrix.h" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\interpreter.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\layer.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\math_functions.hpp" />
@@ -208,10 +212,10 @@
     <ClInclude Include="..\ConvolutionalNeuralNetwork\pooling_layer.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\test_result.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\util.hpp" />
+    <ClInclude Include="test_util.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\ConvolutionalNeuralNetwork\gpu_matrix.cu" />
-    <None Include="..\ConvolutionalNeuralNetwork\gpu_matrix.cuh" />
+    <CudaCompile Include="..\ConvolutionalNeuralNetwork\gpu_matrix.cu" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

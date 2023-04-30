@@ -22,6 +22,9 @@
     <Filter Include="Header Files\nn">
       <UniqueIdentifier>{d796eb59-317a-46ef-921f-a559f8a28d40}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\test\test_util">
+      <UniqueIdentifier>{5e8b2e92-f8a4-4879-9008-afd62e680323}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CNN_Test.cpp">
@@ -102,6 +105,12 @@
     <ClCompile Include="..\ConvolutionalNeuralNetwork\util.cpp">
       <Filter>Source Files\nn</Filter>
     </ClCompile>
+    <ClCompile Include="test_gpu.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="test_util.cpp">
+      <Filter>Source Files\test\test_util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ConvolutionalNeuralNetwork\batch_handler.hpp">
@@ -152,13 +161,19 @@
     <ClInclude Include="..\ConvolutionalNeuralNetwork\util.hpp">
       <Filter>Header Files\nn</Filter>
     </ClInclude>
+    <ClInclude Include="test_util.hpp">
+      <Filter>Source Files\test\test_util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\gpu_matrix.h">
+      <Filter>Header Files\nn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\gpu_matrix.cuh">
+      <Filter>Header Files\nn</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\ConvolutionalNeuralNetwork\gpu_matrix.cu">
+    <CudaCompile Include="..\ConvolutionalNeuralNetwork\gpu_matrix.cu">
       <Filter>Source Files\nn</Filter>
-    </None>
-    <None Include="..\ConvolutionalNeuralNetwork\gpu_matrix.cuh">
-      <Filter>Header Files\nn</Filter>
-    </None>
+    </CudaCompile>
   </ItemGroup>
 </Project>
