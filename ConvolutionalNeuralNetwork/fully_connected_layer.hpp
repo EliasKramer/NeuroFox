@@ -17,8 +17,8 @@ private:
 	e_activation_t activation_fn;
 
 	//GPU Section
-	float* gpu_weights = nullptr;
-	float* gpu_biases = nullptr;
+	std::unique_ptr<gpu_memory<float>> gpu_weights = nullptr;
+	std::unique_ptr<gpu_memory<float>> gpu_biases = nullptr;
 
 	float get_weight_at(int input_layer_idx, int current_activation_idx) const;
 	void set_weight_at(int input_layer_idx, int current_activation_idx, float value);
@@ -28,8 +28,6 @@ private:
 
 	float get_passing_error_at(int input_layer_idx) const;
 	void set_passing_error_at(int input_layer_idx, float value);
-
-	void copy_values_to_gpu() override;
 
 	void forward_propagation_cpu();
 	void forward_propagation_gpu();

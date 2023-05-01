@@ -85,3 +85,10 @@ cudaError_t gpu_add(
 
 	return cudaStatus;
 }
+
+cudaError_t apply_activation_function(
+	const gpu_memory<float>& gpu_memory,
+	e_activation_t activation_function)
+{
+	//TODO
+}

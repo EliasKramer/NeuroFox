@@ -1,54 +1,5 @@
 #include "layer.hpp"
 
-void layer::copy_values_to_gpu()
-{
-	if (gpu_activations == nullptr)
-	{
-		throw std::runtime_error("copying values to gpu failed. gpu_activations is nullptr");
-	}
-	if (gpu_error == nullptr)
-	{
-		throw std::runtime_error("copying values to gpu failed. gpu_error is nullptr");
-	}
-	if (gpu_passing_error == nullptr)
-	{
-		throw std::runtime_error("copying values to gpu failed. gpu_passing_error is nullptr");
-	}
-
-	cudaError_t cudaError = cudaMemcpy(
-		gpu_activations, 
-		activations.flat_readonly().data(), 
-		activations.flat_readonly().size() * sizeof(float), 
-		cudaMemcpyHostToDevice);
-
-	if (cudaError != cudaSuccess)
-	{
-		throw std::runtime_error("copying values to gpu failed. cudaMemcpy failed");
-	}
-
-	cudaError = cudaMemcpy(
-		gpu_error, 
-		error.flat_readonly().data(), 
-		error.flat_readonly().size() * sizeof(float), 
-		cudaMemcpyHostToDevice);
-
-	if (cudaError != cudaSuccess)
-	{
-		throw std::runtime_error("copying values to gpu failed. cudaMemcpy failed");
-	}
-	
-	cudaError = cudaMemcpy(
-		gpu_passing_error, 
-		passing_error->flat_readonly().data(), 
-		passing_error->flat_readonly().size() * sizeof(float), 
-		cudaMemcpyHostToDevice);
-
-	if (cudaError != cudaSuccess)
-	{
-		throw std::runtime_error("copying values to gpu failed. cudaMemcpy failed");
-	}
-}
-
 bool layer::should_use_gpu()
 {
 	return 
@@ -113,16 +64,12 @@ void layer::set_error_for_last_layer(const matrix& expected)
 
 void layer::enable_gpu()
 {
-	//malloc activations
-	cudaError_t cudaError = cudaMalloc(&gpu_activations, activations.flat_readonly().size() * sizeof(float));
-	if (cudaError != cudaSuccess)
-	{
-		throw std::runtime_error("error while allocating cuda activations!");
-	}
+	gpu_activations = std::make_unique<gpu_memory<float>>(activations);
 }
 
 void layer::disable_gpu()
 {
-	cudaFree(gpu_activations);
 	gpu_activations = nullptr;
+	gpu_error = nullptr;
+	gpu_passing_error = nullptr;
 }

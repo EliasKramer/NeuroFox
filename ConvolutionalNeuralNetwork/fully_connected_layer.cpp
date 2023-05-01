@@ -30,33 +30,6 @@ void fully_connected_layer::set_passing_error_at(int input_layer_idx, float valu
 	passing_error->flat()[input_layer_idx] = value;
 }
 
-void fully_connected_layer::copy_values_to_gpu()
-{
-	layer::copy_values_to_gpu();
-
-	cudaError_t cudaError = cudaMemcpy(
-		gpu_weights,
-		weights.flat_readonly().data(),
-		weights.flat_readonly().size() * sizeof(float),
-		cudaMemcpyHostToDevice);
-
-	if (cudaError != cudaSuccess)
-	{
-		throw std::runtime_error("copying values to gpu failed. cudaMemcpy failed");
-	}
-
-	cudaError = cudaMemcpy(
-		gpu_biases,
-		biases.flat_readonly().data(),
-		biases.flat_readonly().size() * sizeof(float),
-		cudaMemcpyHostToDevice);
-
-	if (cudaError != cudaSuccess)
-	{
-		throw std::runtime_error("copying values to gpu failed. cudaMemcpy failed");
-	}
-}
-
 void fully_connected_layer::forward_propagation_cpu()
 {
 	matrix::dot_product_flat(weights, *input, activations);
@@ -66,7 +39,13 @@ void fully_connected_layer::forward_propagation_cpu()
 
 void fully_connected_layer::forward_propagation_gpu()
 {
+	if (!gpu_weights || !gpu_biases || !gpu_activations)
+	{
+		throw std::invalid_argument("gpu_weights, gpu_biases or gpu_activations is null");
+	}
 
+	gpu_add(*gpu_activations.get(), *gpu_biases.get(), *gpu_activations.get());
+	gpu_apply_activation_function(*gpu_activations.get(), activation_fn);
 }
 
 void fully_connected_layer::back_propagation_cpu()
@@ -244,45 +223,14 @@ void fully_connected_layer::apply_deltas(int number_of_inputs)
 void fully_connected_layer::enable_gpu()
 {
 	layer::enable_gpu();
-
-	cudaError_t cudaError = cudaMalloc(&gpu_biases, biases.flat_readonly().size() * sizeof(float));
-	if (cudaError != cudaSuccess)
-	{
-		throw std::runtime_error("failed to allocate gpu memory for biases");
-	}
-	cudaError = cudaMalloc(&gpu_weights, weights.flat_readonly().size() * sizeof(float));
-	if (cudaError != cudaSuccess)
-	{
-		throw std::runtime_error("failed to allocate gpu memory for weights");
-	}
-
-	cudaError = cudaMemcpy(gpu_biases, biases.flat_readonly().data(), biases.flat_readonly().size() * sizeof(float), cudaMemcpyHostToDevice);
-	if (cudaError != cudaSuccess)
-	{
-		throw std::runtime_error("failed to copy biases to gpu");
-	}
-
-	cudaError = cudaMemcpy(gpu_weights, weights.flat_readonly().data(), weights.flat_readonly().size() * sizeof(float), cudaMemcpyHostToDevice);
-	if (cudaError != cudaSuccess)
-	{
-		throw std::runtime_error("failed to copy weights to gpu");
-	}
+	
+	gpu_weights = std::make_unique<gpu_memory<float>>(weights);
+	gpu_biases = std::make_unique<gpu_memory<float>>(biases);
 }
 
 void fully_connected_layer::disable_gpu()
 {
 	layer::disable_gpu();
-
-	cudaError_t cudaError = cudaFree(gpu_biases);
-	if (cudaError != cudaSuccess)
-	{
-		throw std::runtime_error("failed to free gpu memory for biases");
-	}
-	cudaError = cudaFree(gpu_weights);
-	if (cudaError != cudaSuccess)
-	{
-		throw std::runtime_error("failed to free gpu memory for weights");
-	}
 
 	gpu_biases = nullptr;
 	gpu_weights = nullptr;

@@ -1,10 +1,5 @@
 #include "convolutional_layer.hpp"
 
-void convolutional_layer::copy_values_to_gpu()
-{
-	throw std::runtime_error("copying values to gpu failed. convolutional_layer::copy_values_to_gpu not implemented");
-}
-
 convolutional_layer::convolutional_layer(
 	int number_of_kernels,
 	int kernel_size,

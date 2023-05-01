@@ -1,10 +1,5 @@
 #include "pooling_layer.hpp"
 
-void pooling_layer::copy_values_to_gpu()
-{
-	throw std::runtime_error("pooling layer has no implementation of copy values to gpu");
-}
-
 pooling_layer::pooling_layer(
 	int filter_size,
 	int stride,

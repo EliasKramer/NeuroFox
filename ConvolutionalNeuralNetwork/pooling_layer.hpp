@@ -14,8 +14,6 @@ private:
 	int filter_size;
 	int stride;
 	e_pooling_type_t pooling_fn;
-protected:
-	void copy_values_to_gpu() override;
 public:
 	//constructor
 	pooling_layer(

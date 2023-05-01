@@ -9,3 +9,7 @@ cudaError_t gpu_add(
 	const gpu_memory<float>& gpu_memory_a,
 	const gpu_memory<float>& gpu_memory_b,
 	gpu_memory<float>& gpu_memory_result);
+
+cudaError_t apply_activation_function(
+	const gpu_memory<float>& gpu_memory,
+	e_activation_t activation_function);

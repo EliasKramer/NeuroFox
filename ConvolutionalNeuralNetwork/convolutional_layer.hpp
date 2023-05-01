@@ -16,8 +16,6 @@ private:
 	int stride;
 
 	e_activation_t activation_fn;
-protected:
-	void copy_values_to_gpu() override;
 public:
 	//constructor
 	convolutional_layer(

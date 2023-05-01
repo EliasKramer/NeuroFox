@@ -1,6 +1,7 @@
 #pragma once
 #include "matrix.hpp"
-
+#include "gpu_memory.cuh"
+#include "gpu_math.cuh"
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 
@@ -30,11 +31,9 @@ protected:
 	matrix* passing_error = nullptr;
 
 	//GPU section
-	float* gpu_activations = nullptr;
-	float* gpu_error = nullptr;
-	float* gpu_passing_error = nullptr;
-
-	virtual void copy_values_to_gpu();
+	std::unique_ptr<gpu_memory<float>> gpu_activations = nullptr;
+	std::unique_ptr<gpu_memory<float>> gpu_error = nullptr;
+	gpu_memory<float>* gpu_passing_error = nullptr;
 
 	bool should_use_gpu();
 
