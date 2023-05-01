@@ -1,4 +1,15 @@
-#include "gpu_matrix.cuh"
+#include "gpu_math.cuh"
+
+#define THREADS_PER_BLOCK 1024
+
+static unsigned int get_block_count(unsigned int size)
+{
+	//if we have 1024 elements, we need 1 block
+	//if we have 1025 elements, we need 2 blocks
+	//if we have 2048 elements, we need 2 blocks
+	//and as long as it is under 1024 - 1 thread will still work
+	return ((size - 1) / THREADS_PER_BLOCK) + 1;
+}
 
 float* copy_to_gpu(const matrix& m)
 {
@@ -34,14 +45,14 @@ __global__ void gpu_add_matrices_kernel(const float* a, const float* b, float* r
 		result[index] = a[index] + b[index];
 	}
 }
-
-cudaError_t gpu_add_matrices(
-	const float* gpu_matrix_a,
-	const float* gpu_matrix_b,
-	float* gpu_matrix_result,
-	unsigned int size)
+cudaError_t gpu_add(
+	const gpu_memory<float>& gpu_memory_a, 
+	const gpu_memory<float>& gpu_memory_b, 
+	gpu_memory<float>& gpu_memory_result)
 {
-	if (size == 0)
+	if (gpu_memory_a.count() == 0 ||
+		gpu_memory_a.count() != gpu_memory_b.count() ||
+		gpu_memory_a.count() != gpu_memory_result.count())
 	{
 		throw std::invalid_argument("gpu_add_matrices failed. size must be greater than 0");
 	}
@@ -52,19 +63,12 @@ cudaError_t gpu_add_matrices(
 		return cudaStatus;
 	}
 
-	//every block has 1024 threads
-	unsigned int threads_per_block = 1024;
-	//if we have 1024 elements, we need 1 block
-	//if we have 1025 elements, we need 2 blocks
-	//if we have 2048 elements, we need 2 blocks
-	//and as long as it is under 1024 - 1 thread will still work
-	unsigned int blocks = ((size - 1) / threads_per_block) + 1;
-
+	unsigned int size = gpu_memory_a.count();
 	
-	gpu_add_matrices_kernel <<< blocks, threads_per_block >>> (
-		gpu_matrix_a,
-		gpu_matrix_b,
-		gpu_matrix_result,
+	gpu_add_matrices_kernel <<< get_block_count(size), THREADS_PER_BLOCK >> > (
+		gpu_memory_a.gpu_data_ptr(),
+		gpu_memory_b.gpu_data_ptr(),
+		gpu_memory_result.gpu_data_ptr(),
 		size);
 		
 	cudaStatus = cudaGetLastError();

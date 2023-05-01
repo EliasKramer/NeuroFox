@@ -164,15 +164,18 @@
     <ClInclude Include="layer.hpp">
       <Filter>header\layer\base</Filter>
     </ClInclude>
-    <ClInclude Include="gpu_matrix.cuh">
+    <ClInclude Include="gpu_math.cuh">
       <Filter>header\gpu</Filter>
     </ClInclude>
     <ClInclude Include="pooling_layer.hpp">
       <Filter>header\layer</Filter>
     </ClInclude>
+    <ClInclude Include="gpu_memory.cuh">
+      <Filter>header\gpu</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="gpu_matrix.cu">
+    <CudaCompile Include="gpu_math.cu">
       <Filter>source\gpu</Filter>
     </CudaCompile>
   </ItemGroup>

@@ -167,12 +167,18 @@
     <ClInclude Include="..\ConvolutionalNeuralNetwork\gpu_matrix.h">
       <Filter>Header Files\nn</Filter>
     </ClInclude>
-    <ClInclude Include="..\ConvolutionalNeuralNetwork\gpu_matrix.cuh">
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\device_memory.cuh">
+      <Filter>Header Files\nn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\gpu_memory.cuh">
+      <Filter>Header Files\nn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\gpu_math.cuh">
       <Filter>Header Files\nn</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="..\ConvolutionalNeuralNetwork\gpu_matrix.cu">
+    <CudaCompile Include="..\ConvolutionalNeuralNetwork\gpu_math.cu">
       <Filter>Source Files\nn</Filter>
     </CudaCompile>
   </ItemGroup>
