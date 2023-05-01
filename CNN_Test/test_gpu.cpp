@@ -20,11 +20,17 @@ namespace CNNTest
 			cudaStatus = cudaMalloc((void**)gpu_result, n * sizeof(float));
 			Assert::AreEqual((int)cudaSuccess, (int)cudaStatus);
 		}
-		void set_gpu_matrix(float* gpu_ptr, int value, int n)
+		void set_gpu_matrix(float* gpu_ptr, float value, int n)
 		{
 			cudaError_t cudaStatus = cudaSetDevice(0);
 			Assert::AreEqual((int)cudaSuccess, (int)cudaStatus);
-			cudaStatus = cudaMemset(gpu_ptr, value, n * sizeof(float));
+			float* cpu_ptr = new float[n];
+			for (int i = 0; i < n; i++)
+			{
+				cpu_ptr[i] = value;
+			}
+			cudaStatus = cudaMemcpy(gpu_ptr, cpu_ptr, n * sizeof(float), cudaMemcpyHostToDevice);
+			//cudaStatus = cudaMemset(*gpu_ptr, value, n * sizeof(float));
 			Assert::AreEqual((int)cudaSuccess, (int)cudaStatus);
 		}
 		void free_gpu_matrices(float* gpu_a, float* gpu_b, float* gpu_result, int n)
@@ -61,14 +67,13 @@ namespace CNNTest
 			set_gpu_matrix(gpu_matrix_result, 0, n);
 
 			cudaError_t cuda_error = gpu_add_matrices(gpu_matrix_a, gpu_matrix_b, gpu_matrix_result, (unsigned int)n);
-
-			free_gpu_matrices(gpu_matrix_a, gpu_matrix_b, gpu_matrix_result, n);
+			Assert::AreEqual((int)cudaSuccess, (int)cuda_error);
 			
 			std::vector<float> result = get_gpu_values(gpu_matrix_result, n);
 			std::vector<float> expected(n, 3);
 
-
 			Assert::IsTrue(are_float_vectors_equal(expected, result));
+			free_gpu_matrices(gpu_matrix_a, gpu_matrix_b, gpu_matrix_result, n);
 		}
 	};
 }
