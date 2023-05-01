@@ -44,7 +44,7 @@ namespace CNNTest
 			cudaStatus = cudaFree(gpu_result);
 			Assert::AreEqual((int)cudaSuccess, (int)cudaStatus);
 		}
-		
+
 		std::vector<float> get_gpu_values(float* gpu_ptr, int n)
 		{
 			std::vector<float> result(n);
@@ -54,13 +54,23 @@ namespace CNNTest
 			Assert::AreEqual((int)cudaSuccess, (int)cudaStatus);
 			return result;
 		}
+		TEST_METHOD(copy_matrix_to_gpu_test)
+		{
+			matrix m(2, 2, 1);
+			m.set_all(0xDEADBEEF);
+			float* gpu_ptr = copy_to_gpu(m);
+			std::vector<float> gpu_values = get_gpu_values(gpu_ptr, m.flat_readonly().size());
+			std::vector<float> expected_values(4, 0xDEADBEEF);
+
+			Assert::IsTrue(float_vectors_equal(expected_values, gpu_values));
+		}
 		TEST_METHOD(add_matrix_gpu_test)
 		{
 			float* gpu_matrix_a = nullptr;
 			float* gpu_matrix_b = nullptr;
 			float* gpu_matrix_result = nullptr;
 
-			int n = 10;
+			int n = 1000000;
 			allocate_gpu_matrices(&gpu_matrix_a, &gpu_matrix_b, &gpu_matrix_result, n);
 			set_gpu_matrix(gpu_matrix_a, 1, n);
 			set_gpu_matrix(gpu_matrix_b, 2, n);
@@ -68,11 +78,11 @@ namespace CNNTest
 
 			cudaError_t cuda_error = gpu_add_matrices(gpu_matrix_a, gpu_matrix_b, gpu_matrix_result, (unsigned int)n);
 			Assert::AreEqual((int)cudaSuccess, (int)cuda_error);
-			
+
 			std::vector<float> result = get_gpu_values(gpu_matrix_result, n);
 			std::vector<float> expected(n, 3);
 
-			Assert::IsTrue(are_float_vectors_equal(expected, result));
+			Assert::IsTrue(float_vectors_equal(expected, result));
 			free_gpu_matrices(gpu_matrix_a, gpu_matrix_b, gpu_matrix_result, n);
 		}
 	};
