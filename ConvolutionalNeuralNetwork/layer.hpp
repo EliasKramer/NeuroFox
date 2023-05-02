@@ -31,6 +31,7 @@ protected:
 	matrix* passing_error = nullptr;
 
 	//GPU section
+	gpu_memory<float>* gpu_input = nullptr;
 	std::unique_ptr<gpu_memory<float>> gpu_activations = nullptr;
 	std::unique_ptr<gpu_memory<float>> gpu_error = nullptr;
 	gpu_memory<float>* gpu_passing_error = nullptr;

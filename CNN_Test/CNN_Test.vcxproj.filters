@@ -105,7 +105,7 @@
     <ClCompile Include="..\ConvolutionalNeuralNetwork\util.cpp">
       <Filter>Source Files\nn</Filter>
     </ClCompile>
-    <ClCompile Include="test_gpu.cpp">
+    <ClCompile Include="gpu_test.cpp">
       <Filter>Source Files\test</Filter>
     </ClCompile>
     <ClCompile Include="test_util.cpp">

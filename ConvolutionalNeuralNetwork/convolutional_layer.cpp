@@ -76,8 +76,8 @@ void convolutional_layer::set_input_format(const matrix& input_format)
 		kernels[i].set_kernel_depth(input_depth);
 		kernel_deltas[i].set_kernel_depth(input_depth);
 		//BE WARY. THIS ONLY WORKS FOR A STRIDE OF 1
-		kernels[i].set_bias_format(output_width);
-		kernel_deltas[i].set_bias_format(output_width);
+		kernels[i].set_bias_format((int)output_width);
+		kernel_deltas[i].set_bias_format((int)output_width);
 	}
 }
 

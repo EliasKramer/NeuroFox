@@ -13,8 +13,8 @@ private:
     size_t element_count;
 
 public:
-    explicit gpu_memory(size_t count)
-        : element_count(count) 
+    explicit gpu_memory(size_t item_count)
+        : element_count(item_count) 
     {
         cudaError_t err = cudaMalloc(&gpu_ptr, element_count * sizeof(T));
         if (err != cudaSuccess) {
@@ -38,8 +38,8 @@ public:
         }
     }
 
-    explicit gpu_memory(size_t count, T init_value)
-        : gpu_memory(count)
+    explicit gpu_memory(size_t item_count, T init_value)
+        : gpu_memory(item_count)
     {
         set_all(init_value);
     }
@@ -95,7 +95,7 @@ public:
         return element_count * sizeof(T);
     }
 
-    size_t count() const 
+    size_t item_count() const 
     {
 		return element_count;
 	}
