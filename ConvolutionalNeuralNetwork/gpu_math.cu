@@ -11,6 +11,11 @@ static unsigned int get_block_count(unsigned int size)
 	return ((size - 1) / THREADS_PER_BLOCK) + 1;
 }
 
+__device__ int get_idx(int x, int y, int z, int height, int width)
+{
+	return x + y * width + z * width * height;
+}
+
 __global__ void gpu_dot_product_kernel(
 	const float* weights,
 	const float* input,
@@ -24,7 +29,8 @@ __global__ void gpu_dot_product_kernel(
 		float sum = 0;
 		for (int i = 0; i < input_size; i++)
 		{
-			int weight_idx = activation_idx * input_size + i;
+			int weight_idx = get_idx(i, activation_idx, 0, 
+									activations_size, input_size);
 			sum += weights[weight_idx] * input[i];
 		}
 		activations[activation_idx] = sum;

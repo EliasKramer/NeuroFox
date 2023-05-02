@@ -36,10 +36,10 @@ namespace CNNTest
 			gpu_mem.~gpu_memory();
 
 			std::vector<float> cpu_data(2);
-			cudaError_t cudaStatus = 
+			cudaError_t cudaStatus =
 				cudaMemcpy(
-					cpu_data.data(), 
-					gpu_ptr, 2 * sizeof(float), 
+					cpu_data.data(),
+					gpu_ptr, 2 * sizeof(float),
 					cudaMemcpyDeviceToHost);
 
 			Assert::AreNotEqual((int)cudaSuccess, (int)cudaStatus);
@@ -55,7 +55,7 @@ namespace CNNTest
 			std::vector<float> expected_values(m.flat_readonly().size(), (float)0xDEADBEEF);
 			Assert::IsTrue(float_vectors_equal(expected_values, gpu_values));
 		}
-		TEST_METHOD(add_matrix_gpu_test)
+		TEST_METHOD(add_gpu_test)
 		{
 			int n = 1000000;
 			gpu_memory<float> gpu_mem_a(n);
@@ -70,6 +70,52 @@ namespace CNNTest
 
 			std::vector<float> result = *gpu_mem_result.to_cpu().get();
 			std::vector<float> expected(n, 3);
+			Assert::IsTrue(float_vectors_equal(expected, result));
+		}
+		TEST_METHOD(dot_gpu_test)
+		{
+
+			matrix m_input(1, 2, 1);
+			m_input.set_at(0, 0, 5);
+			m_input.set_at(0, 1, 6);
+
+			matrix m_weights(2, 3, 1);
+			m_weights.set_at(0, 0, 1);
+			m_weights.set_at(0, 1, 2);
+			m_weights.set_at(0, 2, 3);
+			m_weights.set_at(1, 0, 4);
+			m_weights.set_at(1, 1, 5);
+			m_weights.set_at(1, 2, 6);
+
+			matrix m_activations(1, 3, 1);
+			m_activations.set_all(0);
+
+			gpu_memory<float> gpu_input(m_input);
+			gpu_memory<float> gpu_weights(m_weights);
+			gpu_memory<float> gpu_activations(m_activations);
+
+			//		+-+
+			//		|5|
+			//		+-+
+			//		|6|
+			//		+-+
+			//+-+-+
+			//|1|4|	29 = 1*5 + 4*6
+			//+-+-+
+			//|2|5|	40 = 2*5 + 5*6
+			//+-+-+
+			//|3|6| 51 = 3*5 + 6*6
+			//+-+-+
+
+			matrix expected_activations(1, 3, 1);
+			expected_activations.set_at(0, 0, 29);
+			expected_activations.set_at(0, 1, 40);
+			expected_activations.set_at(0, 2, 51);
+
+			gpu_dot_product(gpu_weights, gpu_input, gpu_activations);
+
+			std::vector<float> result = *gpu_activations.to_cpu().get();
+			std::vector<float> expected = expected_activations.flat_readonly();
 			Assert::IsTrue(float_vectors_equal(expected, result));
 		}
 	};
