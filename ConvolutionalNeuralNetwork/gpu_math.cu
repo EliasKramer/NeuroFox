@@ -11,6 +11,30 @@ static unsigned int get_block_count(unsigned int size)
 	return ((size - 1) / THREADS_PER_BLOCK) + 1;
 }
 
+static void set_device()
+{
+	cudaError_t cudaStatus = cudaSetDevice(0);
+	if (cudaStatus != cudaSuccess)
+	{
+		throw std::runtime_error("gpu_sigmoid failed. cudaSetDevice failed");
+	}
+}
+
+static void check_for_error_and_synchronize()
+{
+	cudaError_t cudaStatus = cudaGetLastError();
+	if (cudaStatus != cudaSuccess)
+	{
+		throw std::runtime_error("gpu_sigmoid failed. kernel launch failed");
+	}
+
+	cudaStatus = cudaDeviceSynchronize();
+	if (cudaStatus != cudaSuccess)
+	{
+		throw std::runtime_error("gpu_sigmoid failed. cudaDeviceSynchronize failed");
+	}
+}
+
 __device__ int get_idx(int x, int y, int z, int height, int width)
 {
 	return x + y * width + z * width * height;
@@ -29,8 +53,8 @@ __global__ void gpu_dot_product_kernel(
 		float sum = 0;
 		for (int i = 0; i < input_size; i++)
 		{
-			int weight_idx = get_idx(i, activation_idx, 0, 
-									activations_size, input_size);
+			int weight_idx = get_idx(i, activation_idx, 0,
+				activations_size, input_size);
 			sum += weights[weight_idx] * input[i];
 		}
 		activations[activation_idx] = sum;
@@ -53,32 +77,18 @@ void gpu_dot_product(
 		throw std::invalid_argument("gpu_dot_product failed. false format");
 	}
 
-	cudaError_t cudaStatus = cudaSetDevice(0);
-	if (cudaStatus != cudaSuccess)
-	{
-		throw std::runtime_error("gpu_dot_product failed. cudaSetDevice failed");
-	}
+	set_device();
 
 	unsigned int size = gpu_activations.item_count();
 	unsigned int block_count = get_block_count(size);
-	gpu_dot_product_kernel <<< block_count, THREADS_PER_BLOCK >>> (
+	gpu_dot_product_kernel << < block_count, THREADS_PER_BLOCK >> > (
 		gpu_weights.gpu_data_ptr(),
 		gpu_input.gpu_data_ptr(),
 		gpu_input.item_count(),
 		gpu_activations.gpu_data_ptr(),
 		gpu_activations.item_count());
 
-	cudaStatus = cudaGetLastError();
-	if (cudaStatus != cudaSuccess)
-	{
-		throw std::runtime_error("gpu_dot_product failed. gpu_dot_product_kernel failed");
-	}
-
-	cudaStatus = cudaDeviceSynchronize();
-	if (cudaStatus != cudaSuccess)
-	{
-		throw std::runtime_error("gpu_dot_product failed. cudaDeviceSynchronize failed");
-	}
+	check_for_error_and_synchronize();
 }
 
 __global__ void gpu_add_matrices_kernel(const float* a, const float* b, float* result, unsigned int size)
@@ -90,8 +100,8 @@ __global__ void gpu_add_matrices_kernel(const float* a, const float* b, float* r
 	}
 }
 void gpu_add(
-	const gpu_memory<float>& gpu_memory_a, 
-	const gpu_memory<float>& gpu_memory_b, 
+	const gpu_memory<float>& gpu_memory_a,
+	const gpu_memory<float>& gpu_memory_b,
 	gpu_memory<float>& gpu_memory_result)
 {
 	if (gpu_memory_a.item_count() == 0 ||
@@ -101,36 +111,67 @@ void gpu_add(
 		throw std::invalid_argument("gpu_add_matrices failed. size must be greater than 0");
 	}
 
-	cudaError_t cudaStatus = cudaSetDevice(0);
-	if (cudaStatus != cudaSuccess)
-	{
-		throw std::runtime_error("gpu_add_matrices failed. cudaSetDevice failed");
-	}
+	set_device();
 
 	unsigned int size = gpu_memory_a.item_count();
-	
-	gpu_add_matrices_kernel <<< get_block_count(size), THREADS_PER_BLOCK >>> (
+
+	gpu_add_matrices_kernel << < get_block_count(size), THREADS_PER_BLOCK >> > (
 		gpu_memory_a.gpu_data_ptr(),
 		gpu_memory_b.gpu_data_ptr(),
 		gpu_memory_result.gpu_data_ptr(),
 		size);
-		
-	cudaStatus = cudaGetLastError();
-	if (cudaStatus != cudaSuccess)
-	{
-		throw std::runtime_error("gpu_add_matrices failed. kernel launch failed");
-	}
 
-	cudaStatus = cudaDeviceSynchronize();
-	if (cudaStatus != cudaSuccess)
+	check_for_error_and_synchronize();
+}
+
+__global__ void gpu_sigmoid_kernel(float* data, int size)
+{
+	unsigned int index = blockIdx.x * blockDim.x + threadIdx.x;
+	if (index < size)
 	{
-		throw std::runtime_error("gpu_add_matrices failed. cudaDeviceSynchronize failed");
+		data[index] = 1 / (1 + exp(-data[index]));
 	}
 }
 
-void gpu_apply_activation_function(
-	const gpu_memory<float>& gpu_memory,
-	e_activation_t activation_function)
+void gpu_sigmoid(gpu_memory<float>& gpu_memory)
 {
-	//TODO
+	if (gpu_memory.item_count() == 0)
+	{
+		throw std::invalid_argument("gpu_sigmoid failed. size must be greater than 0");
+	}
+
+	set_device();
+
+	unsigned int size = gpu_memory.item_count();
+	gpu_sigmoid_kernel << < get_block_count(size), THREADS_PER_BLOCK >> > (
+		gpu_memory.gpu_data_ptr(),
+		size);
+
+	check_for_error_and_synchronize();
+}
+
+__global__ void gpu_relu_kernel(float* data, int size)
+{
+	unsigned int index = blockIdx.x * blockDim.x + threadIdx.x;
+	if (index < size)
+	{
+		data[index] = data[index] > 0 ? data[index] : 0;
+	}
+}
+
+void gpu_relu(gpu_memory<float>& gpu_memory)
+{
+	if (gpu_memory.item_count() == 0)
+	{
+		throw std::invalid_argument("gpu_relu failed. size must be greater than 0");
+	}
+
+	set_device();
+
+	unsigned int size = gpu_memory.item_count();
+	gpu_relu_kernel << < get_block_count(size), THREADS_PER_BLOCK >> > (
+		gpu_memory.gpu_data_ptr(),
+		size);
+
+	check_for_error_and_synchronize();
 }

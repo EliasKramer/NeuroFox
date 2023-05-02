@@ -72,6 +72,38 @@ namespace CNNTest
 			std::vector<float> expected(n, 3);
 			Assert::IsTrue(float_vectors_equal(expected, result));
 		}
+		TEST_METHOD(gpu_activation_relu_test)
+		{
+			matrix m(1, 3, 1);
+			m.set_at(0, 0, 1);
+			m.set_at(0, 1, 0);
+			m.set_at(0, 2, -3);
+
+			gpu_memory<float> gpu_mem(m);
+			GPU_ACTIVATION[relu_fn](gpu_mem);
+
+			std::vector<float> result = *gpu_mem.to_cpu().get();
+			std::vector<float> expected = { 1, 0, 0 };
+			Assert::IsTrue(float_vectors_equal(expected, result));
+		}
+		TEST_METHOD(gpu_activation_sigmoid_test)
+		{
+			matrix m(1, 3, 1);
+			m.set_at(0, 0, 1);
+			m.set_at(0, 1, 0);
+			m.set_at(0, 2, -3);
+
+			gpu_memory<float> gpu_mem(m);
+			GPU_ACTIVATION[sigmoid_fn](gpu_mem);
+
+			std::vector<float> result = *gpu_mem.to_cpu().get();
+			std::vector<float> expected = {
+				ACTIVATION[sigmoid_fn](1),
+				ACTIVATION[sigmoid_fn](0),
+				ACTIVATION[sigmoid_fn](-3)
+			};
+			Assert::IsTrue(float_vectors_equal(expected, result));
+		}
 		TEST_METHOD(dot_gpu_test)
 		{
 

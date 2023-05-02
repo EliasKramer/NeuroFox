@@ -46,7 +46,7 @@ void fully_connected_layer::forward_propagation_gpu()
 
 	gpu_dot_product(*gpu_weights.get(), *gpu_input, *gpu_activations.get());
 	gpu_add(*gpu_activations.get(), *gpu_biases.get(), *gpu_activations.get());
-	gpu_apply_activation_function(*gpu_activations.get(), activation_fn);
+	GPU_ACTIVATION[activation_fn](*gpu_activations.get());
 }
 
 void fully_connected_layer::back_propagation_cpu()

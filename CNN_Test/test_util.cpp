@@ -4,5 +4,12 @@ bool float_vectors_equal(const std::vector<float>& vec1, const std::vector<float
     if (vec1.size() != vec2.size()) {
         return false;
     }
-    return std::equal(vec1.begin(), vec1.end(), vec2.begin());
+    const float max_diff = 0.000001f;
+
+    for (size_t i = 0; i < vec1.size(); i++) {
+		const float diff = std::abs(vec1[i] - vec2[i]);
+        if (diff > max_diff) {
+			return false;
+		}
+	}
 }
