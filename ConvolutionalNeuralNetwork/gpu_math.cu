@@ -124,6 +124,80 @@ void gpu_add(
 	check_for_error_and_synchronize();
 }
 
+__global__ void gpu_valid_cross_correlation_kernel(
+	const float* input,
+	const float* weights,
+	const float* biases,
+	float* activations,
+	const int stride,
+	const int kernel_size,
+	const int input_size,
+	const int output_size)
+{
+
+}
+
+void gpu_valid_cross_correlation(
+	const gpu_memory<float>& gpu_input, 
+	const std::vector<gpu_memory<float>>& gpu_kernel_weights, 
+	const std::vector<gpu_memory<float>>& gpu_kernel_biases, 
+	gpu_memory<float>& gpu_activations, 
+	size_t stride, 
+	size_t kernel_size, 
+	size_t input_size, 
+	size_t output_size)
+{
+	if (gpu_input.item_count() == 0 ||
+		gpu_activations.item_count() == 0 ||
+		gpu_kernel_weights.size() == 0 ||
+		gpu_kernel_biases.size() == 0)
+	{
+		throw std::invalid_argument("gpu_valid_cross_correlation failed. size must be greater than 0");
+	}
+	if (gpu_kernel_weights.size() != gpu_kernel_biases.size())
+	{
+		throw std::invalid_argument("gpu_valid_cross_correlation failed. must have equal number of weights and biases in the vector");
+	}
+	if (gpu_kernel_weights[0].item_count() == 0)
+	{
+		throw std::invalid_argument("gpu_valid_cross_correlation failed. needs at leaset 1 kernel");
+	}
+	if (gpu_kernel_weights[0].item_count() != gpu_kernel_biases[0].item_count())
+	{
+		throw std::invalid_argument("gpu_valid_cross_correlation failed. kernel size must be equal to bias size");
+	}
+	if (gpu_kernel_weights[0].item_count() != kernel_size * kernel_size)
+	{
+		throw std::invalid_argument("gpu_valid_cross_correlation failed. kernel size must be equal to kernel_size * kernel_size");
+	}
+	
+	const float output_side_size = (input_size - kernel_size) / (float)stride + 1;
+	if (!is_whole_number(output_side_size))
+	{
+		throw std::invalid_argument("gpu_valid_cross_correlation failed. this stride, size combination cannot be used");
+	}
+	if (gpu_activations.item_count() != output_side_size * output_side_size)
+	{
+		throw std::invalid_argument("gpu_valid_cross_correlation failed. false format");
+	}
+
+	set_device();
+
+	unsigned int size = gpu_activations.item_count();
+	unsigned int block_count = get_block_count(size);
+	gpu_valid_cross_correlation_kernel << < block_count, THREADS_PER_BLOCK > >> (
+		gpu_input.gpu_data_ptr(),
+		gpu_kernel_weights[0].gpu_data_ptr(),
+		gpu_kernel_biases[0].gpu_data_ptr(),
+		gpu_activations.gpu_data_ptr(),
+		stride,
+		kernel_size,
+		input_size,
+		output_size);
+
+	check_for_error_and_synchronize();
+}
+
 __global__ void gpu_sigmoid_kernel(float* data, int size)
 {
 	unsigned int index = blockIdx.x * blockDim.x + threadIdx.x;

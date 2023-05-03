@@ -1,7 +1,6 @@
 #include "matrix.hpp"
 #include <numeric>
 
-
 int matrix::get_idx(int x, int y, int z) const
 {
 	return x + y * width + z * width * height;

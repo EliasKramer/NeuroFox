@@ -15,6 +15,9 @@ private:
 	int kernel_size;
 	int stride;
 
+	std::vector<gpu_memory<float>> gpu_kernel_weights;
+	std::vector<gpu_memory<float>> gpu_kernel_biases;
+
 	e_activation_t activation_fn;
 public:
 	//constructor

@@ -15,6 +15,16 @@ void gpu_add(
 	const gpu_memory<float>& gpu_memory_b,
 	gpu_memory<float>& gpu_memory_result);
 
+void gpu_valid_cross_correlation(
+	const gpu_memory<float>& gpu_input,
+	const std::vector<gpu_memory<float>>& gpu_kernel_weights,
+	const std::vector<gpu_memory<float>>& gpu_kernel_biases,
+	gpu_memory<float>& gpu_activations,
+	size_t stride,
+	size_t kernel_size,
+	size_t input_size,
+	size_t output_size);
+
 using gpu_activation_fn = void(*)(gpu_memory<float>&);
 
 void gpu_sigmoid(gpu_memory<float>& gpu_memory);
