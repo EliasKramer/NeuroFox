@@ -61,6 +61,24 @@ __global__ void gpu_dot_product_kernel(
 	}
 }
 
+float* gpu_sub_ptr(gpu_memory<float>& gpu_memory, size_t elements_per_idx, size_t index)
+{
+	if (gpu_memory.gpu_data_ptr() == nullptr)
+	{
+		throw std::invalid_argument("gpu_sub_ptr failed. gpu_memory.gpu_data_ptr() is null");
+	}
+	if (index >= gpu_memory.item_count())
+	{
+		throw std::invalid_argument("gpu_sub_ptr failed. index out of range");
+	}
+	if (gpu_memory.size() < elements_per_idx * sizeof(float))
+	{
+		throw std::invalid_argument("gpu_sub_ptr failed. size_of_element must be less than gpu_memory.size()");
+	}
+
+	return (float*)((char*)gpu_memory.gpu_data_ptr() + index * elements_per_idx * sizeof(float));
+}
+
 void gpu_dot_product(
 	const gpu_memory<float>& gpu_weights,
 	const gpu_memory<float>& gpu_input,
@@ -127,73 +145,69 @@ void gpu_add(
 __global__ void gpu_valid_cross_correlation_kernel(
 	const float* input,
 	const float* weights,
-	const float* biases,
-	float* activations,
-	const int stride,
-	const int kernel_size,
-	const int input_size,
-	const int output_size)
+	float* result,
+	const int input_depth,
+	const int input_width)
 {
 
 }
 
 void gpu_valid_cross_correlation(
-	const gpu_memory<float>& gpu_input, 
-	const std::vector<gpu_memory<float>>& gpu_kernel_weights, 
-	const std::vector<gpu_memory<float>>& gpu_kernel_biases, 
-	gpu_memory<float>& gpu_activations, 
-	size_t stride, 
-	size_t kernel_size, 
-	size_t input_size, 
+	const gpu_memory<float>& gpu_input,
+	const std::vector<gpu_memory<float>>& gpu_kernel_weights,
+	gpu_memory<float>& gpu_activations,
+	size_t input_size,
+	size_t input_depth,
+	size_t kernel_size,
+	size_t kernel_count,
+	size_t stride,
 	size_t output_size)
 {
 	if (gpu_input.item_count() == 0 ||
 		gpu_activations.item_count() == 0 ||
-		gpu_kernel_weights.size() == 0 ||
-		gpu_kernel_biases.size() == 0)
+		gpu_kernel_weights.size() == 0)
 	{
 		throw std::invalid_argument("gpu_valid_cross_correlation failed. size must be greater than 0");
 	}
-	if (gpu_kernel_weights.size() != gpu_kernel_biases.size())
+	if (input_size * input_size * input_depth != gpu_input.item_count())
 	{
-		throw std::invalid_argument("gpu_valid_cross_correlation failed. must have equal number of weights and biases in the vector");
+		throw std::invalid_argument("input size is different on gpu and cpu");
 	}
-	if (gpu_kernel_weights[0].item_count() == 0)
+	if (!is_whole_number(gpu_kernel_weights[0].item_count() / kernel_count))
 	{
-		throw std::invalid_argument("gpu_valid_cross_correlation failed. needs at leaset 1 kernel");
+		throw std::invalid_argument("gpu kernels could not be devided by kernel count");
 	}
-	if (gpu_kernel_weights[0].item_count() != gpu_kernel_biases[0].item_count())
+	if (kernel_size * kernel_size * input_depth != (gpu_kernel_weights[0].item_count() / kernel_count))
 	{
-		throw std::invalid_argument("gpu_valid_cross_correlation failed. kernel size must be equal to bias size");
+		throw std::invalid_argument("kernel size false");
 	}
-	if (gpu_kernel_weights[0].item_count() != kernel_size * kernel_size)
-	{
-		throw std::invalid_argument("gpu_valid_cross_correlation failed. kernel size must be equal to kernel_size * kernel_size");
-	}
-	
+
 	const float output_side_size = (input_size - kernel_size) / (float)stride + 1;
 	if (!is_whole_number(output_side_size))
 	{
 		throw std::invalid_argument("gpu_valid_cross_correlation failed. this stride, size combination cannot be used");
 	}
-	if (gpu_activations.item_count() != output_side_size * output_side_size)
+	if (gpu_activations.item_count() != output_side_size * output_side_size * kernel_count)
 	{
 		throw std::invalid_argument("gpu_valid_cross_correlation failed. false format");
 	}
-
 	set_device();
 
-	unsigned int size = gpu_activations.item_count();
-	unsigned int block_count = get_block_count(size);
-	gpu_valid_cross_correlation_kernel << < block_count, THREADS_PER_BLOCK > >> (
-		gpu_input.gpu_data_ptr(),
-		gpu_kernel_weights[0].gpu_data_ptr(),
-		gpu_kernel_biases[0].gpu_data_ptr(),
-		gpu_activations.gpu_data_ptr(),
-		stride,
-		kernel_size,
-		input_size,
-		output_size);
+
+	for (int activation_depth = 0; activation_depth < kernel_count; activation_depth++)
+	{
+		//splits the gpu_activations into its dephts
+		float* activation_ptr = gpu_sub_ptr(gpu_activations, output_size * output_size, activation_depth);
+
+		dim3 thread(output_side_size, output_side_size, 1);
+		//TODO
+		gpu_valid_cross_correlation_kernel << <1, 1 >> > (
+			gpu_input.gpu_data_ptr(),
+			gpu_kernel_weights[activation_depth].gpu_data_ptr(),
+			activation_ptr,
+			input_depth,
+			input_size);
+	}
 
 	check_for_error_and_synchronize();
 }

@@ -17,6 +17,7 @@ private:
 public:
 	matrix();
 	matrix(int width, int height, int depth);
+	matrix(const std::vector<float>& data, int width, int height, int depth);
 	size_t get_hash() const;
 
 	void resize(int width, int height, int depth);

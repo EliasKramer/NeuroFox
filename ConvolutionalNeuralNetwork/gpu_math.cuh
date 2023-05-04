@@ -5,6 +5,11 @@
 #include "device_launch_parameters.h"
 #include "gpu_memory.cuh"
 
+float* gpu_sub_ptr(
+	gpu_memory<float>& gpu_memory,
+	size_t size_of_element,
+	size_t index);
+
 void gpu_dot_product(
 	const gpu_memory<float>& gpu_weights,
 	const gpu_memory<float>& gpu_input,
@@ -18,11 +23,12 @@ void gpu_add(
 void gpu_valid_cross_correlation(
 	const gpu_memory<float>& gpu_input,
 	const std::vector<gpu_memory<float>>& gpu_kernel_weights,
-	const std::vector<gpu_memory<float>>& gpu_kernel_biases,
 	gpu_memory<float>& gpu_activations,
-	size_t stride,
-	size_t kernel_size,
 	size_t input_size,
+	size_t input_depth,
+	size_t kernel_size,
+	size_t kernel_count,
+	size_t stride,
 	size_t output_size);
 
 using gpu_activation_fn = void(*)(gpu_memory<float>&);

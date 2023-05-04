@@ -1,5 +1,6 @@
 #include "CppUnitTest.h"
 #include "../ConvolutionalNeuralNetwork/matrix.hpp"
+#include "test_util.hpp"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace CNNTest
@@ -15,6 +16,21 @@ namespace CNNTest
 			Assert::AreEqual(3, m.get_height());
 			Assert::AreEqual(4, m.get_depth());
 			Assert::AreEqual(24, (int)m.flat_readonly().size());
+		}
+		TEST_METHOD(constructor_from_vector_test)
+		{
+			matrix m(2, 3, 4);
+			for (int i = 0; i < 24; i++)
+			{
+				m.flat()[i] = i;
+			}
+			std::vector<float> expected_values(24);
+			for (int i = 0; i < 24; i++)
+			{
+				expected_values[i] = i;
+			}
+			matrix mx(expected_values, 2, 3, 4);
+			Assert::IsTrue(matrix::are_equal(m, mx));
 		}
 		TEST_METHOD(setting_getting)
 		{
@@ -152,8 +168,8 @@ namespace CNNTest
 			// Test 4: Two matrices with all different values
 			m1 = matrix(3, 3, 2);
 			m2 = matrix(3, 3, 2);
-			m1.set_all( 1);
-			m2.set_all( 0);
+			m1.set_all(1);
+			m2.set_all(0);
 			Assert::AreNotEqual(m1.get_hash(), m2.get_hash());
 		}
 		TEST_METHOD(valid_cross_correlation_test)
@@ -165,7 +181,7 @@ namespace CNNTest
 				| 2 | 4 |
 				+ - + - +
 			*/
-			matrix kernel(2,2,1);
+			matrix kernel(2, 2, 1);
 
 			kernel.set_at(0, 0, 1);
 			kernel.set_at(0, 1, 2);
@@ -194,7 +210,7 @@ namespace CNNTest
 			input.set_at(2, 1, 8);
 			input.set_at(2, 2, 9);
 
-			matrix output(2,2,1);
+			matrix output(2, 2, 1);
 			output.set_all(0);
 
 			//1*1 + 4*3 + 2*2 + 5*4 = 37 (0,0)

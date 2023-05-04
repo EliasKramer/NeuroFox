@@ -18,6 +18,17 @@ matrix::matrix(int width, int height, int depth)
 	this->data = std::vector<float>(width * height * depth);
 }
 
+matrix::matrix(const std::vector<float>& data, int width, int height, int depth)
+	: data(data)
+{
+	if (data.size() != width * height * depth)
+		throw std::invalid_argument("data size does not match dimensions");
+
+	this->width = width;
+	this->height = height;
+	this->depth = depth;
+}
+
 size_t matrix::get_hash() const
 {
 	return std::accumulate(data.begin(), data.end(), 0,

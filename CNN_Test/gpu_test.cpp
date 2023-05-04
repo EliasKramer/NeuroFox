@@ -55,6 +55,46 @@ namespace CNNTest
 			std::vector<float> expected_values(m.flat_readonly().size(), (float)0xDEADBEEF);
 			Assert::IsTrue(float_vectors_equal(expected_values, gpu_values));
 		}
+		TEST_METHOD(sub_ptr_test)
+		{
+			// depth 0
+			// +-+-+
+			// |0|2|
+			// +-+-+
+			// |1|3|
+			// +-+-+
+			// depth 1
+			// +-+-+
+			// |4|6|
+			// +-+-+
+			// |5|7|
+			// +-+-+
+			matrix m(2, 2, 2);
+			for (int i = 0; i < 8; i++)
+			{
+				m.flat()[i] = i;
+			}
+
+			gpu_memory<float> gpu_mem(m);
+
+			float* gpu_ptr = gpu_sub_ptr(gpu_mem, 4, 1);
+			
+			std::vector<float> gpu_data = get_gpu_values(gpu_ptr, 4);
+			// +-+-+
+			// |4|6|
+			// +-+-+
+			// |5|7|
+			// +-+-+
+			std::vector<float> expected_data(4);
+			for (int i = 0; i < 4; i++)
+			{
+				expected_data[i] = i + 4;
+			}
+			matrix expected(expected_data, 2, 2, 1);
+			matrix gpu_matrix(gpu_data, 2, 2, 1);
+
+			Assert::IsTrue(matrix::are_equal(expected, gpu_matrix));
+		}
 		TEST_METHOD(add_gpu_test)
 		{
 			int n = 1000000;
