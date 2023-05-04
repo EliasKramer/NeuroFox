@@ -59,9 +59,9 @@ public:
 	static bool are_equal(const matrix& a, const matrix& b);
 	static bool equal_format(const matrix& a, const matrix& b);
 
-	static void valid_cross_correlation(const matrix& input, const matrix& kernel, matrix& output);
+	static void valid_cross_correlation(const matrix& input, const matrix& kernel, matrix& output, int stride);
 	static void valid_convolution(const matrix& input, const matrix& kernel, matrix& output);
-	static void full_cross_correlation(const matrix& input, const matrix& kernel, matrix& output);
+	static void full_cross_correlation(const matrix& input, const matrix& kernel, matrix& output, int stride);
 
 	void scalar_multiplication(float a);
 	void apply_activation_function(e_activation_t activation_fn);

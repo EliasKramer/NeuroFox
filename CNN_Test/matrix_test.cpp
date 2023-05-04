@@ -249,7 +249,7 @@ namespace CNNTest
 				+ -- + -- +
 			*/
 
-			matrix::valid_cross_correlation(input, kernel, output);
+			matrix::valid_cross_correlation(input, kernel, output, 1);
 
 			Assert::AreEqual(37, (int)output.get_at(0, 0));
 			Assert::AreEqual(67, (int)output.get_at(1, 0));

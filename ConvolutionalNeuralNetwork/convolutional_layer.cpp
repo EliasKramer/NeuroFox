@@ -21,9 +21,6 @@ convolutional_layer::convolutional_layer(
 	if (stride > kernel_size)
 		throw std::invalid_argument("stride must be smaller or equal than the kernel_size");
 
-	if (stride != 1)
-		throw std::invalid_argument("stride must be 1 in convolutional layer - this version can only handle a stride of 1");
-
 	for (int i = 0; i < number_of_kernels; i++)
 	{
 		kernels.push_back(conv_kernel(kernel_size));
@@ -156,7 +153,7 @@ void convolutional_layer::forward_propagation()
 		const matrix& kernel_bias = kernels[output_depth].get_bias();
 
 		matrix::valid_cross_correlation(
-			*input, curr_kernel.get_weights_readonly(), activations);
+			*input, curr_kernel.get_weights_readonly(), activations, stride);
 		matrix::add(activations, kernel_bias, activations);
 	}
 

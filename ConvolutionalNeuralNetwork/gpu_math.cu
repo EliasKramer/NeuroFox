@@ -16,7 +16,7 @@ static void set_device()
 	cudaError_t cudaStatus = cudaSetDevice(0);
 	if (cudaStatus != cudaSuccess)
 	{
-		throw std::runtime_error("gpu_sigmoid failed. cudaSetDevice failed");
+		throw std::runtime_error("cudaSetDevice failed " + cudaStatus);
 	}
 }
 
@@ -25,13 +25,15 @@ static void check_for_error_and_synchronize()
 	cudaError_t cudaStatus = cudaGetLastError();
 	if (cudaStatus != cudaSuccess)
 	{
-		throw std::runtime_error("gpu_sigmoid failed. kernel launch failed");
+		std::string cuda_status = cudaGetErrorString(cudaStatus);
+		throw std::runtime_error("error while executing cuda kernel cuda status:" + cuda_status);
 	}
 
 	cudaStatus = cudaDeviceSynchronize();
 	if (cudaStatus != cudaSuccess)
 	{
-		throw std::runtime_error("gpu_sigmoid failed. cudaDeviceSynchronize failed");
+		std::string cuda_status = cudaGetErrorString(cudaStatus);
+		throw std::runtime_error("could not sync cuda device cuda status:" + cuda_status);
 	}
 }
 
@@ -148,31 +150,37 @@ __global__ void gpu_valid_cross_correlation_kernel(
 	float* result,
 	const int input_depth,
 	const int input_width,
-	const int kernel_size,
+	const int kernel_width,
+	const int output_width,
 	const int stride)
 {
 	unsigned int result_idx = blockIdx.x * blockDim.x + threadIdx.x;
-	if (result_idx < input_width * input_width)
+		
+	if (result_idx < output_width * output_width)
 	{
-		int input_x = (result_idx % input_width) * stride;
-		int input_y = (result_idx / input_width) * stride;
+		//print all arguments
+		printf("input_depth: %d, input_width: %d, kernel_width: %d, output_width: %d, stride: %d\n",
+			input_depth, input_width, kernel_width, output_width, stride);
+
+		int input_x = (result_idx % output_width) * stride;
+		int input_y = (result_idx / output_width) * stride;
 
 		float sum = 0;
-		for (int kernel_x = 0; kernel_x < kernel_size; kernel_x++)
+		for (int kernel_x = 0; kernel_x < kernel_width; kernel_x++)
 		{
-			for (int kernel_y = 0; kernel_y < kernel_size; kernel_y++)
+			for (int kernel_y = 0; kernel_y < kernel_width; kernel_y++)
 			{
 				for (int kernel_z = 0; kernel_z < input_depth; kernel_z++)
 				{
 					int input_idx = get_idx(input_x + kernel_x, input_y + kernel_y, kernel_z, input_width, input_width);
-					int weight_idx = get_idx(kernel_x, kernel_y, kernel_z, kernel_size, kernel_size);
+					int weight_idx = get_idx(kernel_x, kernel_y, kernel_z, kernel_width, kernel_width);
 					sum += input[input_idx] * weights[weight_idx];
 				}
 			}
 		}
+		printf("result: %f\n", sum);
 		result[result_idx] = sum;
 	}
-	
 }
 
 void gpu_valid_cross_correlation(
@@ -224,17 +232,17 @@ void gpu_valid_cross_correlation(
 
 		size_t block_count = get_block_count(output_width * output_width);
 
-		gpu_valid_cross_correlation_kernel << <block_count, THREADS_PER_BLOCK >> > (
+		gpu_valid_cross_correlation_kernel << <(int)block_count, THREADS_PER_BLOCK >> > (
 			gpu_input.gpu_data_ptr(),
 			gpu_kernel_weights[activation_depth].gpu_data_ptr(),
 			activation_ptr,
-			input_depth,
-			input_width,
-			kernel_width,
-			stride);
+			(int)input_depth,
+			(int)input_width,
+			(int)kernel_width,
+			(int)output_width,
+			(int)stride);
+		//check_for_error_and_synchronize();
 	}
-
-	check_for_error_and_synchronize();
 }
 
 __global__ void gpu_sigmoid_kernel(float* data, int size)
