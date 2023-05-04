@@ -147,21 +147,44 @@ __global__ void gpu_valid_cross_correlation_kernel(
 	const float* weights,
 	float* result,
 	const int input_depth,
-	const int input_width)
+	const int input_width,
+	const int kernel_size,
+	const int stride)
 {
+	unsigned int result_idx = blockIdx.x * blockDim.x + threadIdx.x;
+	if (result_idx < input_width * input_width)
+	{
+		int input_x = (result_idx % input_width) * stride;
+		int input_y = (result_idx / input_width) * stride;
 
+		float sum = 0;
+		for (int kernel_x = 0; kernel_x < kernel_size; kernel_x++)
+		{
+			for (int kernel_y = 0; kernel_y < kernel_size; kernel_y++)
+			{
+				for (int kernel_z = 0; kernel_z < input_depth; kernel_z++)
+				{
+					int input_idx = get_idx(input_x + kernel_x, input_y + kernel_y, kernel_z, input_width, input_width);
+					int weight_idx = get_idx(kernel_x, kernel_y, kernel_z, kernel_size, kernel_size);
+					sum += input[input_idx] * weights[weight_idx];
+				}
+			}
+		}
+		result[result_idx] = sum;
+	}
+	
 }
 
 void gpu_valid_cross_correlation(
 	const gpu_memory<float>& gpu_input,
 	const std::vector<gpu_memory<float>>& gpu_kernel_weights,
 	gpu_memory<float>& gpu_activations,
-	size_t input_size,
+	size_t input_width,
 	size_t input_depth,
-	size_t kernel_size,
+	size_t kernel_width,
 	size_t kernel_count,
 	size_t stride,
-	size_t output_size)
+	size_t output_width)
 {
 	if (gpu_input.item_count() == 0 ||
 		gpu_activations.item_count() == 0 ||
@@ -169,7 +192,7 @@ void gpu_valid_cross_correlation(
 	{
 		throw std::invalid_argument("gpu_valid_cross_correlation failed. size must be greater than 0");
 	}
-	if (input_size * input_size * input_depth != gpu_input.item_count())
+	if (input_width * input_width * input_depth != gpu_input.item_count())
 	{
 		throw std::invalid_argument("input size is different on gpu and cpu");
 	}
@@ -177,12 +200,12 @@ void gpu_valid_cross_correlation(
 	{
 		throw std::invalid_argument("gpu kernels could not be devided by kernel count");
 	}
-	if (kernel_size * kernel_size * input_depth != (gpu_kernel_weights[0].item_count() / kernel_count))
+	if (kernel_width * kernel_width * input_depth != (gpu_kernel_weights[0].item_count() / kernel_count))
 	{
 		throw std::invalid_argument("kernel size false");
 	}
 
-	const float output_side_size = (input_size - kernel_size) / (float)stride + 1;
+	const float output_side_size = (input_width - kernel_width) / (float)stride + 1;
 	if (!is_whole_number(output_side_size))
 	{
 		throw std::invalid_argument("gpu_valid_cross_correlation failed. this stride, size combination cannot be used");
@@ -191,22 +214,24 @@ void gpu_valid_cross_correlation(
 	{
 		throw std::invalid_argument("gpu_valid_cross_correlation failed. false format");
 	}
-	set_device();
 
+	set_device();
 
 	for (int activation_depth = 0; activation_depth < kernel_count; activation_depth++)
 	{
 		//splits the gpu_activations into its dephts
-		float* activation_ptr = gpu_sub_ptr(gpu_activations, output_size * output_size, activation_depth);
+		float* activation_ptr = gpu_sub_ptr(gpu_activations, output_width * output_width, activation_depth);
 
-		dim3 thread(output_side_size, output_side_size, 1);
-		//TODO
-		gpu_valid_cross_correlation_kernel << <1, 1 >> > (
+		size_t block_count = get_block_count(output_width * output_width);
+
+		gpu_valid_cross_correlation_kernel << <block_count, THREADS_PER_BLOCK >> > (
 			gpu_input.gpu_data_ptr(),
 			gpu_kernel_weights[activation_depth].gpu_data_ptr(),
 			activation_ptr,
 			input_depth,
-			input_size);
+			input_width,
+			kernel_width,
+			stride);
 	}
 
 	check_for_error_and_synchronize();

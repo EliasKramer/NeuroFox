@@ -32,6 +32,28 @@ namespace CNNTest
 			matrix mx(expected_values, 2, 3, 4);
 			Assert::IsTrue(matrix::are_equal(m, mx));
 		}
+		TEST_METHOD(constructor_from_vector_test_2)
+		{
+			std::vector<float> inital_data = {
+				11, 22,
+				33, 44,
+
+				55, 66,
+				77, 88
+			};
+
+			matrix inital_matrix(inital_data, 2, 2, 2);
+
+			Assert::AreEqual(11.0f, inital_matrix.get_at(0, 0, 0));
+			Assert::AreEqual(22.0f, inital_matrix.get_at(1, 0, 0));
+			Assert::AreEqual(33.0f, inital_matrix.get_at(0, 1, 0));
+			Assert::AreEqual(44.0f, inital_matrix.get_at(1, 1, 0));
+
+			Assert::AreEqual(55.0f, inital_matrix.get_at(0, 0, 1));
+			Assert::AreEqual(66.0f, inital_matrix.get_at(1, 0, 1));
+			Assert::AreEqual(77.0f, inital_matrix.get_at(0, 1, 1));
+			Assert::AreEqual(88.0f, inital_matrix.get_at(1, 1, 1));
+		}
 		TEST_METHOD(setting_getting)
 		{
 			matrix m(2, 3, 4);

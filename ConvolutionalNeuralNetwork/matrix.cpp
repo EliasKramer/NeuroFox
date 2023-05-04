@@ -303,7 +303,7 @@ void matrix::full_cross_correlation(const matrix& input, const matrix& kernel, m
 	const size_t input_size = input.get_width();
 	const size_t kernel_size = kernel.get_width();
 	const size_t output_size = output.get_width();
-	const size_t expected_output_size = input_size + kernel_size - 1;
+	const size_t expected_output_size = input_size - kernel_size + 1;
 	if (output_size != expected_output_size)
 	{
 		throw std::invalid_argument("cross correlation could not be performed. output matrix is not the correct size");
@@ -323,10 +323,9 @@ void matrix::full_cross_correlation(const matrix& input, const matrix& kernel, m
 				{
 					for (int j = 0; j < kernel_size; j++)
 					{
-						if (x - i >= 0 && x - i < input_size && y - j >= 0 && y - j < input_size)
-						{
-							sum += input.get_at(x - i, y - j, z) * kernel.get_at(i, j, z);
-						}
+						float curr_input = input.get_at(x + i, y + j, z);
+						float curr_weight = kernel.get_at(i, j, z);
+						sum += curr_input * curr_weight;
 					}
 				}
 				output.set_at(x, y, z, sum);

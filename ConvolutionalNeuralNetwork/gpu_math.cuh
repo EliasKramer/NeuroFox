@@ -24,12 +24,12 @@ void gpu_valid_cross_correlation(
 	const gpu_memory<float>& gpu_input,
 	const std::vector<gpu_memory<float>>& gpu_kernel_weights,
 	gpu_memory<float>& gpu_activations,
-	size_t input_size,
+	size_t input_width,
 	size_t input_depth,
-	size_t kernel_size,
+	size_t kernel_width,
 	size_t kernel_count,
 	size_t stride,
-	size_t output_size);
+	size_t output_width);
 
 using gpu_activation_fn = void(*)(gpu_memory<float>&);
 
