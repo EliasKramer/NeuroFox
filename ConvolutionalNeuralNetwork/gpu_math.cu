@@ -20,7 +20,7 @@ static void set_device()
 	}
 }
 
-static void check_for_any_cuda_error()
+static void cuda_error_check()
 {
 	cudaError_t cudaStatus = cudaGetLastError();
 	if (cudaStatus != cudaSuccess)
@@ -29,17 +29,20 @@ static void check_for_any_cuda_error()
 		throw std::runtime_error("error while executing cuda kernel cuda status:" + cuda_status);
 	}
 }
-
-static void check_for_error_and_synchronize()
+static void cuda_sync()
 {
-	check_for_any_cuda_error();
-
 	cudaError_t cudaStatus = cudaDeviceSynchronize();
 	if (cudaStatus != cudaSuccess)
 	{
 		std::string cuda_status = cudaGetErrorString(cudaStatus);
 		throw std::runtime_error("could not sync cuda device cuda status:" + cuda_status);
 	}
+}
+
+static void check_for_error_and_synchronize()
+{
+	cuda_error_check();
+	cuda_sync();
 }
 
 __device__ int get_idx(int x, int y, int z, int height, int width)
@@ -68,7 +71,7 @@ __global__ void gpu_dot_product_kernel(
 	}
 }
 
-float* gpu_sub_ptr(gpu_memory<float>& gpu_memory, size_t elements_per_idx, size_t index)
+float* gpu_sub_ptr(const gpu_memory<float>& gpu_memory, size_t elements, size_t index)
 {
 	if (gpu_memory.gpu_data_ptr() == nullptr)
 	{
@@ -78,12 +81,12 @@ float* gpu_sub_ptr(gpu_memory<float>& gpu_memory, size_t elements_per_idx, size_
 	{
 		throw std::invalid_argument("gpu_sub_ptr failed. index out of range");
 	}
-	if (gpu_memory.byte_size() < elements_per_idx * sizeof(float))
+	if (gpu_memory.byte_size() < elements * sizeof(float))
 	{
 		throw std::invalid_argument("gpu_sub_ptr failed. size_of_element must be less than gpu_memory.size()");
 	}
 
-	return (float*)(((char*)gpu_memory.gpu_data_ptr()) + index * elements_per_idx * sizeof(float));
+	return (float*)(((char*)gpu_memory.gpu_data_ptr()) + index * elements * sizeof(float));
 }
 
 void gpu_dot_product(
@@ -199,7 +202,7 @@ void gpu_valid_cross_correlation(
 	size_t stride,
 	size_t output_width)
 {
-	check_for_any_cuda_error();
+	cuda_error_check();
 	if (gpu_input.item_count() == 0 ||
 		gpu_activations.item_count() == 0 ||
 		gpu_kernel_weights.size() == 0 ||
