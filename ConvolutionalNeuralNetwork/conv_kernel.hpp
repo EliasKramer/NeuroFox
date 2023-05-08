@@ -10,7 +10,7 @@ public:
 	conv_kernel(int kernel_size);
 
 	void set_kernel_depth(int depth);
-	void set_bias_format(int size);
+	void set_bias_format(int byte_size);
 
 	matrix& get_weights();
 	const matrix& get_weights_readonly() const;

@@ -225,10 +225,11 @@ namespace CNNTest
 			Assert::IsTrue(matrix::are_equal(expected, double_check_expected));
 
 			gpu_memory<float> gpu_input(input);
-			gpu_memory<float> gpu_kernel(kernel);
 			gpu_memory<float> gpu_result(4);
 
-			std::vector<gpu_memory<float>> gpu_kernel_weights = { gpu_kernel };
+			std::vector<gpu_memory<float>> gpu_kernel_weights;
+			gpu_kernel_weights.push_back(gpu_memory<float>(kernel));
+
 			gpu_valid_cross_correlation(
 				gpu_input,
 				gpu_kernel_weights,
@@ -280,10 +281,10 @@ namespace CNNTest
 			Assert::IsTrue(matrix::are_equal(expected, double_check_expected));
 
 			gpu_memory<float> gpu_input(input);
-			gpu_memory<float> gpu_kernel(kernel);
 			gpu_memory<float> gpu_result(4);
 
-			std::vector<gpu_memory<float>> gpu_kernel_weights = { gpu_kernel };
+			std::vector<gpu_memory<float>> gpu_kernel_weights;
+			gpu_kernel_weights.push_back(gpu_memory<float>(kernel));
 
 			gpu_valid_cross_correlation(
 				gpu_input,
@@ -295,7 +296,6 @@ namespace CNNTest
 				gpu_kernel_weights.size(),
 				2, //stride 
 				2); //output width
-
 			std::vector<float> result = *gpu_result.to_cpu().get();
 			matrix result_matrix = matrix(result, 2, 2, 1);
 			Assert::IsTrue(matrix::are_equal(expected, result_matrix));

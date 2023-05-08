@@ -1,12 +1,12 @@
 #include "util.hpp"
 
-int random_idx(int size)
+int random_idx(int byte_size)
 {
     // Seed the random number generator with the current time
     std::srand(std::time(nullptr));
 
     // Generate a random number between 0 and size-1
-    return std::rand() % size;
+    return std::rand() % byte_size;
 }
 
 bool biased_coin_toss(float true_bias, float false_bias)

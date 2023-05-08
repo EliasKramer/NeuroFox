@@ -16,7 +16,7 @@ public:
     explicit gpu_memory(size_t item_count)
         : element_count(item_count) 
     {
-        cudaError_t err = cudaMalloc(&gpu_ptr, element_count * sizeof(T));
+        cudaError_t err = cudaMalloc(&gpu_ptr, byte_size());
         if (err != cudaSuccess) {
             throw std::runtime_error("Failed to allocate device memory");
         }
@@ -30,7 +30,7 @@ public:
             cudaMemcpy(
                 gpu_ptr,
                 init_values.data(),
-                element_count * sizeof(T),
+                byte_size(),
                 cudaMemcpyHostToDevice);
 
         if (err != cudaSuccess) {
@@ -53,11 +53,16 @@ public:
 			throw std::runtime_error("gpu_memory only supports float");
 		}
 
+        if (m.flat_readonly().size() != element_count)
+        {
+            throw std::runtime_error("gpu_memory size mismatch");
+        }
+
         cudaError_t err =
             cudaMemcpy(
 				gpu_ptr,
 				m.flat_readonly().data(),
-				element_count * sizeof(T),
+				byte_size(),
 				cudaMemcpyHostToDevice);
 
         if (err != cudaSuccess) {
@@ -77,20 +82,24 @@ public:
 
     std::unique_ptr<std::vector<T>> to_cpu() const
     {
-        std::unique_ptr<std::vector<T>> cpu_data = std::make_unique<std::vector<T>>(element_count);
+        std::unique_ptr<std::vector<T>> cpu_data = 
+            std::make_unique<std::vector<T>>(element_count);
+        
         cudaError_t err =
             cudaMemcpy(
                 cpu_data->data(),
                 gpu_ptr,
-                element_count * sizeof(T),
+                byte_size(),
                 cudaMemcpyDeviceToHost);
+        
         if (err != cudaSuccess) {
             throw std::runtime_error("Failed to copy device memory to host");
         }
+
         return std::move(cpu_data);
 	}
 
-    size_t size() const 
+    size_t byte_size() const 
     {
         return element_count * sizeof(T);
     }

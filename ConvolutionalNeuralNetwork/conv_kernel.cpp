@@ -9,9 +9,9 @@ void conv_kernel::set_kernel_depth(int depth)
 	weights.resize(get_kernel_size(), get_kernel_size(), depth);
 }
 
-void conv_kernel::set_bias_format(int size)
+void conv_kernel::set_bias_format(int byte_size)
 {
-	bias.resize(size, size, 1);
+	bias.resize(byte_size, byte_size, 1);
 }
 
 matrix& conv_kernel::get_weights()
