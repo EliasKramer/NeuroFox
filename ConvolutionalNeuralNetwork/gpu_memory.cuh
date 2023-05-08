@@ -72,7 +72,9 @@ public:
 
     ~gpu_memory()
     {
-        cudaFree(gpu_ptr);
+        cudaError_t err = cudaFree(gpu_ptr);
+        if (err != cudaSuccess)
+            throw std::runtime_error("Failed to free device memory");
     }
 
     T* gpu_data_ptr() const 

@@ -22,7 +22,7 @@ void gpu_add(
 
 void gpu_valid_cross_correlation(
 	const gpu_memory<float>& gpu_input,
-	const std::vector<gpu_memory<float>>& gpu_kernel_weights,
+	const std::vector<std::unique_ptr<gpu_memory<float>>>& gpu_kernel_weights,
 	gpu_memory<float>& gpu_activations,
 	size_t input_width,
 	size_t input_depth,

@@ -30,19 +30,19 @@ namespace CNNTest
 		}
 		TEST_METHOD(gpu_memory_destructor_test)
 		{
-			gpu_memory<float> gpu_mem(2);
+			gpu_memory<float>* gpu_mem = new gpu_memory<float>(2);
 
-			float* gpu_ptr = gpu_mem.gpu_data_ptr();
-			gpu_mem.~gpu_memory();
+			float* gpu_ptr = gpu_mem->gpu_data_ptr();
+			delete gpu_mem;
 
 			std::vector<float> cpu_data(2);
-			cudaError_t cudaStatus =
-				cudaMemcpy(
+			cudaMemcpy(
 					cpu_data.data(),
 					gpu_ptr, 2 * sizeof(float),
 					cudaMemcpyDeviceToHost);
 
-			Assert::AreNotEqual((int)cudaSuccess, (int)cudaStatus);
+			// Check if memory has been correctly freed
+			Assert::AreNotEqual((int)cudaSuccess, (int)cudaGetLastError());
 		}
 		TEST_METHOD(copy_matrix_to_gpu_test)
 		{
@@ -227,9 +227,9 @@ namespace CNNTest
 			gpu_memory<float> gpu_input(input);
 			gpu_memory<float> gpu_result(4);
 
-			std::vector<gpu_memory<float>> gpu_kernel_weights;
-			gpu_kernel_weights.push_back(gpu_memory<float>(kernel));
-
+			std::vector<std::unique_ptr<gpu_memory<float>>> gpu_kernel_weights;
+			gpu_kernel_weights.emplace_back(std::make_unique<gpu_memory<float>>(kernel));
+			
 			gpu_valid_cross_correlation(
 				gpu_input,
 				gpu_kernel_weights,
@@ -240,7 +240,7 @@ namespace CNNTest
 				gpu_kernel_weights.size(),
 				1, //stride 
 				2); //output width
-
+				
 			std::vector<float> result = *gpu_result.to_cpu().get();
 			matrix result_matrix = matrix(result, 2, 2, 1);
 			Assert::IsTrue(matrix::are_equal(expected, result_matrix));
@@ -283,8 +283,9 @@ namespace CNNTest
 			gpu_memory<float> gpu_input(input);
 			gpu_memory<float> gpu_result(4);
 
-			std::vector<gpu_memory<float>> gpu_kernel_weights;
-			gpu_kernel_weights.push_back(gpu_memory<float>(kernel));
+			
+			std::vector<std::unique_ptr<gpu_memory<float>>> gpu_kernel_weights;
+			gpu_kernel_weights.emplace_back(std::make_unique<gpu_memory<float>>(kernel));
 
 			gpu_valid_cross_correlation(
 				gpu_input,
@@ -296,6 +297,7 @@ namespace CNNTest
 				gpu_kernel_weights.size(),
 				2, //stride 
 				2); //output width
+			
 			std::vector<float> result = *gpu_result.to_cpu().get();
 			matrix result_matrix = matrix(result, 2, 2, 1);
 			Assert::IsTrue(matrix::are_equal(expected, result_matrix));
