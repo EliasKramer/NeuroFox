@@ -497,11 +497,70 @@ namespace CNNTest
 			Assert::IsTrue(float_vectors_equal(gpu_values, std::vector<float> {1, 2}));
 			gpu_values = get_gpu_values(block.get_gpu_data_ptr(1), 2);
 			Assert::IsTrue(float_vectors_equal(gpu_values, std::vector<float> {3, 4}));
-			
+
 			gpu_values = get_gpu_values(block.get_gpu_label_ptr(0), 3);
 			Assert::IsTrue(float_vectors_equal(gpu_values, std::vector<float> {5, 6, 7}));
 			gpu_values = get_gpu_values(block.get_gpu_label_ptr(1), 3);
 			Assert::IsTrue(float_vectors_equal(gpu_values, std::vector<float> {8, 9, 1}));
+		}
+		TEST_METHOD(data_block_constructor_test)
+		{
+			gpu_nn_data_block block = gpu_nn_data_block(2, 2, 3);
+			//you can make blocks without labels
+			block = gpu_nn_data_block(2, 2, 0);
+
+			try 
+			{
+				block = gpu_nn_data_block(0, 2, 3);
+				Assert::Fail();
+			}
+			catch (std::runtime_error& e) {
+				Assert::AreEqual(e.what(), "could not create gpu_nn_data_block");
+			}
+			try 
+			{
+				block = gpu_nn_data_block(2, 0, 3);
+				Assert::Fail(); 
+			}
+			catch (std::runtime_error& e) {
+				Assert::AreEqual(e.what(), "could not create gpu_nn_data_block");
+			}
+		}
+		TEST_METHOD(data_block_wrong_indexing_test)
+		{
+			gpu_nn_data_block block = gpu_nn_data_block(2, 2, 3);
+			
+			try
+			{
+				block.set_data(3, std::vector<float>{1, 2});
+				Assert::Fail();
+			}
+			catch (std::runtime_error e)
+			{
+				Assert::AreEqual(e.what(), "index out of bounds");
+			}
+			try {
+				block.get_gpu_data_ptr(-1);
+				Assert::Fail();
+			}
+			catch (std::runtime_error e)
+			{
+				Assert::AreEqual(e.what(), "index out of bounds");
+			}
+		}
+		TEST_METHOD(data_block_no_label_data)
+		{
+			gpu_nn_data_block block = gpu_nn_data_block(2, 2, 0);
+
+			try
+			{
+				block.get_gpu_label_ptr(0);
+				Assert::Fail();
+			}
+			catch (std::runtime_error e)
+			{
+				Assert::AreEqual(e.what(), "this block has no label data");
+			}
 		}
 	};
 }

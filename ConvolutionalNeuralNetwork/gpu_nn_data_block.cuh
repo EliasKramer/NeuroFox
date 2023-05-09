@@ -10,7 +10,7 @@
 //+---------+-----+---------+-----+---------+-----+---------+-----+
 class gpu_nn_data_block {
 private:
-	gpu_memory<float> data;
+	std::unique_ptr<gpu_memory<float>> data;
 	size_t num_of_blocks;
 
 	size_t num_of_label_data;
