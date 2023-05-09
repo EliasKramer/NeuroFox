@@ -177,8 +177,8 @@ void fully_connected_layer::apply_noise(float range)
 void fully_connected_layer::mutate(float range)
 {
 	if (biased_coin_toss(
-		weights.flat_readonly().size(),
-		biases.flat_readonly().size()))
+		(float)weights.flat_readonly().size(),
+		(float)biases.flat_readonly().size()))
 	{
 		weights.mutate(range);
 	}

@@ -65,7 +65,6 @@ void gpu_valid_cross_correlation(
 	size_t stride,
 	size_t output_width);
 
-
 /*
 	activation functions
 	performs a function that has one input and one output

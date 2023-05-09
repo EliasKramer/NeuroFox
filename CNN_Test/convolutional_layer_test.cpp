@@ -100,7 +100,7 @@ namespace CNNTest
 				|-60|-60|
 				+ - + - +
 			*/
-			layer.get_kernel_biases()[0].set_all(-60);
+			layer.get_kernel_biases().set_all(-60);
 
 			/* input matrix
 				+ - + - + - +

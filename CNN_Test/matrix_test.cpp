@@ -20,12 +20,12 @@ namespace CNNTest
 		TEST_METHOD(constructor_from_vector_test)
 		{
 			matrix m(2, 3, 4);
-			for (int i = 0; i < 24; i++)
+			for (float i = 0; i < 24; i++)
 			{
 				m.flat()[i] = i;
 			}
 			std::vector<float> expected_values(24);
-			for (int i = 0; i < 24; i++)
+			for (float i = 0; i < 24; i++)
 			{
 				expected_values[i] = i;
 			}

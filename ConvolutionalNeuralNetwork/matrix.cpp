@@ -210,25 +210,6 @@ void matrix::add(const matrix& a, const matrix& b, matrix& result)
 	}
 }
 
-void matrix::add_each_depth(const matrix& a, const std::vector<matrix>& b, matrix& result)
-{
-	if (a.depth == 0 || a.depth != b.size() || b[0].depth != 1)
-	{
-		throw std::invalid_argument("addition could not be performed. input matrices are in the wrong format");
-	}
-
-	for (int z = 0; z < a.depth; z++)
-	{
-		for (int y = 0; y < a.height; y++)
-		{
-			for (int x = 0; x < a.width; x++)
-			{
-				result.set_at(x, y, z, a.get_at(x, y, z) + b[z].get_at(x, y));
-			}
-		}
-	}
-}
-
 void matrix::add_flat(const matrix& a, const matrix& b, matrix& result)
 {
 	if (a.data.size() != b.data.size())
@@ -304,8 +285,14 @@ void matrix::valid_cross_correlation(
 						for (int j = 0; j < kernel_size; j++)
 						{
 							sum +=
-								input.get_at(x * stride + i, y * stride + j, curr_depth) *
-								kernels[z].get_at(i, j, curr_depth);
+								input.get_at(
+									x * stride + i, 
+									y * stride + j, 
+									curr_depth) *
+								kernels[z].get_at(
+									i, 
+									j, 
+									curr_depth);
 						}
 					}
 				}

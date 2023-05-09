@@ -164,9 +164,15 @@
     <ClInclude Include="convolutional_layer.hpp">
       <Filter>header\layer</Filter>
     </ClInclude>
+    <ClInclude Include="gpu_nn_data_block.cuh">
+      <Filter>header\gpu</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="gpu_math.cu">
+      <Filter>source\gpu</Filter>
+    </CudaCompile>
+    <CudaCompile Include="gpu_nn_data_block.cu">
       <Filter>source\gpu</Filter>
     </CudaCompile>
   </ItemGroup>

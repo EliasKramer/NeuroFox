@@ -37,6 +37,7 @@
     <ClInclude Include="digit_training_data.hpp" />
     <ClInclude Include="fully_connected_layer.hpp" />
     <ClInclude Include="gpu_math.cuh" />
+    <ClInclude Include="gpu_nn_data_block.cuh" />
     <ClInclude Include="interpreter.hpp" />
     <ClInclude Include="layer.hpp" />
     <ClInclude Include="math_functions.hpp" />
@@ -49,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="gpu_math.cu" />
+    <CudaCompile Include="gpu_nn_data_block.cu" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D8C885F6-007A-45AF-A38F-B60CE38A9F9D}</ProjectGuid>

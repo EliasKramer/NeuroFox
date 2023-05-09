@@ -1,5 +1,6 @@
 #include "CppUnitTest.h"
 #include "../ConvolutionalNeuralNetwork/gpu_math.cuh"
+#include "../ConvolutionalNeuralNetwork/gpu_nn_data_block.cuh"
 #include "test_util.hpp"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -37,9 +38,9 @@ namespace CNNTest
 
 			std::vector<float> cpu_data(2);
 			cudaMemcpy(
-					cpu_data.data(),
-					gpu_ptr, 2 * sizeof(float),
-					cudaMemcpyDeviceToHost);
+				cpu_data.data(),
+				gpu_ptr, 2 * sizeof(float),
+				cudaMemcpyDeviceToHost);
 
 			// Check if memory has been correctly freed
 			Assert::AreNotEqual((int)cudaSuccess, (int)cudaGetLastError());
@@ -70,7 +71,7 @@ namespace CNNTest
 			// |5|7|
 			// +-+-+
 			matrix m(2, 2, 2);
-			for (int i = 0; i < 8; i++)
+			for (float i = 0; i < 8; i++)
 			{
 				m.flat()[i] = i;
 			}
@@ -86,7 +87,7 @@ namespace CNNTest
 			// |5|7|
 			// +-+-+
 			std::vector<float> expected_data(4);
-			for (int i = 0; i < 4; i++)
+			for (float i = 0; i < 4; i++)
 			{
 				expected_data[i] = i + 4;
 			}
@@ -230,7 +231,7 @@ namespace CNNTest
 
 			std::vector<std::unique_ptr<gpu_memory<float>>> gpu_kernel_weights;
 			gpu_kernel_weights.emplace_back(std::make_unique<gpu_memory<float>>(kernel));
-			
+
 			gpu_valid_cross_correlation(
 				gpu_input,
 				gpu_kernel_weights,
@@ -241,7 +242,7 @@ namespace CNNTest
 				gpu_kernel_weights.size(),
 				1, //stride 
 				2); //output width
-				
+
 			std::vector<float> result = *gpu_result.to_cpu().get();
 			matrix result_matrix = matrix(result, 2, 2, 1);
 			Assert::IsTrue(matrix::are_equal(expected, result_matrix));
@@ -285,7 +286,7 @@ namespace CNNTest
 			gpu_memory<float> gpu_input(input);
 			gpu_memory<float> gpu_result(4);
 
-			
+
 			std::vector<std::unique_ptr<gpu_memory<float>>> gpu_kernel_weights;
 			gpu_kernel_weights.emplace_back(std::make_unique<gpu_memory<float>>(kernel));
 
@@ -299,7 +300,7 @@ namespace CNNTest
 				gpu_kernel_weights.size(),
 				2, //stride 
 				2); //output width
-			
+
 			std::vector<float> result = *gpu_result.to_cpu().get();
 			matrix result_matrix = matrix(result, 2, 2, 1);
 			Assert::IsTrue(matrix::are_equal(expected, result_matrix));
@@ -457,6 +458,50 @@ namespace CNNTest
 			std::vector<float> result = *gpu_result.to_cpu().get();
 			matrix result_matrix = matrix(result, 2, 2, 2);
 			Assert::IsTrue(matrix::are_equal(expected, result_matrix));
+		}
+		TEST_METHOD(data_block_test_1)
+		{
+			gpu_nn_data_block block = gpu_nn_data_block(3, 2, 1);
+			block.set_data(0, std::vector<float>{1, 2});
+			block.set_data(1, std::vector<float>{3, 4});
+			block.set_data(2, std::vector<float>{5, 6});
+
+			block.set_label_data(0, std::vector<float>{7});
+			block.set_label_data(1, std::vector<float>{8});
+			block.set_label_data(2, std::vector<float>{9});
+
+			std::vector<float> gpu_values = get_gpu_values(block.get_gpu_data_ptr(0), 2);
+			Assert::IsTrue(float_vectors_equal(gpu_values, std::vector<float> {1, 2}));
+			gpu_values = get_gpu_values(block.get_gpu_data_ptr(1), 2);
+			Assert::IsTrue(float_vectors_equal(gpu_values, std::vector<float> {3, 4}));
+			gpu_values = get_gpu_values(block.get_gpu_data_ptr(2), 2);
+			Assert::IsTrue(float_vectors_equal(gpu_values, std::vector<float> {5, 6}));
+
+			gpu_values = get_gpu_values(block.get_gpu_label_ptr(0), 1);
+			Assert::IsTrue(float_vectors_equal(gpu_values, std::vector<float> {7}));
+			gpu_values = get_gpu_values(block.get_gpu_label_ptr(1), 1);
+			Assert::IsTrue(float_vectors_equal(gpu_values, std::vector<float> {8}));
+			gpu_values = get_gpu_values(block.get_gpu_label_ptr(2), 1);
+			Assert::IsTrue(float_vectors_equal(gpu_values, std::vector<float> {9}));
+		}
+		TEST_METHOD(data_block_test_2)
+		{
+			gpu_nn_data_block block = gpu_nn_data_block(2, 2, 3);
+			block.set_data(0, std::vector<float>{1, 2});
+			block.set_data(1, std::vector<float>{3, 4});
+
+			block.set_label_data(0, std::vector<float>{5, 6, 7});
+			block.set_label_data(1, std::vector<float>{8, 9, 1});
+
+			std::vector<float> gpu_values = get_gpu_values(block.get_gpu_data_ptr(0), 2);
+			Assert::IsTrue(float_vectors_equal(gpu_values, std::vector<float> {1, 2}));
+			gpu_values = get_gpu_values(block.get_gpu_data_ptr(1), 2);
+			Assert::IsTrue(float_vectors_equal(gpu_values, std::vector<float> {3, 4}));
+			
+			gpu_values = get_gpu_values(block.get_gpu_label_ptr(0), 3);
+			Assert::IsTrue(float_vectors_equal(gpu_values, std::vector<float> {5, 6, 7}));
+			gpu_values = get_gpu_values(block.get_gpu_label_ptr(1), 3);
+			Assert::IsTrue(float_vectors_equal(gpu_values, std::vector<float> {8, 9, 1}));
 		}
 	};
 }

@@ -8,16 +8,16 @@
 class convolutional_layer : public layer {
 private:
 	std::vector<matrix> kernel_weights;
-	std::vector<matrix> kernel_biases;
+	matrix kernel_biases;
 	std::vector<matrix> kernel_weights_deltas;
-	std::vector<matrix> kernel_bias_deltas;
+	matrix kernel_bias_deltas;
 
 	int kernel_size;
 	int stride;
 	int kernel_count;
 
-	std::vector<gpu_memory<float>> gpu_kernel_weights;
-	std::vector<gpu_memory<float>> gpu_kernel_biases;
+	std::vector<std::unique_ptr<gpu_memory<float>>> gpu_kernel_weights;
+	std::unique_ptr<gpu_memory<float>> gpu_kernel_biases;
 
 	e_activation_t activation_fn;
 
@@ -42,8 +42,8 @@ public:
 
 	std::vector<matrix>& get_kernel_weights();
 	const std::vector<matrix>& get_kernel_weights_readonly() const;
-	std::vector<matrix>& get_kernel_biases();
-	const std::vector<matrix>& get_kernel_biases_readonly() const;
+	matrix& get_kernel_biases();
+	const matrix& get_kernel_biases_readonly() const;
 
 	void set_input_format(const matrix& input_format) override;
 

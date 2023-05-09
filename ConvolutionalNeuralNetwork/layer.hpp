@@ -43,6 +43,7 @@ protected:
 
 	virtual void forward_propagation_gpu() = 0;
 	virtual void back_propagation_gpu() = 0;
+
 public:
 	layer(e_layer_type_t given_layer_type);
 

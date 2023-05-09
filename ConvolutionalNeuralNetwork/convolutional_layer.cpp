@@ -14,8 +14,7 @@ void convolutional_layer::forward_propagation_cpu()
 	matrix::valid_cross_correlation(
 		*input, kernel_weights, activations, stride);
 
-	matrix::add_each_depth
-	(activations, kernel_biases, activations);
+	matrix::add(activations, kernel_biases, activations);
 
 	activations.apply_activation_function(activation_fn);
 }
@@ -26,6 +25,24 @@ void convolutional_layer::back_propagation_cpu()
 
 void convolutional_layer::forward_propagation_gpu()
 {
+	gpu_valid_cross_correlation(
+		*gpu_input,
+		gpu_kernel_weights,
+		*gpu_activations.get(),
+		input->get_width(),
+		input->get_depth(),
+		kernel_size,
+		kernel_weights.size(),
+		stride,
+		activations.get_width());
+
+	gpu_add(
+		*gpu_activations.get(),
+		*gpu_kernel_biases.get(),
+		*gpu_activations.get()
+	);
+
+	GPU_ACTIVATION[activation_fn](*gpu_activations.get());
 }
 
 void convolutional_layer::back_propagation_gpu()
@@ -57,9 +74,7 @@ convolutional_layer::convolutional_layer(
 	for (int i = 0; i < number_of_kernels; i++)
 	{
 		kernel_weights.push_back(matrix(kernel_size, kernel_size, 1));
-		kernel_biases.push_back(matrix(kernel_size, kernel_size, 1));
 		kernel_weights_deltas.push_back(matrix(kernel_size, kernel_size, 1));
-		kernel_bias_deltas.push_back(matrix(kernel_size, kernel_size, 1));
 	}
 
 	activations = matrix(0, 0, 0);
@@ -90,12 +105,12 @@ const std::vector<matrix>& convolutional_layer::get_kernel_weights_readonly() co
 	return kernel_weights;
 }
 
-std::vector<matrix>& convolutional_layer::get_kernel_biases()
+matrix& convolutional_layer::get_kernel_biases()
 {
 	return kernel_biases;
 }
 
-const std::vector<matrix>& convolutional_layer::get_kernel_biases_readonly() const
+const matrix& convolutional_layer::get_kernel_biases_readonly() const
 {
 	return kernel_biases;
 }
@@ -117,15 +132,15 @@ void convolutional_layer::set_input_format(const matrix& input_format)
 		throw std::invalid_argument("input format is not compatible with the kernel size and stride");
 
 	activations.resize((int)output_width, (int)output_height, kernel_count);
-	
+
 	for (int i = 0; i < kernel_count; i++)
 	{
 		kernel_weights[i].resize(kernel_size, kernel_size, input_depth);
 		kernel_weights_deltas[i].resize(kernel_size, kernel_size, input_depth);
-		
-		kernel_biases[i].resize(output_width, output_height, kernel_count);
-		kernel_bias_deltas[i].resize(output_width, output_height, kernel_count);
+
 	}
+	kernel_biases.resize((int)output_width, (int)output_height, kernel_count);
+	kernel_bias_deltas.resize((int)output_width, (int)output_height, kernel_count);
 }
 
 void convolutional_layer::set_all_parameter(float value)
@@ -134,10 +149,7 @@ void convolutional_layer::set_all_parameter(float value)
 	{
 		weights.set_all(value);
 	}
-	for (matrix& biases : kernel_biases)
-	{
-		biases.set_all(value);
-	}
+	kernel_biases.set_all(value);
 }
 
 void convolutional_layer::apply_noise(float range)
@@ -146,20 +158,15 @@ void convolutional_layer::apply_noise(float range)
 	{
 		weights.apply_noise(range);
 	}
-	for (matrix& biases : kernel_biases)
-	{
-		biases.apply_noise(range);
-	}
+	kernel_biases.apply_noise(range);
 }
 
 void convolutional_layer::mutate(float range)
 {
-	//choose a random kernel
-	int random_kernel_idx = random_idx(kernel_count);
 	//choose if a weight or a bias is mutated
 	if (biased_coin_toss(
-		(float)kernel_weights[0].flat_readonly().size(),
-		(float)kernel_biases[0].flat_readonly().size()))
+		(float)kernel_weights[0].flat_readonly().size() * kernel_weights.size(),
+		(float)kernel_biases.flat_readonly().size()))
 	{
 		//choose a random weight to mutate
 		int random_weight_idx =
@@ -168,22 +175,13 @@ void convolutional_layer::mutate(float range)
 				.size());
 
 		//mutate the weight
-		kernel_weights[random_kernel_idx]
+		kernel_weights[random_idx(kernel_weights.size())]
 			.flat()[random_weight_idx] +=
 			random_float_incl(-range, range);
 	}
 	else
 	{
-		//choose a random bias to mutate
-		int random_bias_idx =
-			random_idx((int)kernel_biases[0]
-				.flat_readonly()
-				.size());
-
-		//mutate the weight
-		kernel_biases[random_kernel_idx]
-			.flat()[random_bias_idx] +=
-			random_float_incl(-range, range);
+		kernel_biases.mutate(range);
 	}
 }
 
@@ -194,10 +192,15 @@ void convolutional_layer::apply_deltas(int number_of_inputs)
 
 void convolutional_layer::enable_gpu()
 {
-	throw std::invalid_argument("gpu not supported for convolutional layer");
+	for (const matrix& curr : kernel_weights)
+	{
+		gpu_kernel_weights.emplace_back(std::make_unique<gpu_memory<float>>(curr));
+	}
+	gpu_kernel_biases = std::make_unique<gpu_memory<float>>(kernel_biases);
 }
 
 void convolutional_layer::disable_gpu()
 {
-	throw std::invalid_argument("gpu not supported for convolutional layer");
+	gpu_kernel_weights.clear();
+	gpu_kernel_biases = nullptr;
 }

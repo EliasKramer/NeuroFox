@@ -52,7 +52,6 @@ public:
 	static void dot_product_flat(const matrix& a, const matrix& flat, matrix& result_flat);
 
 	static void add(const matrix& a, const matrix& b, matrix& result);
-	static void add_each_depth(const matrix& a, const std::vector<matrix>& b, matrix& result);
 	static void add_flat(const matrix& a, const matrix& b, matrix& result);
 
 	static void subtract(const matrix& a, const matrix& b, matrix& result);
@@ -67,7 +66,6 @@ public:
 		int stride);
 	//static void valid_convolution(const matrix& input, const matrix& kernel, matrix& output);
 	//static void full_cross_correlation(const matrix& input, const matrix& kernel, matrix& output, int stride);
-
 
 	void scalar_multiplication(float a);
 	void apply_activation_function(e_activation_t activation_fn);

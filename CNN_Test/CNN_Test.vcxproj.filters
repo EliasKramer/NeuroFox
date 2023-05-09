@@ -170,9 +170,15 @@
     <ClInclude Include="..\ConvolutionalNeuralNetwork\gpu_math.cuh">
       <Filter>Header Files\nn</Filter>
     </ClInclude>
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\gpu_nn_data_block.cuh">
+      <Filter>Header Files\nn</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\ConvolutionalNeuralNetwork\gpu_math.cu">
+      <Filter>Source Files\nn</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\ConvolutionalNeuralNetwork\gpu_nn_data_block.cu">
       <Filter>Source Files\nn</Filter>
     </CudaCompile>
   </ItemGroup>
