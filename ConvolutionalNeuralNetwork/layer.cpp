@@ -77,7 +77,7 @@ void layer::back_propagation()
 }
 void layer::enable_gpu()
 {
-	gpu_activations = std::make_unique<gpu_memory<float>>(activations);
+	gpu_activations = std::make_unique<gpu_matrix>(activations, true);
 }
 
 void layer::disable_gpu()

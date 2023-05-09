@@ -233,7 +233,7 @@ namespace CNNTest
 			gpu_kernel_weights.emplace_back(std::make_unique<gpu_memory<float>>(kernel));
 
 			gpu_valid_cross_correlation(
-				gpu_input,
+				gpu_input.gpu_data_ptr(),
 				gpu_kernel_weights,
 				gpu_result,
 				input.get_width(),
@@ -291,7 +291,7 @@ namespace CNNTest
 			gpu_kernel_weights.emplace_back(std::make_unique<gpu_memory<float>>(kernel));
 
 			gpu_valid_cross_correlation(
-				gpu_input,
+				gpu_input.gpu_data_ptr(),
 				gpu_kernel_weights,
 				gpu_result,
 				input.get_width(),
@@ -369,7 +369,7 @@ namespace CNNTest
 			gpu_kernel_weights.emplace_back(std::make_unique<gpu_memory<float>>(kernel));
 
 			gpu_valid_cross_correlation(
-				gpu_input,
+				gpu_input.gpu_data_ptr(),
 				gpu_kernel_weights,
 				gpu_result,
 				input.get_width(),
@@ -445,7 +445,7 @@ namespace CNNTest
 			gpu_kernel_weights.emplace_back(std::make_unique<gpu_memory<float>>(kernel2));
 
 			gpu_valid_cross_correlation(
-				gpu_input,
+				gpu_input.gpu_data_ptr(),
 				gpu_kernel_weights,
 				gpu_result,
 				input.get_width(),
@@ -586,7 +586,6 @@ namespace CNNTest
 			Assert::IsTrue(float_vectors_equal(gpu_values, std::vector<float> {3}));
 			gpu_values = get_gpu_values(block.get_gpu_label_ptr(1), 1);
 			Assert::IsTrue(float_vectors_equal(gpu_values, std::vector<float> {6}));
-
 		}
 	};
 }

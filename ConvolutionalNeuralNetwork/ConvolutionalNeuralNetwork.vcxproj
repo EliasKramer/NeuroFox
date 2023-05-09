@@ -31,6 +31,7 @@
   <ItemGroup>
     <ClInclude Include="batch_handler.hpp" />
     <ClInclude Include="convolutional_layer.hpp" />
+    <ClInclude Include="gpu_matrix.cuh" />
     <ClInclude Include="gpu_memory.cuh" />
     <ClInclude Include="digit_data.hpp" />
     <ClInclude Include="digit_interpreter.hpp" />
@@ -50,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="gpu_math.cu" />
+    <CudaCompile Include="gpu_matrix.cu" />
     <CudaCompile Include="gpu_nn_data_block.cu" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

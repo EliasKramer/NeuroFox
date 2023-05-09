@@ -16,8 +16,8 @@ private:
 	int stride;
 	int kernel_count;
 
-	std::vector<std::unique_ptr<gpu_memory<float>>> gpu_kernel_weights;
-	std::unique_ptr<gpu_memory<float>> gpu_kernel_biases;
+	std::vector<std::unique_ptr<gpu_matrix>> gpu_kernel_weights;
+	std::unique_ptr<gpu_matrix> gpu_kernel_biases;
 
 	e_activation_t activation_fn;
 

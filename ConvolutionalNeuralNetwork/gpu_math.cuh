@@ -3,7 +3,7 @@
 #include "matrix.hpp"
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
-#include "gpu_memory.cuh"
+#include "gpu_matrix.cuh"
 
 /// <summary>
 /// splits one float pointer into multiple chunks
@@ -31,9 +31,9 @@ float* gpu_sub_ptr(
 /// since the gpu_memory class stores the data in one dimension
 /// </summary>
 void gpu_dot_product(
-	const gpu_memory<float>& gpu_weights,
-	const gpu_memory<float>& gpu_input,
-	gpu_memory<float>& gpu_activations);
+	const gpu_matrix& gpu_weights,
+	const gpu_matrix& gpu_input,
+	gpu_matrix& gpu_activations);
 
 /// <summary>
 /// adds the values of two gpu memory objects
@@ -41,9 +41,9 @@ void gpu_dot_product(
 /// //all have to be the same size
 /// </summary>
 void gpu_add(
-	const gpu_memory<float>& gpu_memory_a,
-	const gpu_memory<float>& gpu_memory_b,
-	gpu_memory<float>& gpu_memory_result);
+	const gpu_matrix& gpu_memory_a,
+	const gpu_matrix& gpu_memory_b,
+	gpu_matrix& gpu_memory_result);
 
 /// <summary>
 /// performs a valid cross correlation
@@ -55,9 +55,9 @@ void gpu_add(
 /// the output will have the depth of the amount of kernels that exist
 /// </summary>
 void gpu_valid_cross_correlation(
-	const gpu_memory<float>& gpu_input,
-	const std::vector<std::unique_ptr<gpu_memory<float>>>& gpu_kernel_weights,
-	gpu_memory<float>& gpu_activations,
+	const gpu_matrix gpu_input,
+	const std::vector<std::unique_ptr<gpu_matrix>>& gpu_kernel_weights,
+	gpu_matrix& gpu_activations,
 	size_t input_width,
 	size_t input_depth,
 	size_t kernel_width,
@@ -70,9 +70,9 @@ void gpu_valid_cross_correlation(
 	performs a function that has one input and one output
 	for example relu where x = max(0, x)
 */
-using gpu_activation_fn = void(*)(gpu_memory<float>&);
-void gpu_sigmoid(gpu_memory<float>& gpu_memory);
-void gpu_relu(gpu_memory<float>& gpu_memory);
+using gpu_activation_fn = void(*)(gpu_matrix&);
+void gpu_sigmoid(gpu_matrix& gpu_memory);
+void gpu_relu(gpu_matrix& gpu_memory);
 
 //this has to have the same indexing as the ACTIVATION function pointer array
 const gpu_activation_fn GPU_ACTIVATION[] = {

@@ -201,6 +201,7 @@
     <ClInclude Include="..\ConvolutionalNeuralNetwork\digit_training_data.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\fully_connected_layer.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\gpu_math.cuh" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\gpu_matrix.cuh" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\gpu_matrix.h" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\gpu_memory.cuh" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\gpu_nn_data_block.cuh" />
@@ -217,6 +218,7 @@
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\ConvolutionalNeuralNetwork\gpu_math.cu" />
+    <CudaCompile Include="..\ConvolutionalNeuralNetwork\gpu_matrix.cu" />
     <CudaCompile Include="..\ConvolutionalNeuralNetwork\gpu_nn_data_block.cu" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

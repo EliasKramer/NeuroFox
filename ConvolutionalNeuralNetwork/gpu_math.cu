@@ -90,9 +90,9 @@ float* gpu_sub_ptr(const gpu_memory<float>& gpu_memory, size_t elements, size_t 
 }
 
 void gpu_dot_product(
-	const gpu_memory<float>& gpu_weights,
-	const gpu_memory<float>& gpu_input,
-	gpu_memory<float>& gpu_activations)
+	const gpu_matrix& gpu_weights,
+	const gpu_matrix& gpu_input,
+	gpu_matrix& gpu_activations)
 {
 	if (gpu_weights.item_count() == 0 ||
 		gpu_input.item_count() == 0 ||
@@ -128,9 +128,9 @@ __global__ void gpu_add_matrices_kernel(const float* a, const float* b, float* r
 	}
 }
 void gpu_add(
-	const gpu_memory<float>& gpu_memory_a,
-	const gpu_memory<float>& gpu_memory_b,
-	gpu_memory<float>& gpu_memory_result)
+	const gpu_matrix& gpu_memory_a,
+	const gpu_matrix& gpu_memory_b,
+	gpu_matrix& gpu_memory_result)
 {
 	if (gpu_memory_a.item_count() == 0 ||
 		gpu_memory_a.item_count() != gpu_memory_b.item_count() ||
@@ -192,9 +192,9 @@ __global__ void gpu_valid_cross_correlation_kernel(
 }
 
 void gpu_valid_cross_correlation(
-	const gpu_memory<float>& gpu_input,
-	const std::vector<std::unique_ptr<gpu_memory<float>>>& gpu_kernel_weights,
-	gpu_memory<float>& gpu_activations,
+	const gpu_matrix gpu_input,
+	const std::vector<std::unique_ptr<gpu_matrix>>& gpu_kernel_weights,
+	gpu_matrix& gpu_activations,
 	size_t input_width,
 	size_t input_depth,
 	size_t kernel_width,
@@ -203,17 +203,12 @@ void gpu_valid_cross_correlation(
 	size_t output_width)
 {
 	cuda_error_check();
-	if (gpu_input.item_count() == 0 ||
-		gpu_activations.item_count() == 0 ||
+	if (gpu_activations.item_count() == 0 ||
 		gpu_kernel_weights.size() == 0 ||
 		gpu_kernel_weights[0].get() == nullptr ||
-		gpu_kernel_weights[0].get()->byte_size() == 0)
+		gpu_kernel_weights[0].get()->item_count() == 0)
 	{
 		throw std::invalid_argument("gpu_valid_cross_correlation failed. size must be greater than 0");
-	}
-	if (input_width * input_width * input_depth != gpu_input.item_count())
-	{
-		throw std::invalid_argument("input size is different on gpu and cpu");
 	}
 	if (!is_whole_number(gpu_kernel_weights[0].get()->item_count() / kernel_count))
 	{
@@ -240,13 +235,13 @@ void gpu_valid_cross_correlation(
 	{
 		//splits the gpu_activations into each depth layer
 		//if the activations have a depth of 3 this loop will iterate 3 times
-		float* activation_ptr = gpu_sub_ptr(gpu_activations, output_width * output_width, activation_depth);
+		float* activation_ptr = gpu_sub_ptr(gpu_activations.get_gpu_memory(), output_width * output_width, activation_depth);
 
 		size_t block_count = get_block_count(output_width * output_width);
 
 		gpu_valid_cross_correlation_kernel << <(int)block_count, THREADS_PER_BLOCK >> > (
-			gpu_input.gpu_data_ptr(),
-			gpu_kernel_weights[activation_depth].get()->gpu_data_ptr(),
+			gpu_input,
+			gpu_kernel_weights[activation_depth].get()->get_gpu_memory_readonly().gpu_data_ptr(),
 			activation_ptr,
 			(int)input_depth,
 			(int)input_width,
@@ -266,7 +261,7 @@ __global__ void gpu_sigmoid_kernel(float* data, int size)
 	}
 }
 
-void gpu_sigmoid(gpu_memory<float>& gpu_memory)
+void gpu_sigmoid(gpu_matrix& gpu_memory)
 {
 	if (gpu_memory.item_count() == 0)
 	{
@@ -292,7 +287,7 @@ __global__ void gpu_relu_kernel(float* data, int size)
 	}
 }
 
-void gpu_relu(gpu_memory<float>& gpu_memory)
+void gpu_relu(gpu_matrix& gpu_memory)
 {
 	if (gpu_memory.item_count() == 0)
 	{

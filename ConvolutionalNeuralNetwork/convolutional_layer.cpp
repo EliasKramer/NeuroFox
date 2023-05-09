@@ -26,7 +26,7 @@ void convolutional_layer::back_propagation_cpu()
 void convolutional_layer::forward_propagation_gpu()
 {
 	gpu_valid_cross_correlation(
-		*gpu_input,
+		gpu_input,
 		gpu_kernel_weights,
 		*gpu_activations.get(),
 		input->get_width(),
