@@ -12,7 +12,7 @@ namespace CNNTest
 		{
 			convolutional_layer layer(3, 2, 1, e_activation_t::relu_fn);
 			Assert::AreEqual((int)e_layer_type_t::convolution, (int)layer.get_layer_type());
-			Assert::AreEqual(3, (int)layer.get_kernels_readonly().size());
+			Assert::AreEqual(3, (int)layer.get_kernel_count());
 			Assert::AreEqual(2, layer.get_kernel_size());
 			Assert::AreEqual(1, layer.get_stride());
 		}
@@ -70,8 +70,8 @@ namespace CNNTest
 			//the kernel depth is the input depth
 			Assert::AreEqual(
 				6, 
-				layer.get_kernels_readonly()[0]
-					.get_weights_readonly()
+				layer
+					.get_kernel_weights_readonly()[0]
 					.get_depth());
 		}
 		TEST_METHOD(feed_forward_test)
@@ -88,10 +88,10 @@ namespace CNNTest
 				| 2 | 4 |
 				+ - + - +
 			*/
-			layer.get_kernels()[0].get_weights().set_at(0, 0, 1.0f);
-			layer.get_kernels()[0].get_weights().set_at(0, 1, 2.0f);
-			layer.get_kernels()[0].get_weights().set_at(1, 0, 3.0f);
-			layer.get_kernels()[0].get_weights().set_at(1, 1, 4.0f);
+			layer.get_kernel_weights()[0].set_at(0, 1, 2.0f);
+			layer.get_kernel_weights()[0].set_at(1, 0, 3.0f);
+			layer.get_kernel_weights()[0].set_at(1, 1, 4.0f);
+			layer.get_kernel_weights()[0].set_at(0, 0, 1.0f);
 
 			/* bias matrix
 				+ - + - +
@@ -100,7 +100,7 @@ namespace CNNTest
 				|-60|-60|
 				+ - + - +
 			*/
-			layer.get_kernels()[0].get_bias().set_all(-60);
+			layer.get_kernel_biases()[0].set_all(-60);
 
 			/* input matrix
 				+ - + - + - +

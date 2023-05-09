@@ -9,7 +9,8 @@ convolutional_layer::convolutional_layer(
 	:layer(e_layer_type_t::convolution),
 	stride(stride),
 	kernel_size(kernel_size),
-	activation_fn(activation_function)
+	activation_fn(activation_function),
+	kernel_count(number_of_kernels)
 {
 	if (number_of_kernels <= 0)
 		throw std::invalid_argument("number_of_kernels must be greater than 0");
@@ -23,21 +24,13 @@ convolutional_layer::convolutional_layer(
 
 	for (int i = 0; i < number_of_kernels; i++)
 	{
-		kernels.push_back(conv_kernel(kernel_size));
-		kernel_deltas.push_back(conv_kernel(kernel_size));
+		kernel_weights.push_back(matrix(kernel_size, kernel_size, 1));
+		kernel_biases.push_back(matrix(kernel_size, kernel_size, 1));
+		kernel_weights_deltas.push_back(matrix(kernel_size, kernel_size, 1));
+		kernel_bias_deltas.push_back(matrix(kernel_size, kernel_size, 1));
 	}
 
 	activations = matrix(0, 0, 0);
-}
-
-const std::vector<conv_kernel>& convolutional_layer::get_kernels_readonly() const
-{
-	return kernels;
-}
-
-std::vector<conv_kernel>& convolutional_layer::get_kernels()
-{
-	return kernels;
 }
 
 int convolutional_layer::get_kernel_size() const
@@ -48,6 +41,31 @@ int convolutional_layer::get_kernel_size() const
 int convolutional_layer::get_stride() const
 {
 	return stride;
+}
+
+int convolutional_layer::get_kernel_count() const
+{
+	return kernel_count;
+}
+
+std::vector<matrix>& convolutional_layer::get_kernel_weights()
+{
+	return kernel_weights;
+}
+
+const std::vector<matrix>& convolutional_layer::get_kernel_weights_readonly() const
+{
+	return kernel_weights;
+}
+
+std::vector<matrix>& convolutional_layer::get_kernel_biases()
+{
+	return kernel_biases;
+}
+
+const std::vector<matrix>& convolutional_layer::get_kernel_biases_readonly() const
+{
+	return kernel_biases;
 }
 
 void convolutional_layer::set_input_format(const matrix& input_format)
@@ -66,54 +84,59 @@ void convolutional_layer::set_input_format(const matrix& input_format)
 		!is_whole_number(output_height))
 		throw std::invalid_argument("input format is not compatible with the kernel size and stride");
 
-	activations.resize((int)output_width, (int)output_height, (int)kernels.size());
+	activations.resize((int)output_width, (int)output_height, kernel_count);
 	
-	for (int i = 0; i < kernels.size(); i++)
+	for (int i = 0; i < kernel_count; i++)
 	{
-		kernels[i].set_kernel_depth(input_depth);
-		kernel_deltas[i].set_kernel_depth(input_depth);
-		//BE WARY. THIS ONLY WORKS FOR A STRIDE OF 1
-		kernels[i].set_bias_format((int)output_width);
-		kernel_deltas[i].set_bias_format((int)output_width);
+		kernel_weights[i].resize(kernel_size, kernel_size, input_depth);
+		kernel_weights_deltas[i].resize(kernel_size, kernel_size, input_depth);
+		
+		kernel_biases[i].resize(output_width, output_height, kernel_count);
+		kernel_bias_deltas[i].resize(output_width, output_height, kernel_count);
 	}
 }
 
 void convolutional_layer::set_all_parameter(float value)
 {
-	for (conv_kernel& kernel : kernels)
+	for (matrix& weights : kernel_weights)
 	{
-		kernel.get_weights().set_all(value);
+		weights.set_all(value);
+	}
+	for (matrix& biases : kernel_biases)
+	{
+		biases.set_all(value);
 	}
 }
 
 void convolutional_layer::apply_noise(float range)
 {
-	for (conv_kernel& kernel : kernels)
+	for (matrix& weights : kernel_weights)
 	{
-		kernel.get_weights().apply_noise(range);
-		kernel.get_bias().apply_noise(range);
+		weights.apply_noise(range);
+	}
+	for (matrix& biases : kernel_biases)
+	{
+		biases.apply_noise(range);
 	}
 }
 
 void convolutional_layer::mutate(float range)
 {
 	//choose a random kernel
-	int random_kernel_idx = random_idx((int)kernels.size());
+	int random_kernel_idx = random_idx(kernel_count);
 	//choose if a weight or a bias is mutated
 	if (biased_coin_toss(
-		(float)kernels[0].get_weights_readonly().flat_readonly().size(),
-		(float)kernels[0].get_bias_readonly().flat_readonly().size()))
+		(float)kernel_weights[0].flat_readonly().size(),
+		(float)kernel_biases[0].flat_readonly().size()))
 	{
 		//choose a random weight to mutate
 		int random_weight_idx =
-			random_idx((int)kernels[0]
-				.get_weights_readonly()
+			random_idx((int)kernel_weights[0]
 				.flat_readonly()
 				.size());
 
 		//mutate the weight
-		kernels[random_kernel_idx]
-			.get_weights()
+		kernel_weights[random_kernel_idx]
 			.flat()[random_weight_idx] +=
 			random_float_incl(-range, range);
 	}
@@ -121,14 +144,12 @@ void convolutional_layer::mutate(float range)
 	{
 		//choose a random bias to mutate
 		int random_bias_idx =
-			random_idx((int)kernels[0]
-				.get_bias_readonly()
+			random_idx((int)kernel_biases[0]
 				.flat_readonly()
 				.size());
 
 		//mutate the weight
-		kernels[random_kernel_idx]
-			.get_bias()
+		kernel_biases[random_kernel_idx]
 			.flat()[random_bias_idx] +=
 			random_float_incl(-range, range);
 	}
@@ -136,26 +157,20 @@ void convolutional_layer::mutate(float range)
 
 void convolutional_layer::forward_propagation()
 {
-	const size_t kernel_size = kernels[0].get_kernel_size();
-	const size_t number_of_kernels = kernels.size();
 	const int output_width = activations.get_width();
 	const int output_height = activations.get_height();
 	const int input_depth = input->get_depth();
 
-	if (activations.get_depth() != number_of_kernels)
+	if (activations.get_depth() != kernel_count)
 		throw std::invalid_argument("activations depth must be equal to the number of kernels");
 
 	activations.set_all(0);
-	//iterate over all kernels
-	for (int output_depth = 0; output_depth < number_of_kernels; output_depth++)
-	{
-		const conv_kernel& curr_kernel = kernels[output_depth];
-		const matrix& kernel_bias = kernels[output_depth].get_bias();
 
-		matrix::valid_cross_correlation(
-			*input, curr_kernel.get_weights_readonly(), activations, stride);
-		matrix::add(activations, kernel_bias, activations);
-	}
+	matrix::valid_cross_correlation(
+		*input, kernel_weights, activations, stride);
+
+	matrix::add_each_depth
+		(activations, kernel_biases, activations);
 
 	activations.apply_activation_function(activation_fn);
 }

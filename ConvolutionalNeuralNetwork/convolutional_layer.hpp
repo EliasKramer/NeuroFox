@@ -1,19 +1,20 @@
 #pragma once
 #include "matrix.hpp"
 #include "math_functions.hpp"
-#include "conv_kernel.hpp"
 #include "layer.hpp"
 #include <memory>
 #include <vector>
 
 class convolutional_layer : public layer {
-
 private:
-	std::vector<conv_kernel> kernels;
-	std::vector<conv_kernel> kernel_deltas;
+	std::vector<matrix> kernel_weights;
+	std::vector<matrix> kernel_biases;
+	std::vector<matrix> kernel_weights_deltas;
+	std::vector<matrix> kernel_bias_deltas;
 
 	int kernel_size;
 	int stride;
+	int kernel_count;
 
 	std::vector<gpu_memory<float>> gpu_kernel_weights;
 	std::vector<gpu_memory<float>> gpu_kernel_biases;
@@ -29,10 +30,14 @@ public:
 	);
 
 	//getters
-	const std::vector<conv_kernel>& get_kernels_readonly() const;
-	std::vector<conv_kernel>& get_kernels();
 	int get_kernel_size() const;
 	int get_stride() const;
+	int get_kernel_count() const;
+
+	std::vector<matrix>& get_kernel_weights();
+	const std::vector<matrix>& get_kernel_weights_readonly() const;
+	std::vector<matrix>& get_kernel_biases();
+	const std::vector<matrix>& get_kernel_biases_readonly() const;
 
 	void set_input_format(const matrix& input_format) override;
 

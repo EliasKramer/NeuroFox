@@ -75,9 +75,6 @@
     <ClCompile Include="..\ConvolutionalNeuralNetwork\convolutional_layer.cpp">
       <Filter>Source Files\nn</Filter>
     </ClCompile>
-    <ClCompile Include="..\ConvolutionalNeuralNetwork\conv_kernel.cpp">
-      <Filter>Source Files\nn</Filter>
-    </ClCompile>
     <ClCompile Include="..\ConvolutionalNeuralNetwork\batch_handler.cpp">
       <Filter>Source Files\nn</Filter>
     </ClCompile>
@@ -114,9 +111,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ConvolutionalNeuralNetwork\batch_handler.hpp">
-      <Filter>Header Files\nn</Filter>
-    </ClInclude>
-    <ClInclude Include="..\ConvolutionalNeuralNetwork\conv_kernel.hpp">
       <Filter>Header Files\nn</Filter>
     </ClInclude>
     <ClInclude Include="..\ConvolutionalNeuralNetwork\convolutional_layer.hpp">

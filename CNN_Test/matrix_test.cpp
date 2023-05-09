@@ -248,8 +248,10 @@ namespace CNNTest
 				| 47 | 77 |
 				+ -- + -- +
 			*/
+			std::vector <matrix> kernels;
+			kernels.push_back(kernel);
 
-			matrix::valid_cross_correlation(input, kernel, output, 1);
+			matrix::valid_cross_correlation(input, kernels, output, 1);
 
 			Assert::AreEqual(37, (int)output.get_at(0, 0));
 			Assert::AreEqual(67, (int)output.get_at(1, 0));

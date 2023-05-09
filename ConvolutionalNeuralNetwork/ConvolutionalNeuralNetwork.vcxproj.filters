@@ -87,9 +87,6 @@
     <ClCompile Include="math_functions.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="conv_kernel.cpp">
-      <Filter>source\layer</Filter>
-    </ClCompile>
     <ClCompile Include="layer.cpp">
       <Filter>source\layer</Filter>
     </ClCompile>
@@ -154,9 +151,6 @@
     </ClInclude>
     <ClInclude Include="batch_handler.hpp">
       <Filter>header\training</Filter>
-    </ClInclude>
-    <ClInclude Include="conv_kernel.hpp">
-      <Filter>header\layer\convolutional_layer</Filter>
     </ClInclude>
     <ClInclude Include="convolutional_layer.hpp">
       <Filter>header\layer\convolutional_layer</Filter>

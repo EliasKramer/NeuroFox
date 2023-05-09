@@ -219,7 +219,7 @@ void gpu_valid_cross_correlation(
 	{
 		throw std::invalid_argument("gpu kernels could not be devided by kernel count");
 	}
-	if (kernel_width * kernel_width * input_depth != (gpu_kernel_weights[0].get()->item_count() / kernel_count))
+	if (kernel_width * kernel_width * input_depth != gpu_kernel_weights[0].get()->item_count())
 	{
 		throw std::invalid_argument("kernel size false");
 	}
