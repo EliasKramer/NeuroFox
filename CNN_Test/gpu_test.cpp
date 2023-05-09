@@ -364,7 +364,6 @@ namespace CNNTest
 			gpu_memory<float> gpu_input(input);
 			gpu_memory<float> gpu_result(4);
 
-
 			std::vector<std::unique_ptr<gpu_memory<float>>> gpu_kernel_weights;
 			gpu_kernel_weights.emplace_back(std::make_unique<gpu_memory<float>>(kernel));
 
@@ -439,7 +438,6 @@ namespace CNNTest
 
 			gpu_memory<float> gpu_input(input);
 			gpu_memory<float> gpu_result(8);
-
 
 			std::vector<std::unique_ptr<gpu_memory<float>>> gpu_kernel_weights;
 			gpu_kernel_weights.emplace_back(std::make_unique<gpu_memory<float>>(kernel1));

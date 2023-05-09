@@ -62,6 +62,19 @@ void layer::set_error_for_last_layer(const matrix& expected)
 	error.scalar_multiplication(2);
 }
 
+void layer::forward_propagation()
+{
+	should_use_gpu() ?
+		forward_propagation_gpu() :
+		forward_propagation_cpu();
+}
+
+void layer::back_propagation()
+{
+	should_use_gpu() ?
+		back_propagation_gpu() :
+		back_propagation_cpu();
+}
 void layer::enable_gpu()
 {
 	gpu_activations = std::make_unique<gpu_memory<float>>(activations);

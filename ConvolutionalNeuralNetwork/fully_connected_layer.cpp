@@ -37,18 +37,6 @@ void fully_connected_layer::forward_propagation_cpu()
 	activations.apply_activation_function(activation_fn);
 }
 
-void fully_connected_layer::forward_propagation_gpu()
-{
-	if (!gpu_weights || !gpu_biases || !gpu_activations)
-	{
-		throw std::invalid_argument("gpu_weights, gpu_biases or gpu_activations is null");
-	}
-
-	gpu_dot_product(*gpu_weights.get(), *gpu_input, *gpu_activations.get());
-	gpu_add(*gpu_activations.get(), *gpu_biases.get(), *gpu_activations.get());
-	GPU_ACTIVATION[activation_fn](*gpu_activations.get());
-}
-
 void fully_connected_layer::back_propagation_cpu()
 {
 	if (!matrix::equal_format(activations, error))
@@ -92,6 +80,18 @@ void fully_connected_layer::back_propagation_cpu()
 			}
 		}
 	}
+}
+
+void fully_connected_layer::forward_propagation_gpu()
+{
+	if (!gpu_weights || !gpu_biases || !gpu_activations)
+	{
+		throw std::invalid_argument("gpu_weights, gpu_biases or gpu_activations is null");
+	}
+
+	gpu_dot_product(*gpu_weights.get(), *gpu_input, *gpu_activations.get());
+	gpu_add(*gpu_activations.get(), *gpu_biases.get(), *gpu_activations.get());
+	GPU_ACTIVATION[activation_fn](*gpu_activations.get());
 }
 
 void fully_connected_layer::back_propagation_gpu()
@@ -186,20 +186,6 @@ void fully_connected_layer::mutate(float range)
 	{
 		biases.mutate(range);
 	}
-}
-
-void fully_connected_layer::forward_propagation()
-{
-	should_use_gpu() ?
-		forward_propagation_gpu() :
-		forward_propagation_cpu();
-}
-
-void fully_connected_layer::back_propagation()
-{
-	should_use_gpu() ?
-		back_propagation_gpu() :
-		back_propagation_cpu();
 }
 
 void fully_connected_layer::apply_deltas(int number_of_inputs)

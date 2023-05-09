@@ -38,6 +38,11 @@ protected:
 
 	bool should_use_gpu();
 
+	virtual void forward_propagation_cpu() = 0;
+	virtual	void back_propagation_cpu() = 0;
+
+	virtual void forward_propagation_gpu() = 0;
+	virtual void back_propagation_gpu() = 0;
 public:
 	layer(e_layer_type_t given_layer_type);
 
@@ -61,8 +66,8 @@ public:
 	//add a random value between range and -range to one weight or bias 
 	virtual void mutate(float range) = 0;
 
-	virtual void forward_propagation() = 0;
-	virtual void back_propagation() = 0;
+	void forward_propagation();
+	void back_propagation();
 
 	//the deltas got calculated in the backprop function
 	//all the deltas got summed up. now we need to apply the

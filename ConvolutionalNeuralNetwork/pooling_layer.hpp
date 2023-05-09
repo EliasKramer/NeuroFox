@@ -14,6 +14,12 @@ private:
 	int filter_size;
 	int stride;
 	e_pooling_type_t pooling_fn;
+
+	void forward_propagation_cpu() override;
+	void back_propagation_cpu() override;
+
+	void forward_propagation_gpu() override;
+	void back_propagation_gpu() override;
 public:
 	//constructor
 	pooling_layer(
@@ -30,9 +36,6 @@ public:
 	void set_all_parameter(float value) override;
 	void apply_noise(float range) override;
 	void mutate(float range) override;
-
-	void forward_propagation() override;
-	void back_propagation() override;
 
 	void apply_deltas(int number_of_inputs) override;
 	

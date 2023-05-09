@@ -1,5 +1,37 @@
 #include "convolutional_layer.hpp"
 
+void convolutional_layer::forward_propagation_cpu()
+{
+	const int output_width = activations.get_width();
+	const int output_height = activations.get_height();
+	const int input_depth = input->get_depth();
+
+	if (activations.get_depth() != kernel_count)
+		throw std::invalid_argument("activations depth must be equal to the number of kernels");
+
+	activations.set_all(0);
+
+	matrix::valid_cross_correlation(
+		*input, kernel_weights, activations, stride);
+
+	matrix::add_each_depth
+	(activations, kernel_biases, activations);
+
+	activations.apply_activation_function(activation_fn);
+}
+
+void convolutional_layer::back_propagation_cpu()
+{
+}
+
+void convolutional_layer::forward_propagation_gpu()
+{
+}
+
+void convolutional_layer::back_propagation_gpu()
+{
+}
+
 convolutional_layer::convolutional_layer(
 	int number_of_kernels,
 	int kernel_size,
@@ -153,31 +185,6 @@ void convolutional_layer::mutate(float range)
 			.flat()[random_bias_idx] +=
 			random_float_incl(-range, range);
 	}
-}
-
-void convolutional_layer::forward_propagation()
-{
-	const int output_width = activations.get_width();
-	const int output_height = activations.get_height();
-	const int input_depth = input->get_depth();
-
-	if (activations.get_depth() != kernel_count)
-		throw std::invalid_argument("activations depth must be equal to the number of kernels");
-
-	activations.set_all(0);
-
-	matrix::valid_cross_correlation(
-		*input, kernel_weights, activations, stride);
-
-	matrix::add_each_depth
-		(activations, kernel_biases, activations);
-
-	activations.apply_activation_function(activation_fn);
-}
-
-void convolutional_layer::back_propagation()
-{
-	//TODO
 }
 
 void convolutional_layer::apply_deltas(int number_of_inputs)
