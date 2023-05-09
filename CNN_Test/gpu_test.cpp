@@ -509,7 +509,7 @@ namespace CNNTest
 			//you can make blocks without labels
 			block = gpu_nn_data_block(2, 2, 0);
 
-			try 
+			try
 			{
 				block = gpu_nn_data_block(0, 2, 3);
 				Assert::Fail();
@@ -517,10 +517,10 @@ namespace CNNTest
 			catch (std::runtime_error& e) {
 				Assert::AreEqual(e.what(), "could not create gpu_nn_data_block");
 			}
-			try 
+			try
 			{
 				block = gpu_nn_data_block(2, 0, 3);
-				Assert::Fail(); 
+				Assert::Fail();
 			}
 			catch (std::runtime_error& e) {
 				Assert::AreEqual(e.what(), "could not create gpu_nn_data_block");
@@ -529,7 +529,7 @@ namespace CNNTest
 		TEST_METHOD(data_block_wrong_indexing_test)
 		{
 			gpu_nn_data_block block = gpu_nn_data_block(2, 2, 3);
-			
+
 			try
 			{
 				block.set_data(3, std::vector<float>{1, 2});
@@ -561,6 +561,32 @@ namespace CNNTest
 			{
 				Assert::AreEqual(e.what(), "this block has no label data");
 			}
+		}
+		TEST_METHOD(set_data_with_cpu_nn_data)
+		{
+			std::vector data1 = std::vector<float>{ 1, 2 };
+			std::vector label1 = std::vector<float>{ 3 };
+			std::vector data2 = std::vector<float>{ 4, 5 };
+			std::vector label2 = std::vector<float>{ 6 };
+
+			nn_data nn_data1 = nn_data(matrix(data1, 1, 2, 1), matrix(label1, 1, 1, 1));
+			nn_data nn_data2 = nn_data(matrix(data2, 1, 2, 1), matrix(label2, 1, 1, 1));
+
+			std::vector<nn_data> data_vec = std::vector<nn_data>{ nn_data1, nn_data2 };
+
+			gpu_nn_data_block block = gpu_nn_data_block(2, 2, 1);
+			block.set_data(data_vec.cbegin(), data_vec.cend());
+
+			std::vector<float> gpu_values = get_gpu_values(block.get_gpu_data_ptr(0), 2);
+			Assert::IsTrue(float_vectors_equal(gpu_values, std::vector<float> {1, 2}));
+			gpu_values = get_gpu_values(block.get_gpu_data_ptr(1), 2);
+			Assert::IsTrue(float_vectors_equal(gpu_values, std::vector<float> {4, 5}));
+
+			gpu_values = get_gpu_values(block.get_gpu_label_ptr(0), 1);
+			Assert::IsTrue(float_vectors_equal(gpu_values, std::vector<float> {3}));
+			gpu_values = get_gpu_values(block.get_gpu_label_ptr(1), 1);
+			Assert::IsTrue(float_vectors_equal(gpu_values, std::vector<float> {6}));
+
 		}
 	};
 }
