@@ -5,7 +5,7 @@
 #include <vector>
 #include <memory>
 #include "matrix.hpp"
-
+/*
 template<typename T>
 class gpu_memory {
 private:
@@ -135,4 +135,4 @@ public:
 	{
 		return element_count;
 	}
-};
+};*/

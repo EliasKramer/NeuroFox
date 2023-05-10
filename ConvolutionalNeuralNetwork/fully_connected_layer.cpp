@@ -211,8 +211,8 @@ void fully_connected_layer::enable_gpu()
 {
 	layer::enable_gpu();
 	
-	gpu_weights = std::make_unique<gpu_memory<float>>(weights);
-	gpu_biases = std::make_unique<gpu_memory<float>>(biases);
+	gpu_weights = std::make_unique<gpu_matrix>(weights, true);
+	gpu_biases = std::make_unique<gpu_matrix>(biases, true);
 }
 
 void fully_connected_layer::disable_gpu()

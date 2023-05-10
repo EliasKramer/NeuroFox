@@ -6,20 +6,6 @@
 #include "gpu_matrix.cuh"
 
 /// <summary>
-/// splits one float pointer into multiple chunks
-/// these chunks are the size of elements * sizeof(float)
-/// and you get the index'th pointer
-/// </summary>
-/// <param name="gpu_memory">the gpu memory that will be split</param>
-/// <param name="elements">the amount of elements that each chunk has</param>
-/// <param name="index">the index of the chunk</param>
-/// <returns>gpu pointer to the index'th chunk that got split</returns>
-float* gpu_sub_ptr(
-	const gpu_memory<float>& gpu_memory,
-	size_t elements,
-	size_t index);
-
-/// <summary>
 /// performs a dot product on the gpu
 /// the input is the vector A
 /// the weights are the matrix B
@@ -55,7 +41,7 @@ void gpu_add(
 /// the output will have the depth of the amount of kernels that exist
 /// </summary>
 void gpu_valid_cross_correlation(
-	const gpu_matrix gpu_input,
+	const gpu_matrix& gpu_input,
 	const std::vector<std::unique_ptr<gpu_matrix>>& gpu_kernel_weights,
 	gpu_matrix& gpu_activations,
 	size_t input_width,

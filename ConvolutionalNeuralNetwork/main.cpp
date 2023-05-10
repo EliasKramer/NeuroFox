@@ -3,6 +3,7 @@
 #include "neural_network.hpp"
 #include "digit_interpreter.hpp"
 #include "digit_data.hpp"
+#include "gpu_matrix.cuh"
 
 int main()
 {
@@ -12,8 +13,8 @@ int main()
     };
     matrix kernel(kernel_data, 2, 2, 1);
 
-    std::vector<std::unique_ptr<gpu_memory<float>>> gpu_kernel_weights;
-    gpu_kernel_weights.emplace_back(std::make_unique<gpu_memory<float>>(kernel));
+    std::vector<std::unique_ptr<gpu_matrix>> gpu_kernel_weights;
+    gpu_kernel_weights.emplace_back(std::make_unique<gpu_matrix>(kernel, true));
 
     return 0;
 }

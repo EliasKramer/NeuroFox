@@ -87,6 +87,11 @@ int matrix::get_depth() const
 	return depth;
 }
 
+int matrix::item_count() const
+{
+	return width * height * depth;
+}
+
 std::vector<float>& matrix::flat()
 {
 	return data;

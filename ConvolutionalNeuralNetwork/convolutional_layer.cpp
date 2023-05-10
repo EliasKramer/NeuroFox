@@ -26,7 +26,7 @@ void convolutional_layer::back_propagation_cpu()
 void convolutional_layer::forward_propagation_gpu()
 {
 	gpu_valid_cross_correlation(
-		gpu_input,
+		*gpu_input,
 		gpu_kernel_weights,
 		*gpu_activations.get(),
 		input->get_width(),
@@ -194,9 +194,9 @@ void convolutional_layer::enable_gpu()
 {
 	for (const matrix& curr : kernel_weights)
 	{
-		gpu_kernel_weights.emplace_back(std::make_unique<gpu_memory<float>>(curr));
+		gpu_kernel_weights.emplace_back(std::make_unique<gpu_matrix>(curr, true));
 	}
-	gpu_kernel_biases = std::make_unique<gpu_memory<float>>(kernel_biases);
+	gpu_kernel_biases = std::make_unique<gpu_matrix>(kernel_biases, true);
 }
 
 void convolutional_layer::disable_gpu()

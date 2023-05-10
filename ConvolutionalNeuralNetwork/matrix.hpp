@@ -30,6 +30,7 @@ public:
 	int get_width() const;
 	int get_height() const;
 	int get_depth() const;
+	int item_count() const;
 
 	std::vector<float>& flat();
 	const std::vector<float>& flat_readonly() const;

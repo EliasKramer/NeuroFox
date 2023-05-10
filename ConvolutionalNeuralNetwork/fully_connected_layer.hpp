@@ -17,8 +17,8 @@ private:
 	e_activation_t activation_fn;
 
 	//GPU Section
-	std::unique_ptr<gpu_memory<float>> gpu_weights = nullptr;
-	std::unique_ptr<gpu_memory<float>> gpu_biases = nullptr;
+	std::unique_ptr<gpu_matrix> gpu_weights = nullptr;
+	std::unique_ptr<gpu_matrix> gpu_biases = nullptr;
 
 	float get_weight_at(int input_layer_idx, int current_activation_idx) const;
 	void set_weight_at(int input_layer_idx, int current_activation_idx, float value);
