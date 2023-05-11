@@ -1,6 +1,6 @@
 #include "gpu_matrix.cuh"
 
-void gpu_matrix::check_for_valid_args()
+void gpu_matrix::check_for_valid_args() const
 {
 	if (width == 0 || height == 0 || depth == 0)
 	{
@@ -8,7 +8,7 @@ void gpu_matrix::check_for_valid_args()
 	}
 }
 
-void gpu_matrix::check_for_last_cuda_error()
+void gpu_matrix::check_for_last_cuda_error() const
 {
 	cudaError_t err = cudaGetLastError();
 	if (err != cudaSuccess)
@@ -22,8 +22,14 @@ void gpu_matrix::free_owned_gpu_mem()
 	if (owns_gpu_mem_ptr)
 	{
 		cudaFree(gpu_ptr);
+		check_for_last_cuda_error();
 	}
 	owns_gpu_mem_ptr = false;
+}
+
+int gpu_matrix::get_idx(int x, int y, int z) const
+{
+	return x + y * width + z * width * height;
 }
 
 gpu_matrix::gpu_matrix(
@@ -63,7 +69,7 @@ gpu_matrix::gpu_matrix(const matrix& m, bool copy_values)
 {
 	if (copy_values)
 	{
-		set_values(m);
+		set_values_cpu(m);
 	}
 }
 
@@ -97,7 +103,23 @@ size_t gpu_matrix::get_depth() const
 	return depth;
 }
 
-void gpu_matrix::set_values(const matrix& m)
+void gpu_matrix::set_values_gpu(const gpu_matrix& m)
+{
+	if (!same_format(*this, m))
+	{
+		throw std::runtime_error("gpu_memory size mismatch");
+	}
+
+	cudaMemcpy(
+		gpu_ptr,
+		m.get_gpu_memory_readonly(),
+		item_count() * sizeof(float),
+		cudaMemcpyDeviceToDevice);
+
+	check_for_last_cuda_error();
+}
+
+void gpu_matrix::set_values_cpu(const matrix& m)
 {
 	if (m.flat_readonly().size() != item_count())
 	{
@@ -113,6 +135,25 @@ void gpu_matrix::set_values(const matrix& m)
 	check_for_last_cuda_error();
 }
 
+std::unique_ptr<gpu_matrix> gpu_matrix::clone() const
+{
+	//this allocates new memory
+	std::unique_ptr<gpu_matrix> clone = 
+		std::make_unique<gpu_matrix>(width, height, depth);
+	
+	//this sets the values
+	clone.get()->set_values_gpu(*this);
+
+	return std::move(clone);
+}
+
+bool gpu_matrix::same_format(const gpu_matrix& m1, const gpu_matrix& m2)
+{
+	return m1.get_width() == m2.get_width() &&
+		m1.get_height() == m2.get_height() &&
+		m1.get_depth() == m2.get_depth();
+}
+
 void gpu_matrix::set_all(float value)
 {
 	std::vector<float> values(item_count(), value);
@@ -124,10 +165,32 @@ void gpu_matrix::set_all(float value)
 	check_for_last_cuda_error();
 }
 
+void gpu_matrix::set_at(size_t width, size_t height, size_t depth, float value)
+{
+	if (width >= this->width || height >= this->height || depth >= this->depth)
+	{
+		throw std::invalid_argument("index out of bounds");
+	}
+
+	cudaMemcpy(
+		gpu_ptr + get_idx(width, height, depth),
+		&value,
+		sizeof(float),
+		cudaMemcpyHostToDevice);
+	check_for_last_cuda_error();
+}
+
+
 std::unique_ptr<matrix> gpu_matrix::to_cpu() const
 {
-	//TOOOOOOOOOOOOOOOOOOOOODOOOOOOOOOOOOOOOOOo
-	return std::unique_ptr<matrix>();
+	std::unique_ptr<matrix> result = std::make_unique<matrix>(width, height, depth);
+	cudaMemcpy(
+		result->flat().data(),
+		gpu_ptr,
+		item_count() * sizeof(float),
+		cudaMemcpyDeviceToHost);
+	check_for_last_cuda_error();
+	return result;
 }
 
 float* gpu_matrix::get_gpu_ptr_layer(size_t depth_idx)

@@ -1,5 +1,5 @@
 #include "gpu_nn_data_block.cuh"
-
+/*
 size_t gpu_nn_data_block::elements_in_block() const
 {
 	return (data_per_block + labels_per_block);
@@ -41,31 +41,32 @@ size_t gpu_nn_data_block::block_count() const
 
 float* gpu_nn_data_block::get_gpu_data_ptr(int idx)
 {
-	/*
+	
 	if (idx >= get_num_of_blocks() || idx < 0)
 		throw std::runtime_error("index out of bounds");
 
 	return gpu_sub_ptr(*data.get(), elements_in_block(), idx);
-	*/
+	
+
 	return nullptr;
 }
 
 float* gpu_nn_data_block::get_gpu_label_ptr(int idx)
 {
-	/*
+	
 	if (idx >= get_num_of_blocks() || idx < 0)
 		throw std::runtime_error("index out of bounds");
 	if (labels_per_block == 0)
 		throw std::runtime_error("this block has no label data");
 
 	return gpu_sub_ptr(*data.get(), elements_in_block(), idx) + (data_per_block);
-	*/
+	
 	return nullptr;
 }
 
 void gpu_nn_data_block::set_data(int idx, const std::vector<float>& data)
 {
-	/*
+	
 	if (data.size() != data_per_block)
 		throw std::runtime_error("could net set gpu data in block");
 
@@ -73,12 +74,12 @@ void gpu_nn_data_block::set_data(int idx, const std::vector<float>& data)
 
 	if (cudaGetLastError() != cudaSuccess)
 		throw std::runtime_error("could net set gpu data in block");
-			*/
+			
 }
 
 void gpu_nn_data_block::set_label_data(int idx, const std::vector<float>& data)
 {
-	/*
+	
 	if (data.size() != labels_per_block)
 		throw std::runtime_error("could net set gpu data in block");
 
@@ -86,14 +87,14 @@ void gpu_nn_data_block::set_label_data(int idx, const std::vector<float>& data)
 
 	if (cudaGetLastError() != cudaSuccess)
 		throw std::runtime_error("could net set gpu data in block");
-		*/
+		
 }
 
 void gpu_nn_data_block::set_data(
 	std::vector<nn_data>::const_iterator begin,
 	std::vector<nn_data>::const_iterator end)
 {
-	/*
+	
 	if (std::distance(begin, end) != num_of_blocks ||
 		begin[0].get_data().flat_readonly().size() != data_per_block ||
 		begin[0].get_label().flat_readonly().size() != labels_per_block)
@@ -120,5 +121,6 @@ void gpu_nn_data_block::set_data(
 
 	if (cudaGetLastError() != cudaSuccess)
 		throw std::runtime_error("could net set gpu data in block");
-		*/
+		
 }
+*/

@@ -127,7 +127,7 @@ namespace CNNTest
 			gpu_matrix gpu_mem(m, true);
 			GPU_ACTIVATION[relu_fn](gpu_mem);
 
-			std::vector<float> expected_v { 1, 0, 0 };
+			std::vector<float> expected_v{ 1, 0, 0 };
 			matrix expected = matrix(expected_v, 1, 3, 1);
 			Assert::IsTrue(matrix::are_equal(expected, *gpu_mem.to_cpu().get()));
 		}
@@ -148,7 +148,7 @@ namespace CNNTest
 				ACTIVATION[sigmoid_fn](-3)
 			};
 			matrix expected = matrix(expected_v, 1, 3, 1);
-			Assert::IsTrue(matrix::are_equal(expected, result));
+			Assert::IsTrue(float_vectors_equal(expected.flat_readonly(), result.flat_readonly()));
 		}
 		TEST_METHOD(dot_gpu_test)
 		{
@@ -453,6 +453,92 @@ namespace CNNTest
 
 			Assert::IsTrue(matrix::are_equal(expected, *gpu_result.to_cpu().get()));
 		}
+		TEST_METHOD(set_at_test)
+		{
+			gpu_matrix m(3, 1, 1);
+			m.set_all((float)0xBEEFCACE);
+			m.set_at(1, 0, 0, (float)0xDEADBEEF);
+
+			std::vector<float> expected = {
+				(float)0xBEEFCACE,
+				(float)0xDEADBEEF,
+				(float)0xBEEFCACE
+			};
+
+			Assert::IsTrue(
+				matrix::are_equal(
+					matrix(expected, 3, 1, 1),
+					*m.to_cpu().get()));
+		}
+		TEST_METHOD(test_set_values_and_convert_to_cpu)
+		{
+			gpu_matrix gpu1(2, 2, 1);
+			gpu1.set_all(1.0f);
+
+			gpu_matrix gpu2(2, 2, 1);
+			gpu2.set_values_gpu(gpu1);
+			
+			std::vector<float> expected = {
+				1.0f, 1.0f,
+				1.0f, 1.0f
+			};
+
+			Assert::IsTrue(float_vectors_equal(expected, gpu2.to_cpu().get()->flat_readonly()));
+		}
+		TEST_METHOD(test_set_values_from_gpu)
+		{
+			gpu_matrix gpu1(2, 2, 1);
+			gpu1.set_all(1.0f);
+
+			gpu_matrix gpu2(2, 2, 1);
+			gpu2.set_values_gpu(gpu1);
+
+			//cloned matrix should not be influenced by the original
+			//change original
+			gpu1.set_at(0, 0, 0, 2.0f);
+			//create an identical cpu matrix
+			matrix expected = matrix(2, 2, 1);
+			//set all values to 1.0f (like the inital copied values)
+			expected.set_all(1.0f);
+			Assert::IsTrue(matrix::are_equal(expected, *gpu2.to_cpu().get(), FLOAT_TOLERANCE));
+
+			//cloned matrix should not influence the original
+			//change cloned
+			gpu2.set_at(1, 0, 0, 3.0f);
+			//the cpu matrix is currently all ones.
+			//first we have to set the value at 0,0,0 to 2.0f (the change that we tested before)
+			expected.set_at(0, 0, 0, 2.0f);
+			//the first one on the cloned matrix should be 3.0f, but not the original
+			Assert::IsTrue(matrix::are_equal(expected, *gpu1.to_cpu().get(), FLOAT_TOLERANCE));
+		}
+		//test clone and set values are essentially the same thing.
+		//i like to test them separately, in case the implementation changes
+		TEST_METHOD(test_clone)
+		{
+			gpu_matrix gpu1(2, 2, 1);
+			gpu1.set_all(1.0f);
+
+			std::unique_ptr<gpu_matrix> gpu2 = gpu1.clone();
+
+			//cloned matrix should not be influenced by the original
+			//change original
+			gpu1.set_at(0, 0, 0, 2.0f);
+			//create an identical cpu matrix
+			matrix expected = matrix(2, 2, 1);
+			//set all values to 1.0f (like the inital copied values)
+			expected.set_all(1.0f);
+			Assert::IsTrue(matrix::are_equal(expected, *gpu2->to_cpu().get(), FLOAT_TOLERANCE));
+
+			//cloned matrix should not influence the original
+			//change cloned
+			gpu2->set_at(1, 0, 0, 3.0f);
+			//the cpu matrix is currently all ones.
+			//first we have to set the value at 0,0,0 to 2.0f (the change that we tested before)
+			expected.set_at(0, 0, 0, 2.0f);
+			//the first one on the cloned matrix should be 3.0f, but not the original
+			Assert::IsTrue(matrix::are_equal(expected, *gpu1.to_cpu().get(), FLOAT_TOLERANCE));
+		}
+		
 		/*
 		TEST_METHOD(data_block_test_1)
 		{

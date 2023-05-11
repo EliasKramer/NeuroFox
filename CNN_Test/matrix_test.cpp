@@ -258,5 +258,18 @@ namespace CNNTest
 			Assert::AreEqual(47, (int)output.get_at(0, 1));
 			Assert::AreEqual(77, (int)output.get_at(1, 1));
 		}
+		TEST_METHOD(test_copy)
+		{
+			matrix m = matrix(2, 3, 5);
+			m.set_all(1);
+			matrix m2 = *m.clone().get();
+			Assert::IsTrue(matrix::are_equal(m, m2));
+			
+			m2.set_at(0, 0, 0, 2);
+			Assert::AreNotEqual(2.0f, m.get_at(0,0,0));
+
+			m.set_at(0, 0, 1, 3);
+			Assert::AreNotEqual(3.0f, m2.get_at(0, 0, 1));
+		}
 	};
 }

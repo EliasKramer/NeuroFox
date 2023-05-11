@@ -13,12 +13,15 @@ private:
 	std::vector<float> data;
 
 	int get_idx(int x, int y, int z) const;
-
+	
 public:
 	matrix();
 	matrix(int width, int height, int depth);
 	matrix(const std::vector<float>& data, int width, int height, int depth);
+	
 	size_t get_hash() const;
+
+	std::unique_ptr<matrix> clone() const;
 
 	void resize(int width, int height, int depth);
 	void resize(const matrix& source);
@@ -58,6 +61,7 @@ public:
 	static void subtract(const matrix& a, const matrix& b, matrix& result);
 
 	static bool are_equal(const matrix& a, const matrix& b);
+	static bool are_equal(const matrix& a, const matrix& b, float tolerance);
 	static bool equal_format(const matrix& a, const matrix& b);
 
 	static void valid_cross_correlation(

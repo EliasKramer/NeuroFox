@@ -37,6 +37,11 @@ size_t matrix::get_hash() const
 		});
 }
 
+std::unique_ptr<matrix> matrix::clone() const
+{
+	return std::make_unique<matrix>(data, width, height, depth);
+}
+
 void matrix::resize(int width, int height, int depth)
 {
 	this->width = width;
@@ -248,13 +253,30 @@ bool matrix::are_equal(const matrix& a, const matrix& b)
 	return a.get_hash() == b.get_hash();
 }
 
+bool matrix::are_equal(const matrix& a, const matrix& b, float tolerance)
+{
+	if (!equal_format(a, b))
+	{
+		return false;
+	}
+
+	for (int i = 0; i < a.data.size(); i++)
+	{
+		if (std::abs(a.data[i] - b.data[i]) > tolerance)
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
 bool matrix::equal_format(const matrix& a, const matrix& b)
 {
 	return a.width == b.width && a.height == b.height && a.depth == b.depth;
 }
 
 void matrix::valid_cross_correlation(
-	const matrix& input, 
+	const matrix& input,
 	const std::vector<matrix>& kernels,
 	matrix& output,
 	int stride)
@@ -264,7 +286,7 @@ void matrix::valid_cross_correlation(
 	const size_t kernel_size = kernels[0].get_width();
 	const size_t output_size = output.get_width();
 	const size_t expected_output_size = ((input_size - kernel_size) / (float)stride) + 1;
-	
+
 	if (output_size != expected_output_size)
 	{
 		throw std::invalid_argument("cross correlation could not be performed. output matrix is not the correct size");
@@ -283,7 +305,7 @@ void matrix::valid_cross_correlation(
 			for (int x = 0; x < output.width; x++)
 			{
 				float sum = 0;
-				for(int curr_depth = 0; curr_depth < kernels[0].get_depth(); curr_depth++)
+				for (int curr_depth = 0; curr_depth < kernels[0].get_depth(); curr_depth++)
 				{
 					for (int i = 0; i < kernel_size; i++)
 					{
@@ -291,12 +313,12 @@ void matrix::valid_cross_correlation(
 						{
 							sum +=
 								input.get_at(
-									x * stride + i, 
-									y * stride + j, 
+									x * stride + i,
+									y * stride + j,
 									curr_depth) *
 								kernels[z].get_at(
-									i, 
-									j, 
+									i,
+									j,
 									curr_depth);
 						}
 					}
@@ -340,11 +362,11 @@ void matrix::valid_cross_correlation(
 				{
 					for (int j = 0; j < kernel_size; j++)
 					{
-						sum += 
+						sum +=
 							input.get_at(
-								x + i * stride, 
-								y + j * stride, 
-								z) * 
+								x + i * stride,
+								y + j * stride,
+								z) *
 							kernel.get_at(i, j, z);
 					}
 				}
@@ -353,7 +375,7 @@ void matrix::valid_cross_correlation(
 		}
 	}
 	*/
-//}
+	//}
 
 void matrix::scalar_multiplication(float a)
 {

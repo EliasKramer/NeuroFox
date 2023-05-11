@@ -1,5 +1,5 @@
 #pragma once
-
+/*
 #include "gpu_matrix.cuh"
 #include "gpu_math.cuh"
 #include "nn_data.hpp"
@@ -43,3 +43,4 @@ public:
 		std::vector<nn_data>::const_iterator begin,
 		std::vector<nn_data>::const_iterator end);
 };
+*/

@@ -3,6 +3,8 @@
 #include <ctime>
 #include <random>
 
+constexpr float FLOAT_TOLERANCE = 0.000001f;
+
 // a random number between 0 and size-1
 int random_idx(int size);
 
