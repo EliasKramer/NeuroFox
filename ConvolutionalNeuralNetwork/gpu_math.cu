@@ -20,7 +20,7 @@ static void set_device()
 	}
 }
 
-static void check_for_error_and_synchronize()
+static void cuda_error_check()
 {
 	cudaError_t cudaStatus = cudaGetLastError();
 	if (cudaStatus != cudaSuccess)
@@ -28,13 +28,21 @@ static void check_for_error_and_synchronize()
 		std::string cuda_status = cudaGetErrorString(cudaStatus);
 		throw std::runtime_error("error while executing cuda kernel cuda status:" + cuda_status);
 	}
-
-	cudaStatus = cudaDeviceSynchronize();
+}
+static void cuda_sync()
+{
+	cudaError_t cudaStatus = cudaDeviceSynchronize();
 	if (cudaStatus != cudaSuccess)
 	{
 		std::string cuda_status = cudaGetErrorString(cudaStatus);
 		throw std::runtime_error("could not sync cuda device cuda status:" + cuda_status);
 	}
+}
+
+static void check_for_error_and_synchronize()
+{
+	cuda_error_check();
+	cuda_sync();
 }
 
 __device__ int get_idx(int x, int y, int z, int height, int width)
@@ -63,28 +71,10 @@ __global__ void gpu_dot_product_kernel(
 	}
 }
 
-float* gpu_sub_ptr(gpu_memory<float>& gpu_memory, size_t elements_per_idx, size_t index)
-{
-	if (gpu_memory.gpu_data_ptr() == nullptr)
-	{
-		throw std::invalid_argument("gpu_sub_ptr failed. gpu_memory.gpu_data_ptr() is null");
-	}
-	if (index >= gpu_memory.item_count())
-	{
-		throw std::invalid_argument("gpu_sub_ptr failed. index out of range");
-	}
-	if (gpu_memory.size() < elements_per_idx * sizeof(float))
-	{
-		throw std::invalid_argument("gpu_sub_ptr failed. size_of_element must be less than gpu_memory.size()");
-	}
-
-	return (float*)((char*)gpu_memory.gpu_data_ptr() + index * elements_per_idx * sizeof(float));
-}
-
 void gpu_dot_product(
-	const gpu_memory<float>& gpu_weights,
-	const gpu_memory<float>& gpu_input,
-	gpu_memory<float>& gpu_activations)
+	const gpu_matrix& gpu_weights,
+	const gpu_matrix& gpu_input,
+	gpu_matrix& gpu_activations)
 {
 	if (gpu_weights.item_count() == 0 ||
 		gpu_input.item_count() == 0 ||
@@ -102,10 +92,10 @@ void gpu_dot_product(
 	unsigned int size = gpu_activations.item_count();
 	unsigned int block_count = get_block_count(size);
 	gpu_dot_product_kernel << < block_count, THREADS_PER_BLOCK >> > (
-		gpu_weights.gpu_data_ptr(),
-		gpu_input.gpu_data_ptr(),
+		gpu_weights.get_gpu_memory_readonly(),
+		gpu_input.get_gpu_memory_readonly(),
 		gpu_input.item_count(),
-		gpu_activations.gpu_data_ptr(),
+		gpu_activations.get_gpu_memory(),
 		gpu_activations.item_count());
 
 	check_for_error_and_synchronize();
@@ -120,9 +110,9 @@ __global__ void gpu_add_matrices_kernel(const float* a, const float* b, float* r
 	}
 }
 void gpu_add(
-	const gpu_memory<float>& gpu_memory_a,
-	const gpu_memory<float>& gpu_memory_b,
-	gpu_memory<float>& gpu_memory_result)
+	const gpu_matrix& gpu_memory_a,
+	const gpu_matrix& gpu_memory_b,
+	gpu_matrix& gpu_memory_result)
 {
 	if (gpu_memory_a.item_count() == 0 ||
 		gpu_memory_a.item_count() != gpu_memory_b.item_count() ||
@@ -136,9 +126,9 @@ void gpu_add(
 	unsigned int size = gpu_memory_a.item_count();
 
 	gpu_add_matrices_kernel << < get_block_count(size), THREADS_PER_BLOCK >> > (
-		gpu_memory_a.gpu_data_ptr(),
-		gpu_memory_b.gpu_data_ptr(),
-		gpu_memory_result.gpu_data_ptr(),
+		gpu_memory_a.get_gpu_memory_readonly(),
+		gpu_memory_b.get_gpu_memory_readonly(),
+		gpu_memory_result.get_gpu_memory(),
 		size);
 
 	check_for_error_and_synchronize();
@@ -184,9 +174,9 @@ __global__ void gpu_valid_cross_correlation_kernel(
 }
 
 void gpu_valid_cross_correlation(
-	const gpu_memory<float>& gpu_input,
-	const std::vector<gpu_memory<float>>& gpu_kernel_weights,
-	gpu_memory<float>& gpu_activations,
+	const gpu_matrix& gpu_input,
+	const std::vector<std::unique_ptr<gpu_matrix>>& gpu_kernel_weights,
+	gpu_matrix& gpu_activations,
 	size_t input_width,
 	size_t input_depth,
 	size_t kernel_width,
@@ -194,21 +184,19 @@ void gpu_valid_cross_correlation(
 	size_t stride,
 	size_t output_width)
 {
-	if (gpu_input.item_count() == 0 ||
-		gpu_activations.item_count() == 0 ||
-		gpu_kernel_weights.size() == 0)
+	cuda_error_check();
+	if (gpu_activations.item_count() == 0 ||
+		gpu_kernel_weights.size() == 0 ||
+		gpu_kernel_weights[0].get() == nullptr ||
+		gpu_kernel_weights[0].get()->item_count() == 0)
 	{
 		throw std::invalid_argument("gpu_valid_cross_correlation failed. size must be greater than 0");
 	}
-	if (input_width * input_width * input_depth != gpu_input.item_count())
-	{
-		throw std::invalid_argument("input size is different on gpu and cpu");
-	}
-	if (!is_whole_number(gpu_kernel_weights[0].item_count() / kernel_count))
+	if (!is_whole_number(gpu_kernel_weights[0].get()->item_count() / kernel_count))
 	{
 		throw std::invalid_argument("gpu kernels could not be devided by kernel count");
 	}
-	if (kernel_width * kernel_width * input_depth != (gpu_kernel_weights[0].item_count() / kernel_count))
+	if (kernel_width * kernel_width * input_depth != gpu_kernel_weights[0].get()->item_count())
 	{
 		throw std::invalid_argument("kernel size false");
 	}
@@ -227,20 +215,22 @@ void gpu_valid_cross_correlation(
 
 	for (int activation_depth = 0; activation_depth < kernel_count; activation_depth++)
 	{
-		//splits the gpu_activations into its dephts
-		float* activation_ptr = gpu_sub_ptr(gpu_activations, output_width * output_width, activation_depth);
+		//splits the gpu_activations into each depth layer
+		//if the activations have a depth of 3 this loop will iterate 3 times
+		//float* activation_ptr = gpu_sub_ptr(gpu_activations.get_gpu_memory(), output_width * output_width, activation_depth);
 
 		size_t block_count = get_block_count(output_width * output_width);
 
 		gpu_valid_cross_correlation_kernel << <(int)block_count, THREADS_PER_BLOCK >> > (
-			gpu_input.gpu_data_ptr(),
-			gpu_kernel_weights[activation_depth].gpu_data_ptr(),
-			activation_ptr,
+			gpu_input.get_gpu_memory_readonly(),
+			gpu_kernel_weights[activation_depth].get()->get_gpu_memory_readonly(),
+			gpu_activations.get_gpu_ptr_layer(activation_depth),
 			(int)input_depth,
 			(int)input_width,
 			(int)kernel_width,
 			(int)output_width,
 			(int)stride);
+		check_for_error_and_synchronize();
 	}
 	check_for_error_and_synchronize();
 }
@@ -254,7 +244,7 @@ __global__ void gpu_sigmoid_kernel(float* data, int size)
 	}
 }
 
-void gpu_sigmoid(gpu_memory<float>& gpu_memory)
+void gpu_sigmoid(gpu_matrix& gpu_memory)
 {
 	if (gpu_memory.item_count() == 0)
 	{
@@ -265,7 +255,7 @@ void gpu_sigmoid(gpu_memory<float>& gpu_memory)
 
 	unsigned int size = gpu_memory.item_count();
 	gpu_sigmoid_kernel << < get_block_count(size), THREADS_PER_BLOCK >> > (
-		gpu_memory.gpu_data_ptr(),
+		gpu_memory.get_gpu_memory(),
 		size);
 
 	check_for_error_and_synchronize();
@@ -280,7 +270,7 @@ __global__ void gpu_relu_kernel(float* data, int size)
 	}
 }
 
-void gpu_relu(gpu_memory<float>& gpu_memory)
+void gpu_relu(gpu_matrix& gpu_memory)
 {
 	if (gpu_memory.item_count() == 0)
 	{
@@ -291,7 +281,7 @@ void gpu_relu(gpu_memory<float>& gpu_memory)
 
 	unsigned int size = gpu_memory.item_count();
 	gpu_relu_kernel << < get_block_count(size), THREADS_PER_BLOCK >> > (
-		gpu_memory.gpu_data_ptr(),
+		gpu_memory.get_gpu_memory(),
 		size);
 
 	check_for_error_and_synchronize();

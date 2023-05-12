@@ -1,6 +1,6 @@
 #pragma once
 #include "matrix.hpp"
-#include "gpu_memory.cuh"
+#include "gpu_matrix.cuh"
 #include "gpu_math.cuh"
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
@@ -31,12 +31,18 @@ protected:
 	matrix* passing_error = nullptr;
 
 	//GPU section
-	gpu_memory<float>* gpu_input = nullptr;
-	std::unique_ptr<gpu_memory<float>> gpu_activations = nullptr;
-	std::unique_ptr<gpu_memory<float>> gpu_error = nullptr;
-	gpu_memory<float>* gpu_passing_error = nullptr;
+	gpu_matrix* gpu_input = nullptr;
+	std::unique_ptr<gpu_matrix> gpu_activations = nullptr;
+	std::unique_ptr<gpu_matrix> gpu_error = nullptr;
+	gpu_matrix* gpu_passing_error = nullptr;
 
 	bool should_use_gpu();
+
+	virtual void forward_propagation_cpu() = 0;
+	virtual	void back_propagation_cpu() = 0;
+
+	virtual void forward_propagation_gpu() = 0;
+	virtual void back_propagation_gpu() = 0;
 
 public:
 	layer(e_layer_type_t given_layer_type);
@@ -61,8 +67,8 @@ public:
 	//add a random value between range and -range to one weight or bias 
 	virtual void mutate(float range) = 0;
 
-	virtual void forward_propagation() = 0;
-	virtual void back_propagation() = 0;
+	void forward_propagation();
+	void back_propagation();
 
 	//the deltas got calculated in the backprop function
 	//all the deltas got summed up. now we need to apply the

@@ -161,7 +161,6 @@
   <ItemGroup>
     <ClCompile Include="..\ConvolutionalNeuralNetwork\batch_handler.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\convolutional_layer.cpp" />
-    <ClCompile Include="..\ConvolutionalNeuralNetwork\conv_kernel.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\digit_data.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\digit_interpreter.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\digit_training_data.cpp" />
@@ -196,15 +195,16 @@
   <ItemGroup>
     <ClInclude Include="..\ConvolutionalNeuralNetwork\batch_handler.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\convolutional_layer.hpp" />
-    <ClInclude Include="..\ConvolutionalNeuralNetwork\conv_kernel.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\device_memory.cuh" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\digit_data.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\digit_interpreter.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\digit_training_data.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\fully_connected_layer.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\gpu_math.cuh" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\gpu_matrix.cuh" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\gpu_matrix.h" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\gpu_memory.cuh" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\gpu_nn_data_block.cuh" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\interpreter.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\layer.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\math_functions.hpp" />
@@ -218,6 +218,8 @@
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\ConvolutionalNeuralNetwork\gpu_math.cu" />
+    <CudaCompile Include="..\ConvolutionalNeuralNetwork\gpu_matrix.cu" />
+    <CudaCompile Include="..\ConvolutionalNeuralNetwork\gpu_nn_data_block.cu" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

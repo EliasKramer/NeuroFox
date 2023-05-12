@@ -1,7 +1,9 @@
 #pragma once
-#include <cstdlib> // for rand() and srand()
-#include <ctime> // for time()
+#include <cstdlib>
+#include <ctime>
 #include <random>
+
+constexpr float FLOAT_TOLERANCE = 0.000001f;
 
 // a random number between 0 and size-1
 int random_idx(int size);
@@ -13,3 +15,19 @@ bool biased_coin_toss(float true_bias, float false_bias);
 float random_float_incl(float min, float max);
 
 bool is_whole_number(float number);
+
+/// <summary>
+/// splits the pointer into multiple chunks
+/// these chunks are the size of elements * sizeof(T)
+/// and you get the index'th pointer
+/// </summary>
+/// <param name="ptr">the ptr that will be split</param>
+/// <param name="elements">the amount of elements that each chunk has</param>
+/// <param name="index">the index of the chunk</param>
+/// <returns>pointer to the index'th chunk that got split</returns>
+template<typename T>
+T* sub_ptr(T* ptr, size_t elements, size_t index)
+{
+	//return (T*)(((char*)ptr) + index * elements * sizeof(T))
+	return ptr + index * elements;
+}

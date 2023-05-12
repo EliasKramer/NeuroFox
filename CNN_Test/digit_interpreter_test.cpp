@@ -13,7 +13,7 @@ namespace CNNTest
 
 			for (int i = 0; i < 10; i++)
 			{
-				input.set_at(0, i, 0, i);
+				input.set_at(0, i, 0, (float)i);
 			}
 
 			input.set_at( 0, 4, 0, 11);
@@ -55,8 +55,8 @@ namespace CNNTest
 
 			for (int i = 0; i < 10; i++)
 			{
-				a.set_at(0, i, 0, i);
-				b.set_at(0, i, 0, i);
+				a.set_at(0, i, 0, (float)i);
+				b.set_at(0, i, 0, (float)i);
 			}
 
 			a.set_at(0, 1, 0, .03f);

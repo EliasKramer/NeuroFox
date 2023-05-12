@@ -13,12 +13,15 @@ private:
 	std::vector<float> data;
 
 	int get_idx(int x, int y, int z) const;
-
+	
 public:
 	matrix();
 	matrix(int width, int height, int depth);
 	matrix(const std::vector<float>& data, int width, int height, int depth);
+	
 	size_t get_hash() const;
+
+	std::unique_ptr<matrix> clone() const;
 
 	void resize(int width, int height, int depth);
 	void resize(const matrix& source);
@@ -30,6 +33,7 @@ public:
 	int get_width() const;
 	int get_height() const;
 	int get_depth() const;
+	int item_count() const;
 
 	std::vector<float>& flat();
 	const std::vector<float>& flat_readonly() const;
@@ -57,11 +61,16 @@ public:
 	static void subtract(const matrix& a, const matrix& b, matrix& result);
 
 	static bool are_equal(const matrix& a, const matrix& b);
+	static bool are_equal(const matrix& a, const matrix& b, float tolerance);
 	static bool equal_format(const matrix& a, const matrix& b);
 
-	static void valid_cross_correlation(const matrix& input, const matrix& kernel, matrix& output, int stride);
-	static void valid_convolution(const matrix& input, const matrix& kernel, matrix& output);
-	static void full_cross_correlation(const matrix& input, const matrix& kernel, matrix& output, int stride);
+	static void valid_cross_correlation(
+		const matrix& input,
+		const std::vector<matrix>& kernels, 
+		matrix& output, 
+		int stride);
+	//static void valid_convolution(const matrix& input, const matrix& kernel, matrix& output);
+	//static void full_cross_correlation(const matrix& input, const matrix& kernel, matrix& output, int stride);
 
 	void scalar_multiplication(float a);
 	void apply_activation_function(e_activation_t activation_fn);

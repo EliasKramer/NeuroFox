@@ -20,12 +20,12 @@ namespace CNNTest
 		TEST_METHOD(constructor_from_vector_test)
 		{
 			matrix m(2, 3, 4);
-			for (int i = 0; i < 24; i++)
+			for (float i = 0; i < 24; i++)
 			{
 				m.flat()[i] = i;
 			}
 			std::vector<float> expected_values(24);
-			for (int i = 0; i < 24; i++)
+			for (float i = 0; i < 24; i++)
 			{
 				expected_values[i] = i;
 			}
@@ -248,13 +248,28 @@ namespace CNNTest
 				| 47 | 77 |
 				+ -- + -- +
 			*/
+			std::vector <matrix> kernels;
+			kernels.push_back(kernel);
 
-			matrix::valid_cross_correlation(input, kernel, output, 1);
+			matrix::valid_cross_correlation(input, kernels, output, 1);
 
 			Assert::AreEqual(37, (int)output.get_at(0, 0));
 			Assert::AreEqual(67, (int)output.get_at(1, 0));
 			Assert::AreEqual(47, (int)output.get_at(0, 1));
 			Assert::AreEqual(77, (int)output.get_at(1, 1));
+		}
+		TEST_METHOD(test_copy)
+		{
+			matrix m = matrix(2, 3, 5);
+			m.set_all(1);
+			matrix m2 = *m.clone().get();
+			Assert::IsTrue(matrix::are_equal(m, m2));
+			
+			m2.set_at(0, 0, 0, 2);
+			Assert::AreNotEqual(2.0f, m.get_at(0,0,0));
+
+			m.set_at(0, 0, 1, 3);
+			Assert::AreNotEqual(3.0f, m2.get_at(0, 0, 1));
 		}
 	};
 }

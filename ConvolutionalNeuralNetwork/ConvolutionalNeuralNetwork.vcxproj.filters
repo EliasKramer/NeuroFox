@@ -52,9 +52,6 @@
     <Filter Include="source\testing">
       <UniqueIdentifier>{be512c61-7789-413f-bd35-a745055b82c1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="header\layer\convolutional_layer">
-      <UniqueIdentifier>{84d5b0a1-3144-4633-b794-50d7a6ee7e4f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="header\layer\base">
       <UniqueIdentifier>{ee7c71c0-322b-4418-b786-6bba997d9d37}</UniqueIdentifier>
     </Filter>
@@ -86,9 +83,6 @@
     </ClCompile>
     <ClCompile Include="math_functions.cpp">
       <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="conv_kernel.cpp">
-      <Filter>source\layer</Filter>
     </ClCompile>
     <ClCompile Include="layer.cpp">
       <Filter>source\layer</Filter>
@@ -155,12 +149,6 @@
     <ClInclude Include="batch_handler.hpp">
       <Filter>header\training</Filter>
     </ClInclude>
-    <ClInclude Include="conv_kernel.hpp">
-      <Filter>header\layer\convolutional_layer</Filter>
-    </ClInclude>
-    <ClInclude Include="convolutional_layer.hpp">
-      <Filter>header\layer\convolutional_layer</Filter>
-    </ClInclude>
     <ClInclude Include="layer.hpp">
       <Filter>header\layer\base</Filter>
     </ClInclude>
@@ -173,9 +161,24 @@
     <ClInclude Include="gpu_memory.cuh">
       <Filter>header\gpu</Filter>
     </ClInclude>
+    <ClInclude Include="convolutional_layer.hpp">
+      <Filter>header\layer</Filter>
+    </ClInclude>
+    <ClInclude Include="gpu_nn_data_block.cuh">
+      <Filter>header\gpu</Filter>
+    </ClInclude>
+    <ClInclude Include="gpu_matrix.cuh">
+      <Filter>header\gpu</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="gpu_math.cu">
+      <Filter>source\gpu</Filter>
+    </CudaCompile>
+    <CudaCompile Include="gpu_nn_data_block.cu">
+      <Filter>source\gpu</Filter>
+    </CudaCompile>
+    <CudaCompile Include="gpu_matrix.cu">
       <Filter>source\gpu</Filter>
     </CudaCompile>
   </ItemGroup>

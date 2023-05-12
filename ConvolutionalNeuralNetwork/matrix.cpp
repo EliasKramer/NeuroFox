@@ -37,6 +37,11 @@ size_t matrix::get_hash() const
 		});
 }
 
+std::unique_ptr<matrix> matrix::clone() const
+{
+	return std::make_unique<matrix>(data, width, height, depth);
+}
+
 void matrix::resize(int width, int height, int depth)
 {
 	this->width = width;
@@ -85,6 +90,11 @@ int matrix::get_height() const
 int matrix::get_depth() const
 {
 	return depth;
+}
+
+int matrix::item_count() const
+{
+	return width * height * depth;
 }
 
 std::vector<float>& matrix::flat()
@@ -243,30 +253,47 @@ bool matrix::are_equal(const matrix& a, const matrix& b)
 	return a.get_hash() == b.get_hash();
 }
 
+bool matrix::are_equal(const matrix& a, const matrix& b, float tolerance)
+{
+	if (!equal_format(a, b))
+	{
+		return false;
+	}
+
+	for (int i = 0; i < a.data.size(); i++)
+	{
+		if (std::abs(a.data[i] - b.data[i]) > tolerance)
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
 bool matrix::equal_format(const matrix& a, const matrix& b)
 {
 	return a.width == b.width && a.height == b.height && a.depth == b.depth;
 }
 
-void matrix::valid_cross_correlation(const matrix& input, const matrix& kernel, matrix& output, int stride)
+void matrix::valid_cross_correlation(
+	const matrix& input,
+	const std::vector<matrix>& kernels,
+	matrix& output,
+	int stride)
 {
 	//this only works with a stride of one
 	const size_t input_size = input.get_width();
-	const size_t kernel_size = kernel.get_width();
+	const size_t kernel_size = kernels[0].get_width();
 	const size_t output_size = output.get_width();
 	const size_t expected_output_size = ((input_size - kernel_size) / (float)stride) + 1;
-	
+
 	if (output_size != expected_output_size)
 	{
 		throw std::invalid_argument("cross correlation could not be performed. output matrix is not the correct size");
 	}
-	if (input.get_depth() != kernel.get_depth())
+	if (input.get_depth() != kernels[0].get_depth())
 	{
 		throw std::invalid_argument("cross correlation could not be performed. input matrices are in the wrong format");
-	}
-	if (output.get_depth() != 1)
-	{
-		throw std::invalid_argument("cross correlation could not be performed. output matrix is in the wrong format");
 	}
 
 	output.set_all(0);
@@ -278,13 +305,22 @@ void matrix::valid_cross_correlation(const matrix& input, const matrix& kernel, 
 			for (int x = 0; x < output.width; x++)
 			{
 				float sum = 0;
-				for (int i = 0; i < kernel_size; i++)
+				for (int curr_depth = 0; curr_depth < kernels[0].get_depth(); curr_depth++)
 				{
-					for (int j = 0; j < kernel_size; j++)
+					for (int i = 0; i < kernel_size; i++)
 					{
-						sum +=
-							input.get_at(x * stride + i,y * stride + j ,z) *
-							kernel.get_at(i, j, z);
+						for (int j = 0; j < kernel_size; j++)
+						{
+							sum +=
+								input.get_at(
+									x * stride + i,
+									y * stride + j,
+									curr_depth) *
+								kernels[z].get_at(
+									i,
+									j,
+									curr_depth);
+						}
 					}
 				}
 				//if we do this, the output of all depths will be added together
@@ -294,13 +330,13 @@ void matrix::valid_cross_correlation(const matrix& input, const matrix& kernel, 
 	}
 }
 
-void matrix::valid_convolution(const matrix& input, const matrix& kernel, matrix& output)
-{
+//void matrix::valid_convolution(const matrix& input, const matrix& kernel, matrix& output)
+//{
 	//valid_cross_correlation(input, kernel.rotate180copy(), output);
-}
+//}
 
-void matrix::full_cross_correlation(const matrix& input, const matrix& kernel, matrix& output, int stride)
-{
+//void matrix::full_cross_correlation(const matrix& input, const matrix& kernel, matrix& output, int stride)
+//{
 	/*
 	//this only works with a stride of one
 	const size_t input_size = input.get_width();
@@ -326,11 +362,11 @@ void matrix::full_cross_correlation(const matrix& input, const matrix& kernel, m
 				{
 					for (int j = 0; j < kernel_size; j++)
 					{
-						sum += 
+						sum +=
 							input.get_at(
-								x + i * stride, 
-								y + j * stride, 
-								z) * 
+								x + i * stride,
+								y + j * stride,
+								z) *
 							kernel.get_at(i, j, z);
 					}
 				}
@@ -339,7 +375,7 @@ void matrix::full_cross_correlation(const matrix& input, const matrix& kernel, m
 		}
 	}
 	*/
-}
+	//}
 
 void matrix::scalar_multiplication(float a)
 {

@@ -1,5 +1,6 @@
 #pragma once
 #include "matrix.hpp"
+#include "gpu_memory.cuh"
 
 class nn_data
 {
