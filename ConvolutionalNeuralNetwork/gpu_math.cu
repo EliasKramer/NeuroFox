@@ -155,7 +155,7 @@ __global__ void gpu_valid_cross_correlation_kernel(
 	const int stride)
 {
 	unsigned int result_idx = blockIdx.x * blockDim.x + threadIdx.x;
-		
+
 	if (result_idx < output_width * output_width)
 	{
 		//print all arguments
@@ -241,8 +241,8 @@ void gpu_valid_cross_correlation(
 			(int)kernel_width,
 			(int)output_width,
 			(int)stride);
-		//check_for_error_and_synchronize();
 	}
+	check_for_error_and_synchronize();
 }
 
 __global__ void gpu_sigmoid_kernel(float* data, int size)
