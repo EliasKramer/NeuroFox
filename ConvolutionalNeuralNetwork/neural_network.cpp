@@ -215,9 +215,11 @@ void neural_network::forward_propagation(const matrix* input)
 {
 	set_input(input);
 	//std::vector<std::unique_ptr<layer>>::iterator::value_type
+	const matrix* curr_input = input;
 	for (auto& l : layers)
 	{
-		l->forward_propagation();
+		l->forward_propagation(curr_input);
+		curr_input = l->get_activations_p();
 	}
 }
 
@@ -255,7 +257,7 @@ void neural_network::learn_once(const std::unique_ptr<nn_data>& training_data, b
 
 	//calculating the cost derivative
 	//calculate_cost_derivative(training_data->get_label_p());
-	get_last_layer()->set_error_for_last_layer(
+	get_last_layer()->set_error_for_last_layer_cpu(
 		training_data.get()->get_label());
 
 	//back propagating

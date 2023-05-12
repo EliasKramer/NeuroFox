@@ -1,7 +1,69 @@
 #include "pooling_layer.hpp"
 
-void pooling_layer::forward_propagation_cpu()
+pooling_layer::pooling_layer(
+	int filter_size,
+	int stride,
+	e_pooling_type_t pooling_fn
+)
+	:layer(e_layer_type_t::pooling),
+	filter_size(filter_size),
+	stride(stride),
+	pooling_fn(pooling_fn)
 {
+	if (filter_size <= 0)
+		throw std::invalid_argument("filter size must be greater than 0");
+	if (stride <= 0)
+		throw std::invalid_argument("stride must be greater than 0");
+}
+
+void pooling_layer::set_input_format(const matrix& input_format)
+{
+	layer::set_input_format(input_format);
+
+	int output_width = (input_format.get_width() - filter_size) / stride + 1;
+	int output_height = (input_format.get_height() - filter_size) / stride + 1;
+	int output_depth = input_format.get_depth();
+
+	activations.resize(
+		output_width,
+		output_height,
+		output_depth);
+}
+
+int pooling_layer::get_filter_size() const
+{
+	return filter_size;
+}
+
+int pooling_layer::get_stride() const
+{
+	return stride;
+}
+
+e_pooling_type_t pooling_layer::get_pooling_fn() const
+{
+	return pooling_fn;
+}
+
+void pooling_layer::set_all_parameter(float value)
+{
+	throw std::invalid_argument("pooling layer does not have any parameters");
+}
+
+void pooling_layer::apply_noise(float range)
+{
+	throw std::invalid_argument("pooling layer does not have any parameters");
+}
+
+void pooling_layer::mutate(float range)
+{
+	throw std::invalid_argument("pooling layer does not have any parameters");
+}
+
+void pooling_layer::forward_propagation_cpu(const matrix* input)
+{
+	layer::forward_propagation_cpu(input);
+
 	//iterate over each depth
 	for (int d = 0; d < activations.get_depth(); d++)
 	{
@@ -72,76 +134,22 @@ void pooling_layer::forward_propagation_cpu()
 	}
 }
 
-void pooling_layer::back_propagation_cpu()
+void pooling_layer::back_propagation_cpu(const matrix* previous_error)
 {
+	layer::back_propagation_cpu(previous_error);
+	throw std::exception("not implemented");
 }
 
-void pooling_layer::forward_propagation_gpu()
+void pooling_layer::forward_propagation_gpu(const gpu_matrix* input)
 {
+	layer::forward_propagation_gpu(input);
+	throw std::exception("not implemented");
 }
 
-void pooling_layer::back_propagation_gpu()
+void pooling_layer::back_propagation_gpu(const gpu_matrix* previous_error)
 {
-}
-
-pooling_layer::pooling_layer(
-	int filter_size,
-	int stride,
-	e_pooling_type_t pooling_fn
-)
-	:layer(e_layer_type_t::pooling),
-	filter_size(filter_size),
-	stride(stride),
-	pooling_fn(pooling_fn)
-{
-	if (filter_size <= 0)
-		throw std::invalid_argument("filter size must be greater than 0");
-	if (stride <= 0)
-		throw std::invalid_argument("stride must be greater than 0");
-}
-
-void pooling_layer::set_input_format(const matrix& input_format)
-{
-	layer::set_input_format(input_format);
-
-	int output_width = (input_format.get_width() - filter_size) / stride + 1;
-	int output_height = (input_format.get_height() - filter_size) / stride + 1;
-	int output_depth = input_format.get_depth();
-
-	activations.resize(
-		output_width,
-		output_height,
-		output_depth);
-}
-
-int pooling_layer::get_filter_size() const
-{
-	return filter_size;
-}
-
-int pooling_layer::get_stride() const
-{
-	return stride;
-}
-
-e_pooling_type_t pooling_layer::get_pooling_fn() const
-{
-	return pooling_fn;
-}
-
-void pooling_layer::set_all_parameter(float value)
-{
-	throw std::invalid_argument("pooling layer does not have any parameters");
-}
-
-void pooling_layer::apply_noise(float range)
-{
-	throw std::invalid_argument("pooling layer does not have any parameters");
-}
-
-void pooling_layer::mutate(float range)
-{
-	throw std::invalid_argument("pooling layer does not have any parameters");
+	layer::back_propagation_gpu(previous_error);
+	throw std::exception("not implemented");
 }
 
 void pooling_layer::apply_deltas(int number_of_inputs)

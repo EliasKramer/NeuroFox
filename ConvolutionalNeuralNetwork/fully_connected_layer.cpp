@@ -22,80 +22,12 @@ void fully_connected_layer::set_weight_delta_at(int input_layer_idx, int current
 
 float fully_connected_layer::get_passing_error_at(int input_layer_idx) const
 {
-	return passing_error->flat_readonly()[input_layer_idx];
+	return prev_error->flat_readonly()[input_layer_idx];
 }
 
 void fully_connected_layer::set_passing_error_at(int input_layer_idx, float value)
 {
-	passing_error->flat()[input_layer_idx] = value;
-}
-
-void fully_connected_layer::forward_propagation_cpu()
-{
-	matrix::dot_product_flat(weights, *input, activations);
-	matrix::add_flat(activations, biases, activations);
-	activations.apply_activation_function(activation_fn);
-}
-
-void fully_connected_layer::back_propagation_cpu()
-{
-	if (!matrix::equal_format(activations, error))
-	{
-		throw std::invalid_argument("activations and error_right have different format");
-	}
-
-	for (int current_neuron_idx = 0; current_neuron_idx < activations.flat_readonly().size(); current_neuron_idx++)
-	{
-		float error_value = error.flat_readonly()[current_neuron_idx];
-		//clear the error
-		error.flat()[current_neuron_idx] = 0;
-
-		float current_activation_value = activations.flat_readonly()[current_neuron_idx];
-		float unactivated_activation = INVERSE[activation_fn](current_activation_value);
-		float activation_derivative = DERIVATIVE[activation_fn](unactivated_activation);
-
-		//bias change
-		float bias_change = error_value * activation_derivative;
-		bias_deltas.flat()[current_neuron_idx] += bias_change;
-
-		//iterate input layer
-		for (int current_input_idx = 0; current_input_idx < input->flat_readonly().size(); current_input_idx++)
-		{
-			float current_previous_activation = input->flat_readonly()[current_input_idx];
-
-			//this weight connects the current input node to the current neuron
-			float current_weight = get_weight_at(current_input_idx, current_neuron_idx);
-
-			float weight_change = error_value * activation_derivative * current_previous_activation;
-			float new_passing_error = error_value * activation_derivative * current_weight;
-
-			float current_weight_change = get_weight_delta_at(current_input_idx, current_neuron_idx);
-			set_weight_delta_at(current_input_idx, current_neuron_idx, current_weight_change + weight_change);
-
-			//passing error is null when this is the first layer
-			if (passing_error != nullptr)
-			{
-				float current_error = get_passing_error_at(current_input_idx);
-				set_passing_error_at(current_input_idx, current_error + new_passing_error);
-			}
-		}
-	}
-}
-
-void fully_connected_layer::forward_propagation_gpu()
-{
-	if (!gpu_weights || !gpu_biases || !gpu_activations)
-	{
-		throw std::invalid_argument("gpu_weights, gpu_biases or gpu_activations is null");
-	}
-
-	gpu_dot_product(*gpu_weights.get(), *gpu_input, *gpu_activations.get());
-	gpu_add(*gpu_activations.get(), *gpu_biases.get(), *gpu_activations.get());
-	GPU_ACTIVATION[activation_fn](*gpu_activations.get());
-}
-
-void fully_connected_layer::back_propagation_gpu()
-{
+	prev_error->flat()[input_layer_idx] = value;
 }
 
 fully_connected_layer::fully_connected_layer(
@@ -188,8 +120,85 @@ void fully_connected_layer::mutate(float range)
 	}
 }
 
+void fully_connected_layer::forward_propagation_cpu(const matrix* input)
+{
+	layer::forward_propagation_cpu(input);
+
+	matrix::dot_product_flat(weights, *input, activations);
+	matrix::add_flat(activations, biases, activations);
+	activations.apply_activation_function(activation_fn);
+}
+
+void fully_connected_layer::back_propagation_cpu(const matrix* previous_error)
+{
+	layer::back_propagation_cpu(previous_error);
+
+	if (!matrix::equal_format(activations, error))
+	{
+		throw std::invalid_argument("activations and error_right have different format");
+	}
+
+	for (int current_neuron_idx = 0; current_neuron_idx < activations.flat_readonly().size(); current_neuron_idx++)
+	{
+		float error_value = error.flat_readonly()[current_neuron_idx];
+		//clear the error
+		error.flat()[current_neuron_idx] = 0;
+
+		float current_activation_value = activations.flat_readonly()[current_neuron_idx];
+		float unactivated_activation = INVERSE[activation_fn](current_activation_value);
+		float activation_derivative = DERIVATIVE[activation_fn](unactivated_activation);
+
+		//bias change
+		float bias_change = error_value * activation_derivative;
+		bias_deltas.flat()[current_neuron_idx] += bias_change;
+
+		//iterate input layer
+		for (int current_input_idx = 0; current_input_idx < input->flat_readonly().size(); current_input_idx++)
+		{
+			float current_previous_activation = input->flat_readonly()[current_input_idx];
+
+			//this weight connects the current input node to the current neuron
+			float current_weight = get_weight_at(current_input_idx, current_neuron_idx);
+
+			float weight_change = error_value * activation_derivative * current_previous_activation;
+			float new_passing_error = error_value * activation_derivative * current_weight;
+
+			float current_weight_change = get_weight_delta_at(current_input_idx, current_neuron_idx);
+			set_weight_delta_at(current_input_idx, current_neuron_idx, current_weight_change + weight_change);
+
+			//passing error is null when this is the first layer
+			if (prev_error != nullptr)
+			{
+				float current_error = get_passing_error_at(current_input_idx);
+				set_passing_error_at(current_input_idx, current_error + new_passing_error);
+			}
+		}
+	}
+}
+
+void fully_connected_layer::forward_propagation_gpu(const gpu_matrix* input)
+{
+	layer::forward_propagation_gpu(input);
+
+	if (!gpu_weights || !gpu_biases || !gpu_activations)
+	{
+		throw std::invalid_argument("gpu_weights, gpu_biases or gpu_activations is null");
+	}
+
+	gpu_dot_product(*gpu_weights.get(), *input, *gpu_activations.get());
+	gpu_add(*gpu_activations.get(), *gpu_biases.get(), *gpu_activations.get());
+	GPU_ACTIVATION[activation_fn](*gpu_activations.get());
+}
+
+void fully_connected_layer::back_propagation_gpu(const gpu_matrix* previous_error)
+{
+	layer::back_propagation_gpu(previous_error);
+	throw std::exception("not implemented");
+}
+
 void fully_connected_layer::apply_deltas(int number_of_inputs)
 {
+
 	for (int i = 0; i < biases.flat_readonly().size(); i++)
 	{
 		float current_bias = biases.flat()[i];

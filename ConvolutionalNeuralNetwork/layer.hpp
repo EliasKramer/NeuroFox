@@ -14,35 +14,25 @@ typedef enum _layer_type {
 
 class layer {
 
+private:
+	void valid_input_check_cpu(const matrix* input) const;
+	void valid_passing_error_check_cpu(const matrix* passing_error) const;
+
+	void valid_input_check_gpu(const gpu_matrix* input) const;
+	void valid_passing_error_check_gpu(const gpu_matrix* passing_error) const;
 protected:
 	e_layer_type_t type;
 	//the current matrix of neurons
 	matrix activations;
-
-	//the format, that the previous layer has
-	matrix input_format;
-	//the pointer to the neurons of the previous layer
-	const matrix* input = nullptr;
-
-	//the error has the same format as our neurons
+	//the current error - the same format as the activations
 	matrix error;
-	//the passing error has the same format
-	//as the neurons of the previous layer
-	matrix* passing_error = nullptr;
 
-	//GPU section
-	gpu_matrix* gpu_input = nullptr;
+	matrix input_format;
+	//TODO implement
+	matrix passing_error_format;
+
 	std::unique_ptr<gpu_matrix> gpu_activations = nullptr;
 	std::unique_ptr<gpu_matrix> gpu_error = nullptr;
-	gpu_matrix* gpu_passing_error = nullptr;
-
-	bool should_use_gpu();
-
-	virtual void forward_propagation_cpu() = 0;
-	virtual	void back_propagation_cpu() = 0;
-
-	virtual void forward_propagation_gpu() = 0;
-	virtual void back_propagation_gpu() = 0;
 
 public:
 	layer(e_layer_type_t given_layer_type);
@@ -53,12 +43,11 @@ public:
 	void set_input(const matrix* input);
 	virtual void set_input_format(const matrix& given_input_format);
 	
-	void set_previous_layer(layer& previous_layer);
-
 	const matrix& get_activations() const;
 	matrix* get_activations_p();
 
-	void set_error_for_last_layer(const matrix& expected);
+	//TODO - make this separate
+	void set_error_for_last_layer_cpu(const matrix& expected);
 
 	//set all weights and biases to that value
 	virtual void set_all_parameter(float value) = 0;
@@ -67,8 +56,11 @@ public:
 	//add a random value between range and -range to one weight or bias 
 	virtual void mutate(float range) = 0;
 
-	void forward_propagation();
-	void back_propagation();
+	virtual void forward_propagation_cpu(const matrix* input);
+	virtual	void back_propagation_cpu(const matrix* input, const matrix* passing_error);
+
+	virtual void forward_propagation_gpu(const gpu_matrix* input);
+	virtual void back_propagation_gpu(const gpu_matrix* input, const gpu_matrix* passing_error);
 
 	//the deltas got calculated in the backprop function
 	//all the deltas got summed up. now we need to apply the
