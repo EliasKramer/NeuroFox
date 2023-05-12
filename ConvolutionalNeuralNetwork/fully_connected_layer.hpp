@@ -29,12 +29,6 @@ private:
 	float get_passing_error_at(int input_layer_idx) const;
 	void set_passing_error_at(int input_layer_idx, float value);
 
-	void forward_propagation_cpu() override;
-	void back_propagation_cpu() override;
-
-	void forward_propagation_gpu() override;
-	void back_propagation_gpu() override;
-
 public:
 
 	fully_connected_layer(
@@ -60,6 +54,12 @@ public:
 	void apply_noise(float range) override;
 	//add a random value between range and -range to one weight or bias 
 	void mutate(float range) override;
+
+	void forward_propagation_cpu(const matrix* input) override;
+	void back_propagation_cpu(const matrix* previous_error) override;
+
+	void forward_propagation_gpu(const gpu_matrix* input) override;
+	void back_propagation_gpu(const gpu_matrix* previous_error) override;
 
 	void apply_deltas(int number_of_inputs) override;
 
