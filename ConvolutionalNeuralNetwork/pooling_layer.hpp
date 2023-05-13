@@ -31,11 +31,11 @@ public:
 	void apply_noise(float range) override;
 	void mutate(float range) override;
 
-	void forward_propagation_cpu(const matrix* input) override;
-	void back_propagation_cpu(const matrix* previous_error) override;
+	void forward_propagation_cpu(const matrix& input) override;
+	void back_propagation_cpu(const matrix& input, matrix* passing_error) override;
 
-	void forward_propagation_gpu(const gpu_matrix* input) override;
-	void back_propagation_gpu(const gpu_matrix* previous_error) override;
+	void forward_propagation_gpu(const gpu_matrix& input) override;
+	void back_propagation_gpu(const gpu_matrix& input, gpu_matrix* passing_error) override;
 
 	void apply_deltas(int number_of_inputs) override;
 	

@@ -79,7 +79,6 @@ namespace CNNTest
 			convolutional_layer layer(1, 2, 1, e_activation_t::sigmoid_fn);
 			matrix input(3, 3, 1);
 			layer.set_input_format(input);
-			layer.set_input(&input);
 
 			/* weight matrix
 				+ - + - +
@@ -121,7 +120,7 @@ namespace CNNTest
 			input.set_at(2, 1, 8);
 			input.set_at(2, 2, 9);
 
-			layer.forward_propagation();
+			layer.forward_propagation_cpu(input);
 
 			/* expected output matrix
 				+ -- + -- +

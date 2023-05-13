@@ -1,27 +1,6 @@
 #include "neural_network.hpp"
 #include "util.hpp"
 
-void neural_network::set_input(const matrix* input)
-{
-	if (input == nullptr)
-	{
-		throw "Input is nullptr.";
-	}
-
-	if (input_format_set == false ||
-		matrix::equal_format(input_format, *input) == false)
-	{
-		throw "Could not set Input. Input format is not set or does not match the input format.";
-	}
-
-	if (layers.empty())
-	{
-		throw "Could not set Input. No layers have been added yet.";
-	}
-
-	layers.front()->set_input(input);
-}
-
 layer* neural_network::get_last_layer()
 {
 	//the last layer is the layer that was added last or nullptr 
@@ -34,28 +13,17 @@ neural_network::neural_network()
 
 void neural_network::set_input_format(const matrix& given_input_format)
 {
-	if (input_format_set == false)
-		input_format_set = true;
-	else
+	if (input_format.item_count() != 0)
 		throw std::runtime_error("Cannot set input format twice.");
 
 	this->input_format.resize(given_input_format);
 }
 
-void neural_network::set_output_format(const matrix& given_output_format)
+const matrix& neural_network::get_output() const
 {
-	if (output_format_set == false)
-		output_format_set = true;
-	else
-		throw std::runtime_error("Cannot set output format twice.");
-
-	this->output_format.resize(given_output_format);
-	this->cost_derivative.resize(given_output_format);
-}
-
-const matrix* neural_network::get_output() const
-{
-	return output_p;
+	if(layers.empty())
+		throw std::runtime_error("Cannot get output of neural network with no layers.");
+	return layers.back().get()->get_activations();
 }
 
 void neural_network::add_layer(std::unique_ptr<layer>&& given_layer)
@@ -78,7 +46,7 @@ void neural_network::add_layer(std::unique_ptr<layer>&& given_layer)
 	{
 		//if there are already layers,
 		//set the previous layer of the new layer to the last layer
-		given_layer->set_previous_layer(*get_last_layer());
+		given_layer->set_input_format(get_last_layer()->get_activations());
 	}
 
 	//putting the new layer into the vector of layers
@@ -97,22 +65,16 @@ void neural_network::apply_deltas(int training_data_count)
 
 float neural_network::calculate_cost(const matrix& expected_output)
 {
-	if (get_output() == nullptr)
-	{
-		throw std::runtime_error("Output is nullptr.");
-	}
-	if (matrix::equal_format(*get_output(), expected_output) == false)
+	if (matrix::equal_format(get_output(), expected_output) == false)
 	{
 		throw std::runtime_error("Output format does not match expected output format.");
 	}
-
-	const matrix& output = *get_output();
 
 	float cost = 0.0f;
 	for (int i = 0; i < expected_output.flat_readonly().size(); i++)
 	{
 		float expected = expected_output.flat_readonly()[i];
-		float actual = output.flat_readonly()[i];
+		float actual = get_output().flat_readonly()[i];
 		cost += ((actual - expected) * (actual - expected));
 	}
 	return cost;
@@ -126,13 +88,11 @@ void neural_network::add_fully_connected_layer(int num_neurons, e_activation_t a
 	add_layer(std::move(new_layer));
 }
 
-void neural_network::add_last_fully_connected_layer(e_activation_t activation_fn)
+void neural_network::add_fully_connected_layer(const matrix& neuron_format, e_activation_t activation_fn)
 {
 	std::unique_ptr<fully_connected_layer> new_layer =
-		std::make_unique<fully_connected_layer>(output_format, activation_fn);
-
+		std::make_unique<fully_connected_layer>(neuron_format, activation_fn);
 	add_layer(std::move(new_layer));
-	output_p = get_last_layer()->get_activations_p();
 }
 
 void neural_network::add_convolutional_layer(
@@ -183,7 +143,7 @@ void neural_network::mutate(float range)
 	int layer_idx = parameter_layer_indices[random_idx((int)parameter_layer_indices.size())];
 	layers[layer_idx]->mutate(range);
 }
-
+/*
 test_result neural_network::test(const std::vector<std::unique_ptr<nn_data>>& test_data)
 {
 	test_result result;
@@ -194,7 +154,7 @@ test_result neural_network::test(const std::vector<std::unique_ptr<nn_data>>& te
 
 	for (auto& curr_data : test_data)
 	{
-		forward_propagation(curr_data.get()->get_data_p());
+		forward_propagation_cpu(curr_data.get()->get_data());
 		if (get_interpreter<interpreter>()->same_result(*get_output(), curr_data.get()->get_label()))
 		{
 			correct_predictions++;
@@ -209,18 +169,31 @@ test_result neural_network::test(const std::vector<std::unique_ptr<nn_data>>& te
 	result.avg_cost = cost_sum / (float)result.data_count;
 
 	return result;
-}
+}*/
 
-void neural_network::forward_propagation(const matrix* input)
+void neural_network::forward_propagation_cpu(const matrix& input)
 {
-	set_input(input);
+	matrix* last_layer = nullptr;
 	//std::vector<std::unique_ptr<layer>>::iterator::value_type
-	const matrix* curr_input = input;
 	for (auto& l : layers)
 	{
-		l->forward_propagation(curr_input);
-		curr_input = l->get_activations_p();
+		l->forward_propagation_cpu(
+			last_layer == nullptr ?
+			input :
+			*last_layer
+		);
+		last_layer = l.get()->get_activations_p();
 	}
+}
+
+void neural_network::forward_propagation_gpu(const gpu_matrix& input)
+{
+	if (gpu_enabled == false)
+	{
+		enable_gpu();
+	}
+
+
 }
 
 void neural_network::learn(
@@ -245,25 +218,28 @@ void neural_network::learn(
 
 void neural_network::learn_once(const std::unique_ptr<nn_data>& training_data, bool apply_changes)
 {
-	//checking for correct format
-	if (!matrix::equal_format(training_data.get()->get_label(), output_format))
-	{
-		throw std::runtime_error(
-			"The expected output does not have the correct format.");
-	}
-
 	//feeding the data through
-	forward_propagation(training_data.get()->get_data_p());
+	forward_propagation_cpu(training_data.get()->get_data());
 
 	//calculating the cost derivative
 	//calculate_cost_derivative(training_data->get_label_p());
 	get_last_layer()->set_error_for_last_layer_cpu(
 		training_data.get()->get_label());
 
-	//back propagating
-	for (auto it = layers.rbegin(); it != layers.rend(); ++it)
+	//we start from the last layer
+	for (int i = layers.size() - 1; i >= 0; i--)
 	{
-		(*it)->back_propagation();
+		const matrix& input =
+			i == 0 ?
+			training_data.get()->get_data() :
+			layers[i - 1].get()->get_activations();
+
+		matrix* passing_error =
+			i == 0 ?
+			nullptr :
+			layers[i - 1].get()->get_error_p();
+
+			layers[i].get()->back_propagation_cpu(input, passing_error);
 	}
 
 	//if we only train on one training data piece
@@ -294,10 +270,5 @@ void neural_network::enable_gpu()
 		l->enable_gpu();
 	}
 
-	enabled_gpu = true;
-}
-
-void neural_network::disable_gpu()
-{
-	enabled_gpu = false;
+	gpu_enabled = true;
 }

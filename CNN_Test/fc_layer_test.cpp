@@ -12,7 +12,6 @@ namespace CNNTest
 			matrix* input = new matrix(1, 1, 1);
 			fully_connected_layer fc_layer(5, relu_fn);
 			fc_layer.set_input_format(*input);
-			fc_layer.set_input(input);
 
 			matrix output = fc_layer.get_activations();
 
@@ -25,7 +24,6 @@ namespace CNNTest
 			matrix* input = new matrix(1, 4, 1);
 			fully_connected_layer fc_layer(5, relu_fn);
 			fc_layer.set_input_format(*input);
-			fc_layer.set_input(input);
 
 			Assert::AreEqual(5, fc_layer.get_activations().get_height());
 
@@ -42,13 +40,12 @@ namespace CNNTest
 			input->flat()[0] = 2;
 			fully_connected_layer fc_layer(1, relu_fn);
 			fc_layer.set_input_format(*input);
-			fc_layer.set_input(input);
 
 			//CONTINUE HERE
 			fc_layer.get_weights_ref().flat()[0] = 3;
 			fc_layer.get_biases_ref().flat()[0] = 1;
 
-			fc_layer.forward_propagation();
+			fc_layer.forward_propagation_cpu(*input);
 
 			Assert::AreEqual(7.0f, fc_layer.get_activations().flat_readonly()[0]);
 
@@ -64,14 +61,13 @@ namespace CNNTest
 			input->flat()[4] = 6;
 			fully_connected_layer fc_layer(3, relu_fn);
 			fc_layer.set_input_format(*input);
-			fc_layer.set_input(input);
 
 			fc_layer.get_weights_ref().set_all(2);
 			fc_layer.get_biases_ref().set_all(1);
 
 			fc_layer.get_weights_ref().set_at(0, 0, -1);
 
-			fc_layer.forward_propagation();
+			fc_layer.forward_propagation_cpu(*input);
 
 			Assert::AreEqual(35.0f, fc_layer.get_activations().flat_readonly()[0]);
 			Assert::AreEqual(41.0f, fc_layer.get_activations().flat_readonly()[1]);

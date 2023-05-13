@@ -60,7 +60,7 @@ void pooling_layer::mutate(float range)
 	throw std::invalid_argument("pooling layer does not have any parameters");
 }
 
-void pooling_layer::forward_propagation_cpu(const matrix* input)
+void pooling_layer::forward_propagation_cpu(const matrix& input)
 {
 	layer::forward_propagation_cpu(input);
 
@@ -89,16 +89,16 @@ void pooling_layer::forward_propagation_cpu(const matrix* input)
 				//iterate over the filter
 				for (int i = start_idx_y; i <= end_idx_y; i++)
 				{
-					if (i >= input->get_height())
+					if (i >= input.get_height())
 						break;
 
 					for (int j = start_idx_x; j <= end_idx_x; j++)
 					{
-						if (j >= input->get_width())
+						if (j >= input.get_width())
 							break;
 
 						//get the value of the input at the current index
-						const float curr_val = input->get_at(j, i, d);
+						const float curr_val = input.get_at(j, i, d);
 
 						//if the current value is greater than the max value
 						//set the max value to the current value
@@ -134,21 +134,21 @@ void pooling_layer::forward_propagation_cpu(const matrix* input)
 	}
 }
 
-void pooling_layer::back_propagation_cpu(const matrix* previous_error)
+void pooling_layer::back_propagation_cpu(const matrix& input, matrix* passing_error)
 {
-	layer::back_propagation_cpu(previous_error);
+	layer::back_propagation_cpu(input, passing_error);
 	throw std::exception("not implemented");
 }
 
-void pooling_layer::forward_propagation_gpu(const gpu_matrix* input)
+void pooling_layer::forward_propagation_gpu(const gpu_matrix& input)
 {
 	layer::forward_propagation_gpu(input);
 	throw std::exception("not implemented");
 }
 
-void pooling_layer::back_propagation_gpu(const gpu_matrix* previous_error)
+void pooling_layer::back_propagation_gpu(const gpu_matrix& input, gpu_matrix* passing_error)
 {
-	layer::back_propagation_gpu(previous_error);
+	layer::back_propagation_gpu(input, passing_error);
 	throw std::exception("not implemented");
 }
 
