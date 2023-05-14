@@ -121,14 +121,14 @@ void gpu_matrix::set_values_gpu(const gpu_matrix& m)
 
 void gpu_matrix::set_values_cpu(const matrix& m)
 {
-	if (m.flat_readonly().size() != item_count())
+	if (m.item_count() != item_count())
 	{
 		throw std::runtime_error("gpu_memory size mismatch");
 	}
 
 	cudaMemcpy(
 		gpu_ptr,
-		m.flat_readonly().data(),
+		m.get_data_readonly(),
 		item_count() * sizeof(float),
 		cudaMemcpyHostToDevice);
 
@@ -185,7 +185,7 @@ std::unique_ptr<matrix> gpu_matrix::to_cpu() const
 {
 	std::unique_ptr<matrix> result = std::make_unique<matrix>(width, height, depth);
 	cudaMemcpy(
-		result->flat().data(),
+		result->get_data(),
 		gpu_ptr,
 		item_count() * sizeof(float),
 		cudaMemcpyDeviceToHost);

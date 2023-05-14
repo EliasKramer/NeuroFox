@@ -7,18 +7,28 @@
 
 class matrix {
 private:
-	int width;
-	int height;
-	int depth;
-	std::vector<float> data;
-
-	int get_idx(int x, int y, int z) const;
+	size_t width;
+	size_t height;
+	size_t depth;
 	
+	bool owning_data;
+	float* data;
+
+	size_t get_idx(size_t x, size_t y, size_t z) const;
+	
+	void check_for_valid_format() const;
+	void allocate_mem();
+	void copy_data(const float* src);
 public:
 	matrix();
-	matrix(int width, int height, int depth);
-	matrix(const std::vector<float>& data, int width, int height, int depth);
+	matrix(size_t width, size_t height, size_t depth);
+	matrix(size_t width, size_t height, size_t depth,
+		float* given_ptr, bool copy);
+	matrix(size_t width, size_t height, size_t depth,
+		const std::vector<float>& given_vector);
 	
+	~matrix();
+
 	size_t get_hash() const;
 
 	std::unique_ptr<matrix> clone() const;
@@ -30,27 +40,31 @@ public:
 	void apply_noise(float range);
 	void mutate(float range);
 
-	int get_width() const;
-	int get_height() const;
-	int get_depth() const;
-	int item_count() const;
+	size_t get_width() const;
+	size_t get_height() const;
+	size_t get_depth() const;
+	size_t item_count() const;
 
-	std::vector<float>& flat();
-	const std::vector<float>& flat_readonly() const;
+	float get_at_flat(size_t idx) const;
+	void set_at_flat(size_t idx, float value);
+	void add_at_flat(size_t idx, float value);
 
+	float* get_data();
+	const float* get_data_readonly() const;
+	
 	//setter
-	void set_at(int x, int y, int z, float value);
-	void add_at(int x, int y, int z, float value);
+	void set_at(size_t x, size_t y, size_t z, float value);
+	void add_at(size_t x, size_t y, size_t z, float value);
 	//setting value where z = 0
-	void set_at(int x, int y, float value);
-	void add_at(int x, int y, float value);
+	void set_at(size_t x, size_t y, float value);
+	void add_at(size_t x, size_t y, float value);
 
 	//getter
-	float get_at(int x, int y, int z) const;
+	float get_at(size_t x, size_t y, int z) const;
 	//getting value where z = 0
-	float get_at(int x, int y) const;
+	float get_at(size_t x, size_t y) const;
 
-	const matrix& rotate180copy() const;
+	//const matrix& rotate180copy() const;
 
 	static void dot_product(const matrix& a, const matrix& b, matrix& result);
 	static void dot_product_flat(const matrix& a, const matrix& flat, matrix& result_flat);

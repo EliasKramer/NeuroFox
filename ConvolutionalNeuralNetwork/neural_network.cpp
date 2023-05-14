@@ -71,10 +71,10 @@ float neural_network::calculate_cost(const matrix& expected_output)
 	}
 
 	float cost = 0.0f;
-	for (int i = 0; i < expected_output.flat_readonly().size(); i++)
+	for (int i = 0; i < expected_output.item_count(); i++)
 	{
-		float expected = expected_output.flat_readonly()[i];
-		float actual = get_output().flat_readonly()[i];
+		float expected = expected_output.get_at_flat(i);
+		float actual = get_output().get_at_flat(i);
 		cost += ((actual - expected) * (actual - expected));
 	}
 	return cost;

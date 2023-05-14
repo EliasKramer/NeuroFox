@@ -116,19 +116,16 @@ void convolutional_layer::mutate(float range)
 {
 	//choose if a weight or a bias is mutated
 	if (biased_coin_toss(
-		(float)kernel_weights[0].flat_readonly().size() * kernel_weights.size(),
-		(float)kernel_biases.flat_readonly().size()))
+		(float)kernel_weights[0].item_count() * kernel_weights.size(),
+		(float)kernel_biases.item_count()))
 	{
 		//choose a random weight to mutate
 		int random_weight_idx =
-			random_idx((int)kernel_weights[0]
-				.flat_readonly()
-				.size());
+			random_idx((int)kernel_weights[0].item_count());
 
 		//mutate the weight
 		kernel_weights[random_idx(kernel_weights.size())]
-			.flat()[random_weight_idx] +=
-			random_float_incl(-range, range);
+			.add_at_flat(random_weight_idx, random_float_incl(-range, range));
 	}
 	else
 	{

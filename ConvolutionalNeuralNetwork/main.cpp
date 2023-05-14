@@ -11,7 +11,7 @@ int main()
         1, 2,
         3, 4
     };
-    matrix kernel(kernel_data, 2, 2, 1);
+    matrix kernel(2, 2, 1, kernel_data);
 
     std::vector<std::unique_ptr<gpu_matrix>> gpu_kernel_weights;
     gpu_kernel_weights.emplace_back(std::make_unique<gpu_matrix>(kernel, true));

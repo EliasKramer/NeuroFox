@@ -1,40 +1,127 @@
 #include "matrix.hpp"
 #include <numeric>
 
-int matrix::get_idx(int x, int y, int z) const
+size_t matrix::get_idx(size_t x, size_t y, size_t z) const
 {
 	return x + y * width + z * width * height;
 }
 
-matrix::matrix()
-	:matrix(0, 0, 0)
+void matrix::check_for_valid_format() const
+{
+	if (width == 0 || height == 0 || depth == 0)
+	{
+		throw std::invalid_argument(
+			"width, height and depth must be >=1");
+	}
+}
+
+void matrix::allocate_mem()
+{
+	if (!owning_data)
+	{
+		throw std::runtime_error("cannot allocate if not owning");
+	}
+	if (data != nullptr)
+	{
+		throw std::runtime_error("cannot allocate if data will be overwritten");
+	}
+	data = new float[item_count()];
+}
+
+matrix::matrix(
+) :
+	width(0),
+	height(0),
+	depth(0),
+	owning_data(false),
+	data(nullptr)
 {}
 
-matrix::matrix(int width, int height, int depth)
+void matrix::copy_data(const float* src)
 {
-	this->width = width;
-	this->height = height;
-	this->depth = depth;
-	this->data = std::vector<float>(width * height * depth);
+	if (src == nullptr)
+		throw std::runtime_error("src is null");
+	if (!owning_data)
+		throw std::runtime_error("cannot copy data if it is now owned");
+	if (data == nullptr)
+		throw std::runtime_error("data is null");
+
+	std::copy(src, src + item_count(), this->data);
 }
 
-matrix::matrix(const std::vector<float>& data, int width, int height, int depth)
-	: data(data)
+matrix::matrix(
+	size_t width,
+	size_t height,
+	size_t depth
+) :
+	width(width),
+	height(height),
+	depth(depth),
+	owning_data(true),
+	data(nullptr)
 {
-	if (data.size() != width * height * depth)
-		throw std::invalid_argument("data size does not match dimensions");
-
-	this->width = width;
-	this->height = height;
-	this->depth = depth;
+	check_for_valid_format();
+	allocate_mem();
 }
 
+matrix::matrix(
+	size_t width,
+	size_t height,
+	size_t depth,
+	float* given_ptr,
+	bool copy
+) :
+	width(width),
+	height(height),
+	depth(depth),
+	owning_data(copy),
+	data(given_ptr)
+{
+	check_for_valid_format();
+	if (copy)
+	{
+		allocate_mem();
+		copy_data(given_ptr);
+	}
+}
+
+matrix::matrix(
+	size_t width,
+	size_t height,
+	size_t depth,
+	const std::vector<float>& given_vector
+) :
+	width(width),
+	height(height),
+	depth(depth),
+	owning_data(true),
+	data(nullptr)
+{
+	check_for_valid_format();
+	allocate_mem();
+	copy_data(given_vector.data());
+}
+
+matrix::~matrix()
+{
+	if (owning_data)
+	{
+		if (data == nullptr)
+		{
+			return;
+		}
+		delete[] data;
+		data = nullptr;
+	}
+}
 size_t matrix::get_hash() const
 {
+	/*
 	return std::accumulate(data.begin(), data.end(), 0,
 		[](size_t h, float f) {
 			return h + std::hash<float>()(f);
 		});
+	*/
 }
 
 std::unique_ptr<matrix> matrix::clone() const
@@ -48,7 +135,8 @@ void matrix::resize(int width, int height, int depth)
 	this->height = height;
 	this->depth = depth;
 
-	data.resize(width * height * depth);
+	//TODO
+	//data.resize(width * height * depth);
 }
 
 void matrix::resize(const matrix& source)
@@ -58,7 +146,7 @@ void matrix::resize(const matrix& source)
 
 void matrix::set_all(float value)
 {
-	for (int i = 0; i < data.size(); i++)
+	for (int i = 0; i < item_count(); i++)
 	{
 		data[i] = value;
 	}
@@ -66,7 +154,7 @@ void matrix::set_all(float value)
 
 void matrix::apply_noise(float range)
 {
-	for (int i = 0; i < data.size(); i++)
+	for (int i = 0; i < item_count(); i++)
 	{
 		data[i] += random_float_incl(-range, range);
 	}
@@ -74,69 +162,98 @@ void matrix::apply_noise(float range)
 
 void matrix::mutate(float range)
 {
-	data[random_idx(data.size())] += random_float_incl(-range, range);
+	data[random_idx(item_count())] += random_float_incl(-range, range);
 }
 
-int matrix::get_width() const
+size_t matrix::get_width() const
 {
 	return width;
 }
 
-int matrix::get_height() const
+size_t matrix::get_height() const
 {
 	return height;
 }
 
-int matrix::get_depth() const
+size_t matrix::get_depth() const
 {
 	return depth;
 }
 
-int matrix::item_count() const
+size_t matrix::item_count() const
 {
 	return width * height * depth;
 }
 
-std::vector<float>& matrix::flat()
+
+float matrix::get_at_flat(size_t idx) const
+{
+	if (idx >= item_count())
+	{
+		throw std::invalid_argument("idx must be in range");
+	}
+	return data[idx];
+}
+
+void matrix::set_at_flat(size_t idx, float value)
+{
+	if (idx >= item_count())
+	{
+		throw std::invalid_argument("idx must be in range");
+	}
+	data[idx] = value;
+}
+
+void matrix::add_at_flat(size_t idx, float value)
+{
+	if (idx >= item_count())
+	{
+		throw std::invalid_argument("idx must be in range");
+	}
+	data[idx] += value;
+}
+
+float* matrix::get_data()
 {
 	return data;
 }
 
-const std::vector<float>& matrix::flat_readonly() const
+const float* matrix::get_data_readonly() const
 {
 	return data;
 }
 
-void matrix::set_at(int x, int y, int z, float value)
+void matrix::set_at(size_t x, size_t y, size_t z, float value)
 {
 	data[get_idx(x, y, z)] = value;
 }
 
-void matrix::add_at(int x, int y, int z, float value)
+void matrix::add_at(size_t x, size_t y, size_t z, float value)
 {
 	data[get_idx(x, y, z)] += value;
 }
 
-void matrix::set_at(int x, int y, float value)
+void matrix::set_at(size_t x, size_t y, float value)
 {
 	set_at(x, y, 0, value);
 }
 
-void matrix::add_at(int x, int y, float value)
+void matrix::add_at(size_t x, size_t y, float value)
 {
 	add_at(x, y, 0, value);
 }
 
-float matrix::get_at(int x, int y, int z) const
+float matrix::get_at(size_t x, size_t y, int z) const
 {
 	return data[get_idx(x, y, z)];
 }
 
-float matrix::get_at(int x, int y) const
+float matrix::get_at(size_t x, size_t y) const
 {
 	return get_at(x, y, 0);
 }
 
+/*
 const matrix& matrix::rotate180copy() const
 {
 	//NOT TESTED
@@ -155,6 +272,7 @@ const matrix& matrix::rotate180copy() const
 	}
 	return result;
 }
+*/
 
 void matrix::dot_product(const matrix& a, const matrix& b, matrix& result)
 {
@@ -186,8 +304,8 @@ void matrix::dot_product(const matrix& a, const matrix& b, matrix& result)
 
 void matrix::dot_product_flat(const matrix& a, const matrix& flat, matrix& result_flat)
 {
-	if (a.width != flat.data.size() ||
-		a.height != result_flat.data.size() ||
+	if (a.width != flat.item_count() ||
+		a.height != result_flat.item_count() ||
 		a.depth != 1 ||
 		result_flat.depth != 1)
 	{
@@ -214,7 +332,7 @@ void matrix::add(const matrix& a, const matrix& b, matrix& result)
 		throw std::invalid_argument("addition could not be performed. result matrix is not the correct size");
 	}
 
-	for (int i = 0; i < a.data.size(); i++)
+	for (int i = 0; i < a.item_count(); i++)
 	{
 		result.data[i] = a.data[i] + b.data[i];
 	}
@@ -222,12 +340,12 @@ void matrix::add(const matrix& a, const matrix& b, matrix& result)
 
 void matrix::add_flat(const matrix& a, const matrix& b, matrix& result)
 {
-	if (a.data.size() != b.data.size())
+	if (a.item_count() != b.item_count())
 	{
 		throw std::invalid_argument("addition could not be performed. input matrices are not the same size");
 	}
 
-	for (int i = 0; i < a.data.size(); i++)
+	for (int i = 0; i < a.item_count(); i++)
 	{
 		result.data[i] = a.data[i] + b.data[i];
 	}
@@ -242,7 +360,7 @@ void matrix::subtract(const matrix& a, const matrix& b, matrix& result)
 		throw std::invalid_argument("subtraction could not be performed. input matrices are in the wrong format");
 	}
 
-	for (int i = 0; i < a.data.size(); i++)
+	for (int i = 0; i < a.item_count(); i++)
 	{
 		result.data[i] = a.data[i] - b.data[i];
 	}
@@ -260,7 +378,7 @@ bool matrix::are_equal(const matrix& a, const matrix& b, float tolerance)
 		return false;
 	}
 
-	for (int i = 0; i < a.data.size(); i++)
+	for (int i = 0; i < a.item_count(); i++)
 	{
 		if (std::abs(a.data[i] - b.data[i]) > tolerance)
 		{
@@ -379,7 +497,7 @@ void matrix::valid_cross_correlation(
 
 void matrix::scalar_multiplication(float a)
 {
-	for (int i = 0; i < data.size(); i++)
+	for (int i = 0; i < item_count(); i++)
 	{
 		data[i] *= a;
 	}
@@ -387,7 +505,7 @@ void matrix::scalar_multiplication(float a)
 
 void matrix::apply_activation_function(e_activation_t activation_fn)
 {
-	for (int i = 0; i < data.size(); i++)
+	for (int i = 0; i < item_count(); i++)
 	{
 		data[i] = ACTIVATION[activation_fn](data[i]);
 	}

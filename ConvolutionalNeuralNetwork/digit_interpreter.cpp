@@ -35,6 +35,8 @@ int digit_interpreter::get_interpretation(const matrix* given_input) const
 	float highest_activation = FLT_MIN;
 	int highest_digit = 0;
 	int curr_digit = 0;
+	//TODO rework
+		/*
 	for each (const float curr_activation in given_input->flat_readonly())
 	{
 		if (curr_activation > highest_activation)
@@ -44,7 +46,8 @@ int digit_interpreter::get_interpretation(const matrix* given_input) const
 		}
 		curr_digit++;
 	}
-
+	*/
+	throw std::exception("Not implemented.");
 	return highest_digit;
 }
 
@@ -62,6 +65,8 @@ std::string digit_interpreter::get_string_interpretation(const matrix* given_inp
 
 	float highest_activation = FLT_MIN;
 	int highest_digit = 0;
+	//TODO rework
+	/*
 	for each (const float curr_activation in given_input->flat_readonly())
 	{
 		if (curr_activation > highest_activation)
@@ -72,8 +77,9 @@ std::string digit_interpreter::get_string_interpretation(const matrix* given_inp
 
 		output += std::to_string(curr_digit) + ": " + std::to_string(curr_activation) + "\n";
 		curr_digit++;
-	}
+	}*/
 	output += "result: " + std::to_string(highest_digit) + "\n";
+	throw std::exception("Not implemented.");
 
 	return output;
 }
