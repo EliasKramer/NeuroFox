@@ -32,21 +32,21 @@ namespace CNNTest
 			matrix label(1, 1, 1);
 
 			//set the data before the constructor to 1
-			data.flat()[0] = 1.0f;
-			label.flat()[0] = 1.0f;
+			data.set_at_flat(0, 1.0f);
+			label.set_at_flat(0, 1.0f);
 
 			//construct the data
 			nn_data d(data, label);
 
 			//set the data that was used to something else
-			data.flat()[0] = 2.0f;
-			label.flat()[0] = 2.0f;
+			data.set_at_flat(0, 2.0f);
+			label.set_at_flat(0, 2.0f);
 
 			//the nn_data shoud stay the same, because it got copied
-			Assert::AreEqual(1.0f, d.get_data().flat_readonly()[0]);
-			Assert::AreEqual(1.0f, d.get_label().flat_readonly()[0]);
-			Assert::AreEqual(2.0f, data.flat_readonly()[0]);
-			Assert::AreEqual(2.0f, label.flat_readonly()[0]);
+			Assert::AreEqual(1.0f, d.get_data().get_at_flat(0));
+			Assert::AreEqual(1.0f, d.get_label().get_at_flat(0));
+			Assert::AreEqual(2.0f, data.get_at_flat(0));
+			Assert::AreEqual(2.0f, label.get_at_flat(0));
 		}
 	};
 }

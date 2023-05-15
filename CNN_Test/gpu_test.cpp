@@ -53,8 +53,8 @@ namespace CNNTest
 
 			gpu_matrix gpu_mem(m, true);
 
-			std::vector<float> gpu_values = get_gpu_values(gpu_mem.get_gpu_memory(), m.flat_readonly().size());
-			std::vector<float> expected_values(m.flat_readonly().size(), (float)0xDEADBEEF);
+			std::vector<float> gpu_values = get_gpu_values(gpu_mem.get_gpu_memory(), m.item_count());
+			std::vector<float> expected_values(m.item_count(), (float)0xDEADBEEF);
 			Assert::IsTrue(float_vectors_equal(expected_values, gpu_values));
 		}
 		/*
@@ -128,7 +128,7 @@ namespace CNNTest
 			GPU_ACTIVATION[relu_fn](gpu_mem);
 
 			std::vector<float> expected_v{ 1, 0, 0 };
-			matrix expected = matrix(expected_v, 1, 3, 1);
+			matrix expected = matrix(1, 3, 1, expected_v);
 			Assert::IsTrue(matrix::are_equal(expected, *gpu_mem.to_cpu().get()));
 		}
 		TEST_METHOD(gpu_activation_sigmoid_test)
@@ -147,8 +147,8 @@ namespace CNNTest
 				ACTIVATION[sigmoid_fn](0),
 				ACTIVATION[sigmoid_fn](-3)
 			};
-			matrix expected = matrix(expected_v, 1, 3, 1);
-			Assert::IsTrue(float_vectors_equal(expected.flat_readonly(), result.flat_readonly()));
+			matrix expected = matrix(1, 3, 1, expected_v);
+			Assert::IsTrue(matrix::are_equal(expected, result));
 		}
 		TEST_METHOD(dot_gpu_test)
 		{
@@ -201,13 +201,13 @@ namespace CNNTest
 				4, 5, 6,
 				7, 8, 9
 			};
-			matrix input(input_data, 3, 3, 1);
+			matrix input(3, 3, 1, input_data);
 
 			std::vector<float> kernel_data = {
 				1, 2,
 				3, 4
 			};
-			matrix kernel(kernel_data, 2, 2, 1);
+			matrix kernel(2, 2, 1, kernel_data);
 
 			matrix expected(2, 2, 1);
 			expected.set_at(0, 0,
@@ -256,13 +256,13 @@ namespace CNNTest
 				9, 1, 2, 3,
 				4, 5, 6, 7
 			};
-			matrix input(input_data, 4, 4, 1);
+			matrix input(4, 4, 1, input_data);
 
 			std::vector<float> kernel_data = {
 				1, 2,
 				3, 4
 			};
-			matrix kernel(kernel_data, 2, 2, 1);
+			matrix kernel(2, 2, 1, kernel_data);
 
 			matrix expected(2, 2, 1);
 			expected.set_at(0, 0,
@@ -316,7 +316,7 @@ namespace CNNTest
 				7, 8, 9, 1,
 				2, 3, 4, 5
 			};
-			matrix input(input_data, 4, 4, 2);
+			matrix input(4, 4, 2, input_data);
 
 			std::vector<float> kernel_data = {
 				1, 2,
@@ -325,7 +325,7 @@ namespace CNNTest
 				1, 2,
 				3, 4
 			};
-			matrix kernel(kernel_data, 2, 2, 2);
+			matrix kernel(2, 2, 2, kernel_data);
 
 			matrix expected(2, 2, 1);
 			expected.set_at(0, 0, 0,
@@ -387,7 +387,7 @@ namespace CNNTest
 				9, 1, 2, 3,
 				4, 5, 6, 7
 			};
-			matrix input(input_data, 4, 4, 1);
+			matrix input(4, 4, 1, input_data);
 
 			std::vector<float> kernel_data1 = {
 				1, 2,
@@ -397,8 +397,8 @@ namespace CNNTest
 				5, 6,
 				7, 8
 			};
-			matrix kernel1(kernel_data1, 2, 2, 1);
-			matrix kernel2(kernel_data2, 2, 2, 1);
+			matrix kernel1(2, 2, 1, kernel_data1);
+			matrix kernel2(2, 2, 1, kernel_data2);
 
 			matrix expected(2, 2, 2);
 			expected.set_at(0, 0, 0,
@@ -467,7 +467,7 @@ namespace CNNTest
 
 			Assert::IsTrue(
 				matrix::are_equal(
-					matrix(expected, 3, 1, 1),
+					matrix(3, 1, 1, expected),
 					*m.to_cpu().get()));
 		}
 		TEST_METHOD(test_set_values_and_convert_to_cpu)
@@ -477,13 +477,13 @@ namespace CNNTest
 
 			gpu_matrix gpu2(2, 2, 1);
 			gpu2.set_values_gpu(gpu1);
-			
+
 			std::vector<float> expected = {
 				1.0f, 1.0f,
 				1.0f, 1.0f
 			};
 
-			Assert::IsTrue(float_vectors_equal(expected, gpu2.to_cpu().get()->flat_readonly()));
+			Assert::IsTrue(matrix::are_equal(matrix(2, 2, 1, expected), *gpu2.to_cpu().get()));
 		}
 		TEST_METHOD(test_set_values_from_gpu)
 		{
@@ -538,7 +538,7 @@ namespace CNNTest
 			//the first one on the cloned matrix should be 3.0f, but not the original
 			Assert::IsTrue(matrix::are_equal(expected, *gpu1.to_cpu().get(), FLOAT_TOLERANCE));
 		}
-		
+
 		/*
 		TEST_METHOD(data_block_test_1)
 		{

@@ -14,9 +14,9 @@ namespace CNNTest
 			pooling_layer pooling(1, 1, max_pooling);
 			pooling.set_input_format(input);
 
-			Assert::AreEqual(2, pooling.get_activations().get_height());
-			Assert::AreEqual(2, pooling.get_activations().get_width());
-			Assert::AreEqual(1, pooling.get_activations().get_depth());
+			Assert::AreEqual((size_t)2, pooling.get_activations().get_height());
+			Assert::AreEqual((size_t)2, pooling.get_activations().get_width());
+			Assert::AreEqual((size_t)1, pooling.get_activations().get_depth());
 
 			Assert::AreEqual(1, pooling.get_stride());
 			Assert::AreEqual(1, pooling.get_filter_size());
@@ -28,9 +28,9 @@ namespace CNNTest
 			pooling_layer pooling(2, 2, average_pooling);
 			pooling.set_input_format(input);
 
-			Assert::AreEqual(3, pooling.get_activations().get_height());
-			Assert::AreEqual(3, pooling.get_activations().get_width());
-			Assert::AreEqual(2, pooling.get_activations().get_depth());
+			Assert::AreEqual((size_t)3, pooling.get_activations().get_height());
+			Assert::AreEqual((size_t)3, pooling.get_activations().get_width());
+			Assert::AreEqual((size_t)2, pooling.get_activations().get_depth());
 
 			Assert::AreEqual(2, pooling.get_stride());
 			Assert::AreEqual(2, pooling.get_filter_size());
@@ -72,14 +72,14 @@ namespace CNNTest
 			pooling.set_input_format(input);
 
 			pooling.forward_propagation_cpu(input);
-			Assert::AreEqual(3, pooling.get_activations().get_height());
-			Assert::AreEqual(3, pooling.get_activations().get_width());
-			Assert::AreEqual(2, pooling.get_activations().get_depth());
+			Assert::AreEqual((size_t)3, pooling.get_activations().get_height());
+			Assert::AreEqual((size_t)3, pooling.get_activations().get_width());
+			Assert::AreEqual((size_t)2, pooling.get_activations().get_depth());
 
-			Assert::AreEqual(0.0f, pooling.get_activations().flat_readonly()[0]);
-			for (int i = 1; i < pooling.get_activations().flat_readonly().size(); i++)
+			Assert::AreEqual(0.0f, pooling.get_activations().get_at_flat(0));
+			for (int i = 1; i < pooling.get_activations().item_count(); i++)
 			{
-				Assert::AreEqual(1.0f, pooling.get_activations().flat_readonly()[i]);
+				Assert::AreEqual(1.0f, pooling.get_activations().get_at_flat(i));
 			}
 		}
 	};

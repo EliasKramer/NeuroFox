@@ -114,29 +114,31 @@ matrix::~matrix()
 		data = nullptr;
 	}
 }
-size_t matrix::get_hash() const
-{
-	/*
-	return std::accumulate(data.begin(), data.end(), 0,
-		[](size_t h, float f) {
-			return h + std::hash<float>()(f);
-		});
-	*/
-}
 
 std::unique_ptr<matrix> matrix::clone() const
 {
-	return std::make_unique<matrix>(data, width, height, depth);
+	return std::make_unique<matrix>(width, height, depth, data, true);
 }
 
-void matrix::resize(int width, int height, int depth)
+void matrix::resize(size_t width, size_t height, size_t depth)
 {
+	check_for_valid_format();
 	this->width = width;
 	this->height = height;
 	this->depth = depth;
 
-	//TODO
-	//data.resize(width * height * depth);
+	if (!owning_data)
+	{
+		throw std::runtime_error("cannot resize if not owning");
+	}
+
+	if (data != nullptr)
+	{
+		delete[] data;
+		data = nullptr;
+	}
+
+	allocate_mem();
 }
 
 void matrix::resize(const matrix& source)
@@ -162,7 +164,9 @@ void matrix::apply_noise(float range)
 
 void matrix::mutate(float range)
 {
-	data[random_idx(item_count())] += random_float_incl(-range, range);
+	add_at_flat(
+		random_idx((int)item_count()), 
+		random_float_incl(-range, range));
 }
 
 size_t matrix::get_width() const
@@ -368,7 +372,7 @@ void matrix::subtract(const matrix& a, const matrix& b, matrix& result)
 
 bool matrix::are_equal(const matrix& a, const matrix& b)
 {
-	return a.get_hash() == b.get_hash();
+	return are_equal(a, b, FLOAT_TOLERANCE);
 }
 
 bool matrix::are_equal(const matrix& a, const matrix& b, float tolerance)
@@ -403,9 +407,9 @@ void matrix::valid_cross_correlation(
 	const size_t input_size = input.get_width();
 	const size_t kernel_size = kernels[0].get_width();
 	const size_t output_size = output.get_width();
-	const size_t expected_output_size = ((input_size - kernel_size) / (float)stride) + 1;
+	const float expected_output_size = ((input_size - kernel_size) / (float)stride) + 1;
 
-	if (output_size != expected_output_size)
+	if ((float)output_size != expected_output_size)
 	{
 		throw std::invalid_argument("cross correlation could not be performed. output matrix is not the correct size");
 	}

@@ -62,14 +62,14 @@ namespace CNNTest
 			layer.set_input_format(input_format);
 			//the width and the heigh are
 			//the (input_size - kernel_size) / stride + 1
-			Assert::AreEqual(4, layer.get_activations().get_width());
-			Assert::AreEqual(4, layer.get_activations().get_height());
+			Assert::AreEqual((size_t)4, layer.get_activations().get_width());
+			Assert::AreEqual((size_t)4, layer.get_activations().get_height());
 			//the depth is the number of kernels
-			Assert::AreEqual(3, layer.get_activations().get_depth());
+			Assert::AreEqual((size_t)3, layer.get_activations().get_depth());
 
 			//the kernel depth is the input depth
 			Assert::AreEqual(
-				6, 
+				(size_t)6,
 				layer
 					.get_kernel_weights_readonly()[0]
 					.get_depth());

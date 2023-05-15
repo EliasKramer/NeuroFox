@@ -3,7 +3,7 @@
 int random_idx(int size)
 {
     // Seed the random number generator with the current time
-    std::srand(std::time(nullptr));
+    std::srand((int)std::time(nullptr));
 
     // Generate a random number between 0 and size-1
     return std::rand() % size;
@@ -15,7 +15,7 @@ bool biased_coin_toss(float true_bias, float false_bias)
 		throw std::invalid_argument("true_bias and false_bias must be greater than 0");
 
     // Seed the random number generator with the current time
-	std::srand(std::time(nullptr));
+	std::srand((int)std::time(nullptr));
 	// Generate a random number between 0 and 1
 	float random_number = (float)std::rand() / (float)RAND_MAX;
 	// Return true if the random number is less than the bias, false otherwise

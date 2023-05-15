@@ -58,9 +58,9 @@ void fully_connected_layer::set_input_format(const matrix& input_format)
 	layer::set_input_format(input_format);
 
 	weights.resize(
-		(int)input_format.item_count(),
-		(int)activations.item_count(),
-		1);
+		input_format.item_count(),
+		activations.item_count(),
+		(size_t)1);
 	weight_deltas.resize(weights);
 }
 

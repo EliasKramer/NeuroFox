@@ -29,11 +29,10 @@ public:
 	
 	~matrix();
 
-	size_t get_hash() const;
-
 	std::unique_ptr<matrix> clone() const;
 
-	void resize(int width, int height, int depth);
+	//deletes the old data and allocates new memory
+	void resize(size_t width, size_t height, size_t depth);
 	void resize(const matrix& source);
 
 	void set_all(float value);

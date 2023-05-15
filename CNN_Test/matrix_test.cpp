@@ -12,24 +12,24 @@ namespace CNNTest
 		TEST_METHOD(creating_matrix)
 		{
 			matrix m(2, 3, 4);
-			Assert::AreEqual(2, m.get_width());
-			Assert::AreEqual(3, m.get_height());
-			Assert::AreEqual(4, m.get_depth());
-			Assert::AreEqual(24, (int)m.flat_readonly().size());
+			Assert::AreEqual((size_t)2, m.get_width());
+			Assert::AreEqual((size_t)3, m.get_height());
+			Assert::AreEqual((size_t)4, m.get_depth());
+			Assert::AreEqual((size_t)24, m.item_count());
 		}
 		TEST_METHOD(constructor_from_vector_test)
 		{
 			matrix m(2, 3, 4);
 			for (float i = 0; i < 24; i++)
 			{
-				m.flat()[i] = i;
+				m.set_at_flat(i, i);
 			}
 			std::vector<float> expected_values(24);
 			for (float i = 0; i < 24; i++)
 			{
 				expected_values[i] = i;
 			}
-			matrix mx(expected_values, 2, 3, 4);
+			matrix mx(2, 3, 4, expected_values);
 			Assert::IsTrue(matrix::are_equal(m, mx));
 		}
 		TEST_METHOD(constructor_from_vector_test_2)
@@ -42,7 +42,7 @@ namespace CNNTest
 				77, 88
 			};
 
-			matrix inital_matrix(inital_data, 2, 2, 2);
+			matrix inital_matrix(2, 2, 2, inital_data);
 
 			Assert::AreEqual(11.0f, inital_matrix.get_at(0, 0, 0));
 			Assert::AreEqual(22.0f, inital_matrix.get_at(1, 0, 0));
@@ -142,9 +142,9 @@ namespace CNNTest
 			matrix m3(3, 4, 1);
 			matrix::dot_product(m1, m2, m3);
 
-			for (int i = 0; i < m3.flat_readonly().size(); i++)
+			for (int i = 0; i < m3.item_count(); i++)
 			{
-				Assert::AreEqual(12, (int)m3.flat_readonly()[i]);
+				Assert::AreEqual(12.0f, m3.get_at_flat(i));
 			}
 		}
 		TEST_METHOD(dot_test_3D)
@@ -158,41 +158,10 @@ namespace CNNTest
 			matrix m3(3, 4, 2);
 			matrix::dot_product(m1, m2, m3);
 
-			for (int i = 0; i < m3.flat_readonly().size(); i++)
+			for (int i = 0; i < m3.item_count(); i++)
 			{
-				Assert::AreEqual(12, (int)m3.flat_readonly()[i]);
+				Assert::AreEqual(12.0f, m3.get_at_flat(i));
 			}
-		}
-		TEST_METHOD(hash_test)
-		{
-			// Test 1: Two identical matrices
-			matrix m1(2, 4, 2);
-			matrix m2(2, 4, 2);
-			m1.set_all(3);
-			m2.set_all(3);
-			Assert::AreEqual(m1.get_hash(), m2.get_hash());
-
-			// Test 2: Two matrices with one different value
-			m1 = matrix(2, 4, 2);
-			m2 = matrix(2, 4, 2);
-			m1.set_all(3);
-			m2.set_all(3);
-			m2.set_at(0, 0, 0, 4);
-			Assert::AreNotEqual(m1.get_hash(), m2.get_hash());
-
-			// Test 3: Two matrices with different sizes
-			m1 = matrix(2, 4, 2);
-			m2 = matrix(2, 3, 2);
-			m1.set_all(0);
-			m2.set_all(0);
-			Assert::AreNotEqual(m1.get_hash(), m2.get_hash());
-
-			// Test 4: Two matrices with all different values
-			m1 = matrix(3, 3, 2);
-			m2 = matrix(3, 3, 2);
-			m1.set_all(1);
-			m2.set_all(0);
-			Assert::AreNotEqual(m1.get_hash(), m2.get_hash());
 		}
 		TEST_METHOD(valid_cross_correlation_test)
 		{
@@ -264,9 +233,9 @@ namespace CNNTest
 			m.set_all(1);
 			matrix m2 = *m.clone().get();
 			Assert::IsTrue(matrix::are_equal(m, m2));
-			
+
 			m2.set_at(0, 0, 0, 2);
-			Assert::AreNotEqual(2.0f, m.get_at(0,0,0));
+			Assert::AreNotEqual(2.0f, m.get_at(0, 0, 0));
 
 			m.set_at(0, 0, 1, 3);
 			Assert::AreNotEqual(3.0f, m2.get_at(0, 0, 1));
