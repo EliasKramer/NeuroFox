@@ -36,20 +36,18 @@ namespace CNNTest
 		}
 		TEST_METHOD(simple_forward_propagating)
 		{
-			matrix* input = new matrix(1, 1, 1);
-			input->set_at_flat(0, 2);
+			matrix input(1, 1, 1);
+			input.set_at_flat(0, 2);
 			fully_connected_layer fc_layer(1, relu_fn);
-			fc_layer.set_input_format(*input);
+			fc_layer.set_input_format(input);
 
 			//CONTINUE HERE
 			fc_layer.get_weights_ref().set_at_flat(0, 3);
 			fc_layer.get_biases_ref().set_at_flat(0, 1);
 
-			fc_layer.forward_propagation_cpu(*input);
+			fc_layer.forward_propagation_cpu(input);
 
 			Assert::AreEqual(7.0f, fc_layer.get_activations().get_at_flat(0));
-
-			delete input;
 		}
 		TEST_METHOD(propagating_forward_5node_input_3node_layer)
 		{

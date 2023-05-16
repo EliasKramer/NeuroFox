@@ -26,6 +26,7 @@ void matrix::allocate_mem()
 		throw std::runtime_error("cannot allocate if data will be overwritten");
 	}
 	data = new float[item_count()];
+	set_all(0);
 }
 
 matrix::matrix(
@@ -332,7 +333,7 @@ void matrix::dot_product_flat(const matrix& a, const matrix& flat, matrix& resul
 	{
 		for (int y = 0; y < a.height; y++)
 		{
-			result_flat.data[y] += a.get_at(x, y) * flat.data[x];
+			result_flat.add_at_flat(y, a.get_at(x, y) * flat.get_at_flat(x));
 		}
 	}
 }
