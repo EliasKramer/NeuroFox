@@ -63,6 +63,7 @@ void matrix::delete_data()
 	{
 		delete[] data;
 		data = nullptr;
+		owning_data = false;
 	}
 }
 
@@ -97,6 +98,7 @@ matrix::matrix(
 	check_for_valid_format();
 	if (copy)
 	{
+		data = nullptr;
 		allocate_mem();
 		copy_data(given_ptr);
 	}
@@ -118,15 +120,19 @@ matrix::matrix(
 	allocate_mem();
 	copy_data(given_vector.data());
 }
-
 matrix::~matrix()
 {
 	delete_data();
 }
 
-std::unique_ptr<matrix> matrix::clone() const
+matrix& matrix::operator=(const matrix& other) 
 {
-	return std::make_unique<matrix>(width, height, depth, data, true);
+	if (this != &other) {
+		delete_data();
+		resize(other);
+		copy_data(other.data);
+	}
+	return *this;
 }
 
 void matrix::resize(size_t width, size_t height, size_t depth)

@@ -231,7 +231,7 @@ namespace CNNTest
 		{
 			matrix m = matrix(2, 3, 5);
 			m.set_all(1);
-			matrix m2 = *m.clone().get();
+			matrix m2 = matrix(m);
 			Assert::IsTrue(matrix::are_equal(m, m2));
 
 			m2.set_at(0, 0, 0, 2);

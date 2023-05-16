@@ -21,12 +21,6 @@ convolutional_layer::convolutional_layer(
 
 	if (stride > kernel_size)
 		throw std::invalid_argument("stride must be smaller or equal than the kernel_size");
-
-	for (int i = 0; i < number_of_kernels; i++)
-	{
-		kernel_weights.emplace_back(matrix(kernel_size, kernel_size, 1));
-		kernel_weights_deltas.push_back(matrix(kernel_size, kernel_size, 1));
-	}
 }
 
 int convolutional_layer::get_kernel_size() const
@@ -84,8 +78,8 @@ void convolutional_layer::set_input_format(const matrix& input_format)
 
 	for (int i = 0; i < kernel_count; i++)
 	{
-		kernel_weights[i].resize(kernel_size, kernel_size, input_depth);
-		kernel_weights_deltas[i].resize(kernel_size, kernel_size, input_depth);
+		kernel_weights.push_back(matrix(kernel_size, kernel_size, input_depth));
+		kernel_weights_deltas.push_back(matrix(kernel_size, kernel_size, input_depth));
 
 	}
 	kernel_biases.resize((int)output_width, (int)output_height, kernel_count);

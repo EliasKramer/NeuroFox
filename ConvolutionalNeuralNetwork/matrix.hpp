@@ -30,10 +30,10 @@ public:
 		const std::vector<float>& given_vector);
 	//copy constructor
 	matrix(const matrix& source);
-	
-	~matrix();
 
-	std::unique_ptr<matrix> clone() const;
+	matrix& operator=(const matrix& other);
+	
+	~matrix();	
 
 	//deletes the old data and allocates new memory
 	void resize(size_t width, size_t height, size_t depth);

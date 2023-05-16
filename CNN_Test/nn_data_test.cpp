@@ -13,7 +13,6 @@ namespace CNNTest
 			matrix data(1, 1, 1);
 			matrix label(1, 1, 1);
 			nn_data d(data, label);
-
 			// test if the data is set correctly
 			Assert::IsTrue(matrix::equal_format(d.get_data(), data));
 			Assert::IsTrue(matrix::equal_format(d.get_label(), label));
