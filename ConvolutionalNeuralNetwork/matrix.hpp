@@ -19,6 +19,8 @@ private:
 	void check_for_valid_format() const;
 	void allocate_mem();
 	void copy_data(const float* src);
+	void copy_data(const matrix& src);
+	void delete_data();
 public:
 	matrix();
 	matrix(size_t width, size_t height, size_t depth);
@@ -26,6 +28,8 @@ public:
 		float* given_ptr, bool copy);
 	matrix(size_t width, size_t height, size_t depth,
 		const std::vector<float>& given_vector);
+	//copy constructor
+	matrix(const matrix& source);
 	
 	~matrix();
 

@@ -24,11 +24,9 @@ convolutional_layer::convolutional_layer(
 
 	for (int i = 0; i < number_of_kernels; i++)
 	{
-		kernel_weights.push_back(matrix(kernel_size, kernel_size, 1));
+		kernel_weights.emplace_back(matrix(kernel_size, kernel_size, 1));
 		kernel_weights_deltas.push_back(matrix(kernel_size, kernel_size, 1));
 	}
-
-	activations = matrix(0, 0, 0);
 }
 
 int convolutional_layer::get_kernel_size() const

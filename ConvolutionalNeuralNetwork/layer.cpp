@@ -31,7 +31,16 @@ void layer::valid_passing_error_check_gpu(const gpu_matrix* passing_error) const
 }
 
 layer::layer(e_layer_type_t given_layer_type)
-	:type(given_layer_type)
+: type(given_layer_type)
+{}
+
+layer::layer(
+	matrix activation_format,
+	e_layer_type_t given_layer_type
+) :
+	type(given_layer_type),
+	activations(activation_format),
+	error(activation_format)
 {}
 
 const e_layer_type_t layer::get_layer_type() const

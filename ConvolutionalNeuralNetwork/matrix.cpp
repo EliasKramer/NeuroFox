@@ -49,6 +49,22 @@ void matrix::copy_data(const float* src)
 	std::copy(src, src + item_count(), this->data);
 }
 
+void matrix::copy_data(const matrix& src)
+{
+	if (src.item_count() != item_count())
+		throw std::runtime_error("cannot copy data if not the same size");
+	copy_data(src.data);
+}
+
+void matrix::delete_data()
+{
+	if (owning_data && data != nullptr)
+	{
+		delete[] data;
+		data = nullptr;
+	}
+}
+
 matrix::matrix(
 	size_t width,
 	size_t height,
@@ -104,15 +120,7 @@ matrix::matrix(
 
 matrix::~matrix()
 {
-	if (owning_data)
-	{
-		if (data == nullptr)
-		{
-			return;
-		}
-		delete[] data;
-		data = nullptr;
-	}
+	delete_data();
 }
 
 std::unique_ptr<matrix> matrix::clone() const
@@ -122,28 +130,32 @@ std::unique_ptr<matrix> matrix::clone() const
 
 void matrix::resize(size_t width, size_t height, size_t depth)
 {
-	check_for_valid_format();
 	this->width = width;
 	this->height = height;
 	this->depth = depth;
+	check_for_valid_format();
 
-	if (!owning_data)
+	if (!owning_data && data == nullptr)
 	{
-		throw std::runtime_error("cannot resize if not owning");
+		owning_data = true;
+		allocate_mem();
 	}
-
-	if (data != nullptr)
+	else
 	{
-		delete[] data;
-		data = nullptr;
+		throw std::runtime_error("resizing can only be done once after default constructor");
 	}
-
-	allocate_mem();
 }
 
 void matrix::resize(const matrix& source)
 {
 	resize(source.width, source.height, source.depth);
+}
+
+matrix::matrix(const matrix& source)
+	:matrix()
+{
+	resize(source);
+	copy_data(source.data);
 }
 
 void matrix::set_all(float value)
@@ -165,7 +177,7 @@ void matrix::apply_noise(float range)
 void matrix::mutate(float range)
 {
 	add_at_flat(
-		random_idx((int)item_count()), 
+		random_idx((int)item_count()),
 		random_float_incl(-range, range));
 }
 

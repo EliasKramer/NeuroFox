@@ -29,7 +29,7 @@ private:
 public:
 
 	fully_connected_layer(
-		int number_of_neurons,
+		size_t number_of_neurons,
 		e_activation_t activation_function
 	);
 	

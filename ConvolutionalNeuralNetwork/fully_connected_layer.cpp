@@ -21,7 +21,7 @@ void fully_connected_layer::set_weight_delta_at(int input_layer_idx, int current
 }
 
 fully_connected_layer::fully_connected_layer(
-	int number_of_neurons,
+	size_t number_of_neurons,
 	e_activation_t activation_function
 )
 	:fully_connected_layer(
@@ -32,26 +32,12 @@ fully_connected_layer::fully_connected_layer(
 fully_connected_layer::fully_connected_layer(
 	const matrix& activation_format,
 	e_activation_t activation_function
-)
-	:layer(e_layer_type_t::fully_connected)
-{
-	activations.resize(activation_format);
-
-	//the error is needed for every output (we need it for learning)
-	error.resize(activation_format);
-
-	//weights and biases are the parameter values
-	biases.resize(activation_format);
-	weights.resize(0, 0, 0);
-
-	//when training the network, we need to know how much the weights and biases need to change
-	bias_deltas.resize(activation_format);
-
-	weight_deltas.resize(0, 0, 0);
-
-	//the activation function for making the output not linear
-	activation_fn = activation_function;
-}
+) :
+	layer(activation_format, e_layer_type_t::fully_connected),
+	activation_fn(activation_function),
+	biases(activation_format),
+	bias_deltas(activation_format)
+{}
 
 void fully_connected_layer::set_input_format(const matrix& input_format)
 {
@@ -207,7 +193,7 @@ void fully_connected_layer::apply_deltas(int number_of_inputs)
 void fully_connected_layer::enable_gpu()
 {
 	layer::enable_gpu();
-	
+
 	gpu_weights = std::make_unique<gpu_matrix>(weights, true);
 	gpu_biases = std::make_unique<gpu_matrix>(biases, true);
 }

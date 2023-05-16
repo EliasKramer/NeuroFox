@@ -35,6 +35,7 @@ protected:
 
 public:
 	layer(e_layer_type_t given_layer_type);
+	layer(matrix activation_format, e_layer_type_t given_layer_type);
 
 	const e_layer_type_t get_layer_type() const;
 
