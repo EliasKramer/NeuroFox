@@ -21,8 +21,8 @@ digit_data::get_mnist_digit_data(std::string image_path, std::string label_path)
 
 digit_data::digit_data(const digit_image_t& data, const std::string& label)
 {
-	this->data.resize(IMAGE_SIZE_X, IMAGE_SIZE_Y, 1);
-	this->label.resize(1, 10, 1);
+	this->data.initialize_format(IMAGE_SIZE_X, IMAGE_SIZE_Y, 1);
+	this->label.initialize_format(1, 10, 1);
 
 	for (int y = 0; y < IMAGE_SIZE_Y; y++)
 	{

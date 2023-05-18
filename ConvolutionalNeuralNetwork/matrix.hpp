@@ -16,19 +16,30 @@ private:
 
 	size_t get_idx(size_t x, size_t y, size_t z) const;
 	
+	void if_not_initialized_throw() const;
+
 	void check_for_valid_format() const;
 	void allocate_mem();
-	void copy_data(const float* src);
-	void copy_data(const matrix& src);
-	void delete_data();
+	void set_own_data_from(const float* src);
+	void set_own_data_from(const matrix& src);
+	void delete_data_if_owning();
 public:
 	matrix();
-	matrix(size_t width, size_t height, size_t depth);
-	matrix(size_t width, size_t height, size_t depth,
-		float* given_ptr, bool copy);
-	matrix(size_t width, size_t height, size_t depth,
+	matrix(
+		size_t width, 
+		size_t height, 
+		size_t depth);
+	matrix(
+		size_t width, 
+		size_t height, 
+		size_t depth,
+		float* given_ptr, 
+		bool copy);
+	matrix(
+		size_t width, 
+		size_t height, 
+		size_t depth,
 		const std::vector<float>& given_vector);
-	//copy constructor
 	matrix(const matrix& source);
 
 	matrix& operator=(const matrix& other);
@@ -36,8 +47,10 @@ public:
 	~matrix();	
 
 	//deletes the old data and allocates new memory
-	void resize(size_t width, size_t height, size_t depth);
-	void resize(const matrix& source);
+	void initialize_format(size_t width, size_t height, size_t depth);
+	//deletes the old data and allocates new memory
+	//does not copy values
+	void initialize_format(const matrix& source);
 
 	void set_all(float value);
 	void apply_noise(float range);

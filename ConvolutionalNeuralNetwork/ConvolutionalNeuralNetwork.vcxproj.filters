@@ -111,6 +111,9 @@
     <ClCompile Include="batch_handler.cpp">
       <Filter>source\training</Filter>
     </ClCompile>
+    <ClCompile Include="data_space.cpp">
+      <Filter>source\training</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="neural_network.hpp">
@@ -169,6 +172,9 @@
     </ClInclude>
     <ClInclude Include="gpu_matrix.cuh">
       <Filter>header\gpu</Filter>
+    </ClInclude>
+    <ClInclude Include="data_space.hpp">
+      <Filter>header\training</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -13,12 +13,15 @@ private:
 
 	bool owns_gpu_mem_ptr;
 
+	void if_not_initialized_throw() const;
+
 	void check_for_valid_args() const;
 	void check_for_last_cuda_error() const;
 	void free_owned_gpu_mem();
 
 	int get_idx(int x, int y, int z) const;
 public:
+	gpu_matrix();
 	gpu_matrix(
 		size_t width,
 		size_t height,
@@ -39,7 +42,7 @@ public:
 	std::unique_ptr<gpu_matrix> clone() const;
 	
 	void set_values_gpu(const gpu_matrix& m);
-	void set_values_cpu(const matrix& m);
+	void set_values_from_cpu(const matrix& m);
 	void set_all(float value);
 	void set_at(size_t width, size_t height, size_t depth, float value);
 

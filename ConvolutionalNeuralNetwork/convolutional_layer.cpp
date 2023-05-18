@@ -74,7 +74,7 @@ void convolutional_layer::set_input_format(const matrix& input_format)
 		!is_whole_number(output_height))
 		throw std::invalid_argument("input format is not compatible with the kernel size and stride");
 
-	activations.resize((int)output_width, (int)output_height, kernel_count);
+	activations.initialize_format((int)output_width, (int)output_height, kernel_count);
 
 	for (int i = 0; i < kernel_count; i++)
 	{
@@ -82,8 +82,8 @@ void convolutional_layer::set_input_format(const matrix& input_format)
 		kernel_weights_deltas.push_back(matrix(kernel_size, kernel_size, input_depth));
 
 	}
-	kernel_biases.resize((int)output_width, (int)output_height, kernel_count);
-	kernel_bias_deltas.resize((int)output_width, (int)output_height, kernel_count);
+	kernel_biases.initialize_format((int)output_width, (int)output_height, kernel_count);
+	kernel_bias_deltas.initialize_format((int)output_width, (int)output_height, kernel_count);
 }
 
 void convolutional_layer::set_all_parameter(float value)

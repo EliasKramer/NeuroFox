@@ -16,7 +16,7 @@ void neural_network::set_input_format(const matrix& given_input_format)
 	if (input_format.item_count() != 0)
 		throw std::runtime_error("Cannot set input format twice.");
 
-	this->input_format.resize(given_input_format);
+	this->input_format.initialize_format(given_input_format);
 }
 
 const matrix& neural_network::get_output() const

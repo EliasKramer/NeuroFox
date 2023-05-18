@@ -3,7 +3,21 @@
 
 size_t matrix::get_idx(size_t x, size_t y, size_t z) const
 {
+	if (x >= width || y >= height || z >= depth)
+		throw std::invalid_argument("index out of bounds");
+
 	return x + y * width + z * width * height;
+}
+
+void matrix::if_not_initialized_throw() const
+{
+	if (data == nullptr ||
+		width == 0 ||
+		height == 0 ||
+		depth == 0)
+	{
+		throw std::runtime_error("matrix not initialized");
+	}
 }
 
 void matrix::check_for_valid_format() const
@@ -11,22 +25,56 @@ void matrix::check_for_valid_format() const
 	if (width == 0 || height == 0 || depth == 0)
 	{
 		throw std::invalid_argument(
-			"width, height and depth must be >=1");
+			"invalid format");
 	}
 }
 
 void matrix::allocate_mem()
 {
-	if (!owning_data)
-	{
-		throw std::runtime_error("cannot allocate if not owning");
-	}
 	if (data != nullptr)
 	{
 		throw std::runtime_error("cannot allocate if data will be overwritten");
 	}
+	if (item_count() == 0)
+	{
+		throw std::runtime_error("cannot allocate if item count is 0");
+	}
 	data = new float[item_count()];
+	owning_data = true;
 	set_all(0);
+}
+
+void matrix::set_own_data_from(const float* src)
+{
+	if_not_initialized_throw();
+
+	if (src == nullptr)
+		throw std::runtime_error("src is null");
+	if (!owning_data)
+		throw std::runtime_error("cannot set data if not owned");
+
+	std::copy(src, src + item_count(), this->data);
+}
+
+void matrix::set_own_data_from(const matrix& src)
+{
+	if_not_initialized_throw();
+	src.if_not_initialized_throw();
+
+	if (src.item_count() != item_count())
+		throw std::runtime_error("cannot copy data if not the same size");
+
+	set_own_data_from(src.data);
+}
+
+void matrix::delete_data_if_owning()
+{
+	if (owning_data && data != nullptr)
+	{
+		delete[] data;
+		data = nullptr;
+		owning_data = false;
+	}
 }
 
 matrix::matrix(
@@ -38,49 +86,18 @@ matrix::matrix(
 	data(nullptr)
 {}
 
-void matrix::copy_data(const float* src)
-{
-	if (src == nullptr)
-		throw std::runtime_error("src is null");
-	if (!owning_data)
-		throw std::runtime_error("cannot copy data if it is now owned");
-	if (data == nullptr)
-		throw std::runtime_error("data is null");
-
-	std::copy(src, src + item_count(), this->data);
-}
-
-void matrix::copy_data(const matrix& src)
-{
-	if (src.item_count() != item_count())
-		throw std::runtime_error("cannot copy data if not the same size");
-	copy_data(src.data);
-}
-
-void matrix::delete_data()
-{
-	if (owning_data && data != nullptr)
-	{
-		delete[] data;
-		data = nullptr;
-		owning_data = false;
-	}
-}
-
 matrix::matrix(
 	size_t width,
 	size_t height,
 	size_t depth
 ) :
-	width(width),
-	height(height),
-	depth(depth),
-	owning_data(true),
-	data(nullptr)
-{
-	check_for_valid_format();
-	allocate_mem();
-}
+	matrix(
+		width,
+		height,
+		depth,
+		nullptr,
+		false)
+{}
 
 matrix::matrix(
 	size_t width,
@@ -96,11 +113,10 @@ matrix::matrix(
 	data(given_ptr)
 {
 	check_for_valid_format();
+	allocate_mem();
 	if (copy)
 	{
-		data = nullptr;
-		allocate_mem();
-		copy_data(given_ptr);
+		set_own_data_from(given_ptr);
 	}
 }
 
@@ -110,63 +126,61 @@ matrix::matrix(
 	size_t depth,
 	const std::vector<float>& given_vector
 ) :
-	width(width),
-	height(height),
-	depth(depth),
-	owning_data(true),
-	data(nullptr)
+	matrix(
+		width,
+		height,
+		depth)
 {
-	check_for_valid_format();
-	allocate_mem();
-	copy_data(given_vector.data());
-}
-matrix::~matrix()
-{
-	delete_data();
-}
-
-matrix& matrix::operator=(const matrix& other) 
-{
-	if (this != &other) {
-		delete_data();
-		resize(other);
-		copy_data(other.data);
-	}
-	return *this;
-}
-
-void matrix::resize(size_t width, size_t height, size_t depth)
-{
-	this->width = width;
-	this->height = height;
-	this->depth = depth;
-	check_for_valid_format();
-
-	if (!owning_data && data == nullptr)
-	{
-		owning_data = true;
-		allocate_mem();
-	}
-	else
-	{
-		throw std::runtime_error("resizing can only be done once after default constructor");
-	}
-}
-
-void matrix::resize(const matrix& source)
-{
-	resize(source.width, source.height, source.depth);
+	owning_data = true;
+	set_own_data_from(given_vector.data());
 }
 
 matrix::matrix(const matrix& source)
 	:matrix()
 {
-	resize(source);
-	copy_data(source.data);
+	initialize_format(source);
+	set_own_data_from(source.get_data_readonly());
+}
+
+matrix::~matrix()
+{
+	delete_data_if_owning();
+}
+
+matrix& matrix::operator=(const matrix& other) 
+{
+	other.if_not_initialized_throw();
+	//sets this matrix to the value of the other
+	//by copying
+
+	if (this != &other) {
+		delete_data_if_owning();
+		initialize_format(other);
+		set_own_data_from(other.data);
+	}
+	return *this;
+}
+
+void matrix::initialize_format(size_t width, size_t height, size_t depth)
+{
+	this->width = width;
+	this->height = height;
+	this->depth = depth;
+
+	check_for_valid_format();
+	delete_data_if_owning();
+	allocate_mem();
+}
+
+void matrix::initialize_format(const matrix& source)
+{
+	initialize_format(source.width, source.height, source.depth);
 }
 
 void matrix::set_all(float value)
 {
+	if_not_initialized_throw();
+
 	for (int i = 0; i < item_count(); i++)
 	{
 		data[i] = value;
@@ -175,6 +189,8 @@ void matrix::set_all(float value)
 
 void matrix::apply_noise(float range)
 {
+	if_not_initialized_throw();
+
 	for (int i = 0; i < item_count(); i++)
 	{
 		data[i] += random_float_incl(-range, range);
@@ -183,6 +199,8 @@ void matrix::apply_noise(float range)
 
 void matrix::mutate(float range)
 {
+	if_not_initialized_throw();
+
 	add_at_flat(
 		random_idx((int)item_count()),
 		random_float_incl(-range, range));
@@ -211,6 +229,8 @@ size_t matrix::item_count() const
 
 float matrix::get_at_flat(size_t idx) const
 {
+	if_not_initialized_throw();
+
 	if (idx >= item_count())
 	{
 		throw std::invalid_argument("idx must be in range");
@@ -220,6 +240,8 @@ float matrix::get_at_flat(size_t idx) const
 
 void matrix::set_at_flat(size_t idx, float value)
 {
+	if_not_initialized_throw();
+
 	if (idx >= item_count())
 	{
 		throw std::invalid_argument("idx must be in range");
@@ -229,6 +251,8 @@ void matrix::set_at_flat(size_t idx, float value)
 
 void matrix::add_at_flat(size_t idx, float value)
 {
+	if_not_initialized_throw();
+
 	if (idx >= item_count())
 	{
 		throw std::invalid_argument("idx must be in range");
@@ -248,11 +272,13 @@ const float* matrix::get_data_readonly() const
 
 void matrix::set_at(size_t x, size_t y, size_t z, float value)
 {
+	if_not_initialized_throw();
 	data[get_idx(x, y, z)] = value;
 }
 
 void matrix::add_at(size_t x, size_t y, size_t z, float value)
 {
+	if_not_initialized_throw();
 	data[get_idx(x, y, z)] += value;
 }
 
@@ -268,6 +294,7 @@ void matrix::add_at(size_t x, size_t y, float value)
 
 float matrix::get_at(size_t x, size_t y, int z) const
 {
+	if_not_initialized_throw();
 	return data[get_idx(x, y, z)];
 }
 
@@ -299,6 +326,10 @@ const matrix& matrix::rotate180copy() const
 
 void matrix::dot_product(const matrix& a, const matrix& b, matrix& result)
 {
+	a.if_not_initialized_throw();
+	b.if_not_initialized_throw();
+	result.if_not_initialized_throw();
+
 	if (a.width != b.height || a.depth != b.depth)
 	{
 		throw std::invalid_argument("dot product could not be performed. input matrices are in the wrong format");
@@ -327,6 +358,10 @@ void matrix::dot_product(const matrix& a, const matrix& b, matrix& result)
 
 void matrix::dot_product_flat(const matrix& a, const matrix& flat, matrix& result_flat)
 {
+	a.if_not_initialized_throw();
+	flat.if_not_initialized_throw();
+	result_flat.if_not_initialized_throw();
+
 	if (a.width != flat.item_count() ||
 		a.height != result_flat.item_count() ||
 		a.depth != 1 ||
@@ -346,6 +381,10 @@ void matrix::dot_product_flat(const matrix& a, const matrix& flat, matrix& resul
 
 void matrix::add(const matrix& a, const matrix& b, matrix& result)
 {
+	a.if_not_initialized_throw();
+	b.if_not_initialized_throw();
+	result.if_not_initialized_throw();
+
 	if (a.width != b.width || a.height != b.height || a.depth != b.depth)
 	{
 		throw std::invalid_argument("addition could not be performed. input matrices are in the wrong format");
@@ -363,6 +402,10 @@ void matrix::add(const matrix& a, const matrix& b, matrix& result)
 
 void matrix::add_flat(const matrix& a, const matrix& b, matrix& result)
 {
+	a.if_not_initialized_throw();
+	b.if_not_initialized_throw();
+	result.if_not_initialized_throw();
+
 	if (a.item_count() != b.item_count())
 	{
 		throw std::invalid_argument("addition could not be performed. input matrices are not the same size");
@@ -376,6 +419,10 @@ void matrix::add_flat(const matrix& a, const matrix& b, matrix& result)
 
 void matrix::subtract(const matrix& a, const matrix& b, matrix& result)
 {
+	a.if_not_initialized_throw();
+	b.if_not_initialized_throw();
+	result.if_not_initialized_throw();
+
 	if (!equal_format(a, b) ||
 		!equal_format(b, result) ||
 		!equal_format(result, a))
@@ -396,6 +443,9 @@ bool matrix::are_equal(const matrix& a, const matrix& b)
 
 bool matrix::are_equal(const matrix& a, const matrix& b, float tolerance)
 {
+	a.if_not_initialized_throw();
+	b.if_not_initialized_throw();
+
 	if (!equal_format(a, b))
 	{
 		return false;
@@ -422,6 +472,13 @@ void matrix::valid_cross_correlation(
 	matrix& output,
 	int stride)
 {
+	input.if_not_initialized_throw();
+	output.if_not_initialized_throw();
+	for (const auto& curr_kernel : kernels)
+	{
+		curr_kernel.if_not_initialized_throw();
+	}
+
 	//this only works with a stride of one
 	const size_t input_size = input.get_width();
 	const size_t kernel_size = kernels[0].get_width();
@@ -520,6 +577,7 @@ void matrix::valid_cross_correlation(
 
 void matrix::scalar_multiplication(float a)
 {
+	if_not_initialized_throw();
 	for (int i = 0; i < item_count(); i++)
 	{
 		data[i] *= a;
@@ -528,6 +586,7 @@ void matrix::scalar_multiplication(float a)
 
 void matrix::apply_activation_function(e_activation_t activation_fn)
 {
+	if_not_initialized_throw();
 	for (int i = 0; i < item_count(); i++)
 	{
 		data[i] = ACTIVATION[activation_fn](data[i]);
@@ -536,6 +595,8 @@ void matrix::apply_activation_function(e_activation_t activation_fn)
 
 std::string matrix::get_string() const
 {
+	if_not_initialized_throw();
+
 	std::string ret_val = "";
 
 	for (int z = 0; z < depth; z++)

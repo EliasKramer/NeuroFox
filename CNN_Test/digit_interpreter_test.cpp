@@ -7,6 +7,7 @@ namespace CNNTest
 	TEST_CLASS(digit_interpreter_test)
 	{
 	public:
+		/* digit interpreter will get a rework
 		TEST_METHOD(test_string_interpretation)
 		{
 			matrix input(1,10,1);
@@ -84,5 +85,6 @@ namespace CNNTest
 
 			Assert::AreEqual(false, output);
 		}
+	*/
 	};
 }

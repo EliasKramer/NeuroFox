@@ -24,7 +24,7 @@ void pooling_layer::set_input_format(const matrix& input_format)
 	int output_height = (input_format.get_height() - filter_size) / stride + 1;
 	int output_depth = input_format.get_depth();
 
-	activations.resize(
+	activations.initialize_format(
 		output_width,
 		output_height,
 		output_depth);

@@ -50,7 +50,7 @@ const e_layer_type_t layer::get_layer_type() const
 
 void layer::set_input_format(const matrix& given_input_format)
 {
-	this->input_format.resize(given_input_format);
+	this->input_format.initialize_format(given_input_format);
 }
 
 const matrix& layer::get_activations() const
