@@ -52,6 +52,8 @@ public:
 	//does not copy values
 	void initialize_format(const matrix& source);
 
+	void set_ptr_as_source(float* given_ptr);
+
 	void set_all(float value);
 	void apply_noise(float range);
 	void mutate(float range);
@@ -67,6 +69,10 @@ public:
 
 	float* get_data();
 	const float* get_data_readonly() const;
+
+	float* get_ptr_layer(size_t depth_idx);
+	float* get_ptr_row(size_t height_idx, size_t depth_idx);
+	float* get_ptr_item(size_t width_idx, size_t height_idx, size_t depth_idx);
 	
 	//setter
 	void set_at(size_t x, size_t y, size_t z, float value);

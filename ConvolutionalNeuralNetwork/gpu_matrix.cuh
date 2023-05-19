@@ -51,7 +51,7 @@ public:
 
 	float* get_gpu_ptr_layer(size_t depth_idx);
 	float* get_gpu_ptr_row(size_t height_idx, size_t depth_idx);
-	float* get_gpu_ptr_item(size_t width, size_t height, size_t depth);
+	float* get_gpu_ptr_item(size_t width_idx, size_t height_idx, size_t depth_idx);
 
 	std::unique_ptr<matrix> to_cpu() const;
 

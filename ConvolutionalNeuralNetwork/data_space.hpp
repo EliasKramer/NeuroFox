@@ -6,14 +6,41 @@ private:
 	size_t item_count = 0;
 	bool copied_to_gpu = false;
 
-	matrix data;
-	gpu_matrix gpu_data;
+	/*
+		One piece of data is stored in the following format:
+		+-------------+-----+
+		| data        |label|
+		+-------------+-----+
+		data and label are stored in one dimension
+
+		the data_iterator and label_iterator are used to
+		point to current data and label
+		these iterators also store the format of the data and label
+
+		data_table looks like this:
+		+-------------+-----+
+		| data        |label|
+		+-------------+-----+
+		| data        |label|
+		+-------------+-----+
+		| data        |label|
+		+-------------+-----+
+	*/
+	matrix data_table;
+	//gpu_data_table is made the exact same way as data_table
+	//just on the gpu
+	gpu_matrix gpu_data_table;
+
+	size_t iterator_idx = 0;
 	
 	matrix data_iterator;
 	matrix label_iterator;
 
 	gpu_matrix gpu_data_iterator;
 	gpu_matrix gpu_label_iterator;
+
+	size_t label_item_count();
+	size_t data_item_count();
 
 public:
 	data_space(
@@ -26,6 +53,8 @@ public:
 		const matrix& data_format,
 		const matrix& label_format,
 		const std::vector<matrix>& given_data);
+
+	void iterator_next();
 
 	//load in file
 	//save in file

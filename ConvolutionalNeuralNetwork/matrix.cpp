@@ -177,6 +177,19 @@ void matrix::initialize_format(const matrix& source)
 	initialize_format(source.width, source.height, source.depth);
 }
 
+void matrix::set_ptr_as_source(float* given_ptr)
+{
+	if (owning_data)
+	{
+		throw std::runtime_error("cannot set ptr as source if owning data");
+	}
+	if (given_ptr == nullptr)
+	{
+		throw std::runtime_error("given ptr is null");
+	}
+	data = given_ptr;
+}
+
 void matrix::set_all(float value)
 {
 	if_not_initialized_throw();
@@ -268,6 +281,23 @@ float* matrix::get_data()
 const float* matrix::get_data_readonly() const
 {
 	return data;
+}
+
+//THESE ARE NOT TESTED
+float* matrix::get_ptr_layer(size_t depth_idx)
+{
+	if_not_initialized_throw();
+	return sub_ptr<float>(data, width * height, depth_idx);
+}
+
+float* matrix::get_ptr_row(size_t height_idx, size_t depth_idx)
+{
+	return get_ptr_layer(depth_idx) + height_idx * width;
+}
+
+float* matrix::get_ptr_item(size_t width_idx, size_t height_idx, size_t depth_idx)
+{
+	return get_ptr_row(height_idx, depth_idx) + width_idx;
 }
 
 void matrix::set_at(size_t x, size_t y, size_t z, float value)
