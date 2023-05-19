@@ -42,6 +42,9 @@ private:
 	size_t label_item_count();
 	size_t data_item_count();
 
+	void set_data_in_table_at(const matrix& m, size_t idx);
+	void set_label_in_table_at(const matrix& m, size_t idx);
+
 public:
 	data_space(
 		const matrix& data_format,
@@ -51,7 +54,6 @@ public:
 
 	data_space(
 		const matrix& data_format,
-		const matrix& label_format,
 		const std::vector<matrix>& given_data);
 
 	void iterator_next();
