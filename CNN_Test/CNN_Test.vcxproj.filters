@@ -108,6 +108,12 @@
     <ClCompile Include="test_util.cpp">
       <Filter>Source Files\test\test_util</Filter>
     </ClCompile>
+    <ClCompile Include="data_space_test.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\data_space.cpp">
+      <Filter>Source Files\nn</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ConvolutionalNeuralNetwork\batch_handler.hpp">
@@ -174,6 +180,9 @@
       <Filter>Header Files\nn</Filter>
     </ClInclude>
     <ClInclude Include="..\ConvolutionalNeuralNetwork\gpu_matrix.cuh">
+      <Filter>Header Files\nn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\data_space.hpp">
       <Filter>Header Files\nn</Filter>
     </ClInclude>
   </ItemGroup>

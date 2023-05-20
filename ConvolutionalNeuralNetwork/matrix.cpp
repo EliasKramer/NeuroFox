@@ -179,10 +179,8 @@ void matrix::initialize_format(const matrix& source)
 
 void matrix::set_ptr_as_source(float* given_ptr)
 {
-	if (owning_data)
-	{
-		throw std::runtime_error("cannot set ptr as source if owning data");
-	}
+	delete_data_if_owning();
+
 	if (given_ptr == nullptr)
 	{
 		throw std::runtime_error("given ptr is null");

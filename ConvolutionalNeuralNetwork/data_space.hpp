@@ -56,6 +56,8 @@ public:
 		const matrix& data_format,
 		const std::vector<matrix>& given_data);
 
+	size_t get_item_count() const;
+
 	void iterator_next();
 
 	//load in file

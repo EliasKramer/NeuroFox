@@ -161,6 +161,7 @@
   <ItemGroup>
     <ClCompile Include="..\ConvolutionalNeuralNetwork\batch_handler.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\convolutional_layer.cpp" />
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\data_space.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\digit_data.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\digit_interpreter.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\digit_training_data.cpp" />
@@ -176,6 +177,7 @@
     <ClCompile Include="..\ConvolutionalNeuralNetwork\util.cpp" />
     <ClCompile Include="CNN_Test.cpp" />
     <ClCompile Include="convolutional_layer_test.cpp" />
+    <ClCompile Include="data_space_test.cpp" />
     <ClCompile Include="digit_interpreter_test.cpp" />
     <ClCompile Include="fc_layer_test.cpp" />
     <ClCompile Include="layer_test.cpp" />
@@ -195,6 +197,7 @@
   <ItemGroup>
     <ClInclude Include="..\ConvolutionalNeuralNetwork\batch_handler.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\convolutional_layer.hpp" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\data_space.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\device_memory.cuh" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\digit_data.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\digit_interpreter.hpp" />

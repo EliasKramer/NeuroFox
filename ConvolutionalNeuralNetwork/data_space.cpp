@@ -12,10 +12,22 @@ size_t data_space::data_item_count()
 
 void data_space::set_data_in_table_at(const matrix& m, size_t idx)
 {
+	float* data_ptr = data_table.get_ptr_row(idx, 0);
+	
+	for (size_t i = 0; i < m.item_count(); i++)
+	{
+		data_ptr[i] = m.get_at_flat(i);
+	}
 }
 
 void data_space::set_label_in_table_at(const matrix& m, size_t idx)
 {
+	float * label_ptr = data_table.get_ptr_item(data_item_count(), idx, 0);
+	
+	for (size_t i = 0; i < m.item_count(); i++)
+	{
+		label_ptr[i] = m.get_at_flat(i);
+	}
 }
 
 data_space::data_space(
@@ -53,7 +65,8 @@ data_space::data_space(
 	const matrix& data_format,
 	const std::vector<matrix>& given_data
 ) :
-	data_iterator(data_format)
+	data_iterator(data_format),
+	item_count(given_data.size())
 {
 	if (given_data.size() == 0)
 	{
@@ -69,6 +82,11 @@ data_space::data_space(
 	{
 		set_data_in_table_at(given_data[i], i);
 	}
+}
+
+size_t data_space::get_item_count() const
+{
+	return item_count;
 }
 
 void data_space::iterator_next()
