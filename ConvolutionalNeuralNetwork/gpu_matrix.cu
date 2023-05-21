@@ -11,7 +11,7 @@ void gpu_matrix::if_not_initialized_throw() const
 	}
 }
 
-void gpu_matrix::check_for_valid_args() const
+void gpu_matrix::check_for_valid_format() const
 {
 	if (width == 0 || height == 0 || depth == 0)
 	{
@@ -28,14 +28,14 @@ void gpu_matrix::check_for_last_cuda_error() const
 	}
 }
 
-void gpu_matrix::free_owned_gpu_mem()
+void gpu_matrix::free_if_owned()
 {
-	if (owns_gpu_mem_ptr)
+	if (owns_gpu_mem_ptr && gpu_ptr != nullptr)
 	{
 		cudaFree(gpu_ptr);
 		check_for_last_cuda_error();
-		gpu_ptr = nullptr;
 	}
+	gpu_ptr = nullptr;
 	owns_gpu_mem_ptr = false;
 }
 
@@ -58,7 +58,7 @@ gpu_matrix::gpu_matrix(
 	depth(depth),
 	owns_gpu_mem_ptr(true)
 {
-	check_for_valid_args();
+	check_for_valid_format();
 	cudaMalloc(&gpu_ptr, item_count() * sizeof(float));
 	check_for_last_cuda_error();
 }
@@ -75,7 +75,7 @@ gpu_matrix::gpu_matrix(
 	depth(depth),
 	owns_gpu_mem_ptr(false)
 {
-	check_for_valid_args();
+	check_for_valid_format();
 	//TODO if there is a way to check how much is allocated on the given ptr, 
 	//then check if that matches the given height, width and depth
 }
@@ -91,7 +91,36 @@ gpu_matrix::gpu_matrix(const matrix& m, bool copy_values)
 
 gpu_matrix::~gpu_matrix()
 {
-	free_owned_gpu_mem();
+	free_if_owned();
+}
+
+gpu_matrix& gpu_matrix::operator=(const gpu_matrix& other)
+{
+	other.if_not_initialized_throw();
+
+	if (this != &other)
+	{
+		free_if_owned();
+
+		width = other.width;
+		height = other.height;
+		depth = other.depth;
+		check_for_valid_format();
+
+		cudaMalloc(&gpu_ptr, item_count() * sizeof(float));
+		owns_gpu_mem_ptr = true;
+
+		set_values_gpu(other);
+	}
+
+	return *this;
+}
+
+void gpu_matrix::set_gpu_ptr_as_source(float* new_ptr)
+{
+	free_if_owned();
+	gpu_ptr = new_ptr;
+	owns_gpu_mem_ptr = false;
 }
 
 const float* gpu_matrix::get_gpu_memory_readonly() const
@@ -160,9 +189,9 @@ std::unique_ptr<gpu_matrix> gpu_matrix::clone() const
 	if_not_initialized_throw();
 
 	//this allocates new memory
-	std::unique_ptr<gpu_matrix> clone = 
+	std::unique_ptr<gpu_matrix> clone =
 		std::make_unique<gpu_matrix>(width, height, depth);
-	
+
 	//this sets the values
 	clone.get()->set_values_gpu(*this);
 

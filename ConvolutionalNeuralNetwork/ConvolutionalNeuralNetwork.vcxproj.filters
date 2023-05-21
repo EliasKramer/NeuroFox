@@ -61,6 +61,12 @@
     <Filter Include="source\gpu">
       <UniqueIdentifier>{563228e2-f328-47fe-b959-3be8bba7e3b6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="header\overlords">
+      <UniqueIdentifier>{f0e2f925-5cd2-4beb-a727-73deec6f661a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\overlords">
+      <UniqueIdentifier>{d98f4350-b963-461b-b0f3-03cf949941eb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="neural_network.cpp">
@@ -113,6 +119,9 @@
     </ClCompile>
     <ClCompile Include="data_space.cpp">
       <Filter>source\training</Filter>
+    </ClCompile>
+    <ClCompile Include="mnist_digit_overlord.cpp">
+      <Filter>source\overlords</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -175,6 +184,9 @@
     </ClInclude>
     <ClInclude Include="data_space.hpp">
       <Filter>header\training</Filter>
+    </ClInclude>
+    <ClInclude Include="mnist_digit_overlord.hpp">
+      <Filter>header\overlords</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

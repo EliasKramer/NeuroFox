@@ -15,9 +15,9 @@ private:
 
 	void if_not_initialized_throw() const;
 
-	void check_for_valid_args() const;
+	void check_for_valid_format() const;
 	void check_for_last_cuda_error() const;
-	void free_owned_gpu_mem();
+	void free_if_owned();
 
 	int get_idx(int x, int y, int z) const;
 public:
@@ -37,6 +37,9 @@ public:
 
 	~gpu_matrix();
 	
+	gpu_matrix& operator=(const gpu_matrix& other);
+	void set_gpu_ptr_as_source(float* new_ptr);
+
 	static bool same_format(const gpu_matrix& m1, const gpu_matrix& m2);
 
 	std::unique_ptr<gpu_matrix> clone() const;

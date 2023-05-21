@@ -34,3 +34,18 @@ bool is_whole_number(float number)
 {
     return number == (int)number;
 }
+
+int swap_endian(int value) {
+	int result = 0;
+	result |= (value & 0xFF) << 24;
+	result |= ((value >> 8) & 0xFF) << 16;
+	result |= ((value >> 16) & 0xFF) << 8;
+	result |= ((value >> 24) & 0xFF);
+	return result;
+}
+//determins wether the system is little endian or big endian
+bool is_little_endian()
+{
+	int num = 1;
+	return (*(char*)&num == 1);
+}

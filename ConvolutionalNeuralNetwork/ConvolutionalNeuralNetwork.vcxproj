@@ -25,6 +25,7 @@
     <ClCompile Include="matrix.cpp" />
     <ClCompile Include="neural_network.cpp" />
     <ClCompile Include="nn_data.cpp" />
+    <ClCompile Include="mnist_digit_overlord.cpp" />
     <ClCompile Include="pooling_layer.cpp" />
     <ClCompile Include="test_result.cpp" />
     <ClCompile Include="util.cpp" />
@@ -47,6 +48,7 @@
     <ClInclude Include="matrix.hpp" />
     <ClInclude Include="neural_network.hpp" />
     <ClInclude Include="nn_data.hpp" />
+    <ClInclude Include="mnist_digit_overlord.hpp" />
     <ClInclude Include="pooling_layer.hpp" />
     <ClInclude Include="test_result.hpp" />
     <ClInclude Include="util.hpp" />

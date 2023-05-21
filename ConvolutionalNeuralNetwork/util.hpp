@@ -31,3 +31,7 @@ T* sub_ptr(T* ptr, size_t elements, size_t index)
 	//return (T*)(((char*)ptr) + index * elements * sizeof(T))
 	return ptr + index * elements;
 }
+
+int swap_endian(int value);
+//determins wether the system is little endian or big endian
+bool is_little_endian();

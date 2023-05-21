@@ -76,15 +76,19 @@ namespace CNNTest
 			std::vector<matrix> label;
 
 			data_format.set_all(1.0f);
+			data_format.set_at_flat(0, 0.9f);
 			data.push_back(data_format);
 
 			label_format.set_all(1.5f);
+			label_format.set_at_flat(0, 0.4f);
 			label.push_back(label_format);
 
 			data_format.set_all(5.0f);
+			data_format.set_at_flat(0, 4.9f);
 			data.push_back(data_format);
 
 			label_format.set_all(5.5f);
+			label_format.set_at_flat(0, 5.4f);
 			label.push_back(label_format);
 
 			data_space ds(data_format, label_format, data, label);
@@ -95,16 +99,20 @@ namespace CNNTest
 			matrix m = ds.get_next_data();
 			matrix l = ds.get_next_label();
 			expected_data.set_all(1.0f);
+			expected_data.set_at_flat(0, 0.9f);
 			expected_label.set_all(1.5f);
+			expected_label.set_at_flat(0, 0.4f);
 			Assert::IsTrue(matrix::are_equal(m, expected_data));
 			Assert::IsTrue(matrix::are_equal(l, expected_label));
 
 			ds.iterator_next();
-			
+
 			m = ds.get_next_data();
 			l = ds.get_next_label();
 			expected_data.set_all(5.0f);
+			expected_data.set_at_flat(0, 4.9f);
 			expected_label.set_all(5.5f);
+			expected_label.set_at_flat(0, 5.4f);
 			Assert::IsTrue(matrix::are_equal(m, expected_data));
 			Assert::IsTrue(matrix::are_equal(l, expected_label));
 		}

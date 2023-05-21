@@ -45,7 +45,9 @@ private:
 	void set_data_in_table_at(const matrix& m, size_t idx);
 	void set_label_in_table_at(const matrix& m, size_t idx);
 
+	void if_not_initialized_throw() const;
 public:
+	data_space();
 	data_space(
 		const matrix& data_format,
 		const matrix& label_format,
@@ -56,10 +58,15 @@ public:
 		const matrix& data_format,
 		const std::vector<matrix>& given_data);
 
+	data_space& operator=(const data_space& other);
+
 	size_t get_item_count() const;
 
 	void iterator_next();
+	void iterator_reset();
+	bool iterator_has_next() const;
 
+	//TODO
 	//load in file
 	//save in file
 
@@ -68,6 +75,6 @@ public:
 	const matrix& get_next_data();
 	const matrix& get_next_label();
 	
-	const matrix& get_next_gpu_data();
-	const matrix& get_next_gpu_label();
+	const gpu_matrix& get_next_gpu_data();
+	const gpu_matrix& get_next_gpu_label();
 };
