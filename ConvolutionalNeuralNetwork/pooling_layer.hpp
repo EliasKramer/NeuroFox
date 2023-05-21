@@ -37,7 +37,7 @@ public:
 	void forward_propagation_gpu(const gpu_matrix& input) override;
 	void back_propagation_gpu(const gpu_matrix& input, gpu_matrix* passing_error) override;
 
-	void apply_deltas(int number_of_inputs) override;
+	void apply_deltas(size_t training_data_count, float learning_rate) override;
 	
 	void enable_gpu() override;
 	void disable_gpu() override;

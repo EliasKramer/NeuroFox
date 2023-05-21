@@ -1,6 +1,4 @@
 #pragma once
-
-#include "gpu_memory.cuh"
 #include "matrix.hpp"
 
 class gpu_matrix

@@ -53,16 +53,6 @@ void neural_network::add_layer(std::unique_ptr<layer>&& given_layer)
 	layers.push_back(std::move(given_layer));
 }
 
-void neural_network::apply_deltas(int training_data_count)
-{
-	//iterate over all parameter layers
-	for (auto& l : parameter_layer_indices)
-	{
-		//update the parameters
-		layers[l]->apply_deltas(training_data_count);
-	}
-}
-
 float neural_network::calculate_cost(const matrix& expected_output)
 {
 	if (matrix::equal_format(get_output(), expected_output) == false)
@@ -196,42 +186,21 @@ void neural_network::forward_propagation_gpu(const gpu_matrix& input)
 
 }
 
-void neural_network::learn(
-	const std::vector<std::unique_ptr<nn_data>>& training_data,
-	int batch_size,
-	int epochs)
-{
-	batch_handler batch(training_data, batch_size);
-
-	for (int i = 0; i < epochs; i++)
-	{
-		//std::cout << "Epoch " << i << std::endl;
-		int x = 0;
-		for (auto curr_data = batch.get_batch_start(); curr_data != batch.get_batch_end(); ++curr_data)
-		{
-			learn_once(*curr_data, false);
-			apply_deltas(batch_size);
-		}
-		batch.calculate_new_batch();
-	}
-}
-
-void neural_network::learn_once(const std::unique_ptr<nn_data>& training_data, bool apply_changes)
+void neural_network::back_propagation_cpu(const matrix& given_data, const matrix& given_label)
 {
 	//feeding the data through
-	forward_propagation_cpu(training_data.get()->get_data());
+	forward_propagation_cpu(given_data);
 
 	//calculating the cost derivative
 	//calculate_cost_derivative(training_data->get_label_p());
-	get_last_layer()->set_error_for_last_layer_cpu(
-		training_data.get()->get_label());
+	get_last_layer()->set_error_for_last_layer_cpu(given_label);
 
 	//we start from the last layer
 	for (int i = layers.size() - 1; i >= 0; i--)
 	{
 		const matrix& input =
 			i == 0 ?
-			training_data.get()->get_data() :
+			given_data :
 			layers[i - 1].get()->get_activations();
 
 		matrix* passing_error =
@@ -239,17 +208,19 @@ void neural_network::learn_once(const std::unique_ptr<nn_data>& training_data, b
 			nullptr :
 			layers[i - 1].get()->get_error_p();
 
-			layers[i].get()->back_propagation_cpu(input, passing_error);
-	}
-
-	//if we only train on one training data piece
-	//we can apply the changes right away
-	if (apply_changes)
-	{
-		apply_deltas(1);
+		layers[i].get()->back_propagation_cpu(input, passing_error);
 	}
 }
 
+void neural_network::apply_deltas(size_t training_data_count, float learning_rate)
+{
+	//iterate over all parameter layers
+	for (auto& l : parameter_layer_indices)
+	{
+		//update the parameters
+		layers[l]->apply_deltas(training_data_count, learning_rate);
+	}
+}
 void neural_network::enable_gpu()
 {
 	int device_count = 0;

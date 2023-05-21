@@ -9,7 +9,8 @@ private:
 	neural_network nn;
 
 	void label_to_matrix(unsigned char label, matrix& m) const;
-	
+	float get_digit_cost(const matrix& output, const matrix& label) const;
+	void print_digit_image(const matrix& m) const;
 	void load_data(
 		data_space& ds, 
 		std::string data_path, 

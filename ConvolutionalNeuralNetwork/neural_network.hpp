@@ -5,8 +5,6 @@
 #include "pooling_layer.hpp"
 #include "fully_connected_layer.hpp"
 #include "convolutional_layer.hpp"
-#include "nn_data.hpp"
-#include "batch_handler.hpp"
 #include "test_result.hpp"
 
 #include "cuda_runtime.h"
@@ -24,10 +22,6 @@ private:
 	layer* get_last_layer();
 
 	void add_layer(std::unique_ptr<layer>&& given_layer);
-
-	//we need the training_data_count for 
-	//calculating the average of the deltas
-	void apply_deltas(int training_data_count);
 
 	float calculate_cost(const matrix& expected_output);
 
@@ -62,8 +56,11 @@ public:
 	void forward_propagation_cpu(const matrix& input);
 	void forward_propagation_gpu(const gpu_matrix& input);
 
-	void learn(const std::vector<std::unique_ptr<nn_data>>& training_data, int batch_size, int epochs);
-	void learn_once(const std::unique_ptr<nn_data>& expected_output, bool apply_changes = true);
+	void back_propagation_cpu(const matrix& given_data, const matrix& given_label);
+
+	//we need the training_data_count for 
+	//calculating the average of the deltas
+	void apply_deltas(size_t training_data_count, float learning_rate);
 
 	void enable_gpu();
 };

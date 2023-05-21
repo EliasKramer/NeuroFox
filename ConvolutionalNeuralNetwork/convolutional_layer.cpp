@@ -182,7 +182,7 @@ void convolutional_layer::back_propagation_gpu(const gpu_matrix& input, gpu_matr
 	throw std::exception("not implemented");
 }
 
-void convolutional_layer::apply_deltas(int number_of_inputs)
+void convolutional_layer::apply_deltas(size_t training_data_count, float learning_rate)
 {
 	//TODO
 }

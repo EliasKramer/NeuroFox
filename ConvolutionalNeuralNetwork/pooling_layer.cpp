@@ -152,7 +152,7 @@ void pooling_layer::back_propagation_gpu(const gpu_matrix& input, gpu_matrix* pa
 	throw std::exception("not implemented");
 }
 
-void pooling_layer::apply_deltas(int number_of_inputs)
+void pooling_layer::apply_deltas(size_t training_data_count, float learning_rate)
 {
 	throw std::invalid_argument("pooling layer does not have any parameters");
 }

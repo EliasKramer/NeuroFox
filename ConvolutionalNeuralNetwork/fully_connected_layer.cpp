@@ -171,21 +171,21 @@ void fully_connected_layer::back_propagation_gpu(const gpu_matrix& input, gpu_ma
 	throw std::exception("not implemented");
 }
 
-void fully_connected_layer::apply_deltas(int number_of_inputs)
+void fully_connected_layer::apply_deltas(size_t training_data_count, float learning_rate)
 {
 	for (int i = 0; i < biases.item_count(); i++)
 	{
 		float current_bias = biases.get_at_flat(i);
-		float avg_bias_delta = bias_deltas.get_at_flat(i) / number_of_inputs;
-		biases.set_at_flat(i, current_bias - avg_bias_delta);
+		float avg_bias_delta = bias_deltas.get_at_flat(i) / training_data_count;
+		biases.set_at_flat(i, current_bias - (avg_bias_delta * learning_rate));
 		bias_deltas.set_at_flat(i, 0.0f);
 	}
 
 	for (int i = 0; i < weights.item_count(); i++)
 	{
 		float current_weight = weights.get_at_flat(i);
-		float avg_weight_delta = weight_deltas.get_at_flat(i) / number_of_inputs;
-		weights.set_at_flat(i, current_weight - avg_weight_delta);
+		float avg_weight_delta = weight_deltas.get_at_flat(i) / training_data_count;
+		weights.set_at_flat(i, current_weight - (avg_weight_delta * learning_rate));
 		weight_deltas.set_at_flat(i, 0.0f);
 	}
 }

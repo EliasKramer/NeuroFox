@@ -1,11 +1,40 @@
 #include "mnist_digit_overlord.hpp"
 #include <filesystem>
 #include <fstream>
+#include <iostream>
+#include <chrono>
 
 void mnist_digit_overlord::label_to_matrix(unsigned char label, matrix& m) const
 {
 	m = matrix(1, 10, 1);
 	m.set_at(0, label, 1);
+}
+
+float mnist_digit_overlord::get_digit_cost(const matrix& output, const matrix& label) const
+{
+	float cost = 0;
+	for (size_t i = 0; i < output.item_count(); i++)
+	{
+		cost += 
+			(output.get_at_flat(i) - label.get_at_flat(i)) * 
+			(output.get_at_flat(i) - label.get_at_flat(i));
+	}
+	return cost;
+}
+
+void mnist_digit_overlord::print_digit_image(const matrix& m) const
+{
+	for (int x = 0; x < m.get_width(); x++)
+	{
+		for (int y = 0; y < m.get_height(); y++)
+		{
+			m.get_at(x,y) > 0.5 ? 
+				std::cout << "# " : 
+				std::cout << ". ";
+		}
+		std::cout << std::endl;
+	}
+	std::cout << std::endl;
 }
 
 void mnist_digit_overlord::load_data(
@@ -120,7 +149,7 @@ void mnist_digit_overlord::load_data(
 
 size_t mnist_digit_overlord::idx_of_max(const matrix& m) const
 {
-	size_t idx = 0;
+	size_t max_idx = 0;
 	float max = m.get_at(0, 0);
 	for (size_t idx = 1; idx < m.item_count(); idx++)
 	{
@@ -128,10 +157,10 @@ size_t mnist_digit_overlord::idx_of_max(const matrix& m) const
 		if (curr > max)
 		{
 			max = curr;
-			idx = idx;
+			max_idx = idx;
 		}
 	}
-	return idx;
+	return max_idx;
 }
 
 mnist_digit_overlord::mnist_digit_overlord()
@@ -156,23 +185,42 @@ mnist_digit_overlord::mnist_digit_overlord()
 void mnist_digit_overlord::test()
 {
 	ds_test.iterator_reset();
+	test_result result;
+	
 	size_t correct = 0;
+	size_t cost_sum = 0;
 	size_t total = 0;
+	
+	auto start = std::chrono::high_resolution_clock::now();
 
 	do
 	{
 		matrix input = ds_test.get_next_data();
 		matrix label = ds_test.get_next_label();
 		nn.forward_propagation_cpu(input);
+
+		cost_sum += get_digit_cost(nn.get_output(), label);
+
 		size_t idx = idx_of_max(nn.get_output());
 		size_t label_idx = idx_of_max(label);
 		if (idx == label_idx)
 		{
 			correct++;
 		}
+		else {
+			print_digit_image(input);
+		}
 		ds_test.iterator_next();
 		total++;
 	} while (ds_test.iterator_has_next());
+	auto end = std::chrono::high_resolution_clock::now();
+
+	result.accuracy = (float)correct / (float)total;
+	result.data_count = total;
+	result.time_in_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+	result.avg_cost = (float)cost_sum / float(total);
+
+	std::cout << "test result: " << std::endl << result.to_string() << std::endl;
 }
 
 void mnist_digit_overlord::train()

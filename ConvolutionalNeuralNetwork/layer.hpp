@@ -66,7 +66,7 @@ public:
 	//the deltas got calculated in the backprop function
 	//all the deltas got summed up. now we need to apply the
 	//average. this is done by dividing the deltas by the number of inputs
-	virtual void apply_deltas(int number_of_inputs) = 0;
+	virtual void apply_deltas(size_t training_data_count, float learning_rate) = 0;
 
 	virtual void enable_gpu();
 	virtual void disable_gpu();

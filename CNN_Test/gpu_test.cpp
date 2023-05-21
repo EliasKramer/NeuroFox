@@ -1,6 +1,5 @@
 #include "CppUnitTest.h"
 #include "../ConvolutionalNeuralNetwork/gpu_math.cuh"
-#include "../ConvolutionalNeuralNetwork/gpu_nn_data_block.cuh"
 #include "../ConvolutionalNeuralNetwork/util.hpp"
 #include "test_util.hpp"
 
