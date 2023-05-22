@@ -23,6 +23,7 @@
     <ClCompile Include="pooling_layer.cpp" />
     <ClCompile Include="test_result.cpp" />
     <ClCompile Include="util.cpp" />
+    <ClCompile Include="vector3.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="convolutional_layer.hpp" />
@@ -38,6 +39,7 @@
     <ClInclude Include="pooling_layer.hpp" />
     <ClInclude Include="test_result.hpp" />
     <ClInclude Include="util.hpp" />
+    <ClInclude Include="vector3.hpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="gpu_math.cu" />

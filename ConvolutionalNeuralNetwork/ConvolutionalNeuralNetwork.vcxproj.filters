@@ -81,6 +81,9 @@
     <ClCompile Include="mnist_digit_overlord.cpp">
       <Filter>source\overlords</Filter>
     </ClCompile>
+    <ClCompile Include="vector3.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="neural_network.hpp">
@@ -121,6 +124,9 @@
     </ClInclude>
     <ClInclude Include="data_space.hpp">
       <Filter>header\training</Filter>
+    </ClInclude>
+    <ClInclude Include="vector3.hpp">
+      <Filter>header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
