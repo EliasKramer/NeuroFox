@@ -1,20 +1,14 @@
 #include "matrix.hpp"
 #include <numeric>
 
-size_t matrix::get_idx(size_t x, size_t y, size_t z) const
+bool matrix::is_initialized() const
 {
-	if (x >= width || y >= height || z >= depth)
-		throw std::invalid_argument("index out of bounds");
-
-	return x + y * width + z * width * height;
+	return host_data != nullptr && format.item_count() != 0;
 }
 
 void matrix::if_not_initialized_throw() const
 {
-	if (data == nullptr ||
-		width == 0 ||
-		height == 0 ||
-		depth == 0)
+	if (!is_initialized())
 	{
 		throw std::runtime_error("matrix not initialized");
 	}
@@ -22,7 +16,7 @@ void matrix::if_not_initialized_throw() const
 
 void matrix::check_for_valid_format() const
 {
-	if (width == 0 || height == 0 || depth == 0)
+	if (format.item_count() == 0)
 	{
 		throw std::invalid_argument(
 			"invalid format");
@@ -31,7 +25,7 @@ void matrix::check_for_valid_format() const
 
 void matrix::allocate_mem()
 {
-	if (data != nullptr)
+	if (host_data != nullptr)
 	{
 		throw std::runtime_error("cannot allocate if data will be overwritten");
 	}
@@ -39,7 +33,7 @@ void matrix::allocate_mem()
 	{
 		throw std::runtime_error("cannot allocate if item count is 0");
 	}
-	data = new float[item_count()];
+	host_data = new float[item_count()];
 	owning_data = true;
 	set_all(0);
 }
@@ -53,7 +47,6 @@ void matrix::set_own_data_from(const float* src)
 	if (!owning_data)
 		throw std::runtime_error("cannot set data if not owned");
 
-	std::copy(src, src + item_count(), this->data);
 }
 
 void matrix::set_own_data_from(const matrix& src)
@@ -63,42 +56,41 @@ void matrix::set_own_data_from(const matrix& src)
 
 	if (src.item_count() != item_count())
 		throw std::runtime_error("cannot copy data if not the same size");
+	if (!owning_data)
+		throw std::runtime_error("cannot set data if not owned");
 
-	set_own_data_from(src.data);
+	std::copy(src.host_data, src.host_data + item_count(), this->host_data);
 }
 
 void matrix::delete_data_if_owning()
 {
-	if (owning_data && data != nullptr)
+	if (owning_data && host_data != nullptr)
 	{
-		delete[] data;
-		data = nullptr;
+		delete[] host_data;
+		host_data = nullptr;
 		owning_data = false;
 	}
 }
 
 matrix::matrix(
 ) :
-	width(0),
-	height(0),
-	depth(0),
 	owning_data(false),
-	data(nullptr)
+	host_data(nullptr),
+	device_data(nullptr)
 {}
 
 matrix::matrix(
-	size_t width,
-	size_t height,
-	size_t depth
+	vector3 given_format
 ) :
-	matrix(
-		width,
-		height,
-		depth,
-		nullptr,
-		false)
-{}
-
+	format(given_format),
+	owning_data(true),
+	host_data(nullptr),
+	device_data(nullptr)
+{
+	check_for_valid_format();
+	allocate_mem();
+}
+/*
 matrix::matrix(
 	size_t width,
 	size_t height,
@@ -118,33 +110,34 @@ matrix::matrix(
 	{
 		set_own_data_from(given_ptr);
 	}
-}
+}*/
 
 matrix::matrix(
-	size_t width,
-	size_t height,
-	size_t depth,
+	vector3 given_format,
 	const std::vector<float>& given_vector
 ) :
-	matrix(
-		width,
-		height,
-		depth)
+	matrix(given_format)
 {
-	owning_data = true;
 	set_own_data_from(given_vector.data());
 }
 
 matrix::matrix(const matrix& source)
 	:matrix()
 {
-	initialize_format(source);
-	set_own_data_from(source.get_data_readonly());
+	if (source.is_initialized())
+	{
+		allocate_mem();
+		set_own_data_from(source);
+	}
 }
 
 matrix::~matrix()
 {
 	delete_data_if_owning();
+}
+
+void matrix::copy_device_to_host()
+{
 }
 
 matrix& matrix::operator=(const matrix& other) 
@@ -155,37 +148,29 @@ matrix& matrix::operator=(const matrix& other)
 
 	if (this != &other) {
 		delete_data_if_owning();
-		initialize_format(other);
-		set_own_data_from(other.data);
+		this->format = other.format;
+
+		if (other.is_initialized() && 
+			other.format.item_count() != 0)
+		{
+			allocate_mem();
+			set_own_data_from(other);
+		}
 	}
 	return *this;
 }
 
-void matrix::initialize_format(size_t width, size_t height, size_t depth)
-{
-	this->width = width;
-	this->height = height;
-	this->depth = depth;
-
-	check_for_valid_format();
-	delete_data_if_owning();
-	allocate_mem();
-}
-
-void matrix::initialize_format(const matrix& source)
-{
-	initialize_format(source.width, source.height, source.depth);
-}
-
 void matrix::set_ptr_as_source(float* given_ptr)
 {
+	throw std::exception("overhauling this function");
+
 	delete_data_if_owning();
 
 	if (given_ptr == nullptr)
 	{
 		throw std::runtime_error("given ptr is null");
 	}
-	data = given_ptr;
+	//data = given_ptr;
 }
 
 void matrix::set_all(float value)
@@ -194,7 +179,7 @@ void matrix::set_all(float value)
 
 	for (int i = 0; i < item_count(); i++)
 	{
-		data[i] = value;
+		host_data[i] = value;
 	}
 }
 
@@ -204,7 +189,7 @@ void matrix::apply_noise(float range)
 
 	for (int i = 0; i < item_count(); i++)
 	{
-		data[i] += random_float_incl(-range, range);
+		host_data[i] += random_float_incl(-range, range);
 	}
 }
 
@@ -217,24 +202,27 @@ void matrix::mutate(float range)
 		random_float_incl(-range, range));
 }
 
+vector3 matrix::get_format() const
+{
+	return format;
+}
+
 size_t matrix::get_width() const
 {
-	return width;
+	return format.x;
 }
-
 size_t matrix::get_height() const
 {
-	return height;
+	return format.y;
 }
-
 size_t matrix::get_depth() const
 {
-	return depth;
+	return format.z;
 }
 
 size_t matrix::item_count() const
 {
-	return width * height * depth;
+	return format.item_count();
 }
 
 
@@ -246,7 +234,8 @@ float matrix::get_at_flat(size_t idx) const
 	{
 		throw std::invalid_argument("idx must be in range");
 	}
-	return data[idx];
+
+	return host_data[idx];
 }
 
 void matrix::set_at_flat(size_t idx, float value)
@@ -257,7 +246,7 @@ void matrix::set_at_flat(size_t idx, float value)
 	{
 		throw std::invalid_argument("idx must be in range");
 	}
-	data[idx] = value;
+	host_data[idx] = value;
 }
 
 void matrix::add_at_flat(size_t idx, float value)
@@ -268,7 +257,7 @@ void matrix::add_at_flat(size_t idx, float value)
 	{
 		throw std::invalid_argument("idx must be in range");
 	}
-	data[idx] += value;
+	host_data[idx] += value;
 }
 
 float* matrix::get_data()
@@ -491,7 +480,7 @@ bool matrix::are_equal(const matrix& a, const matrix& b, float tolerance)
 
 bool matrix::equal_format(const matrix& a, const matrix& b)
 {
-	return a.width == b.width && a.height == b.height && a.depth == b.depth;
+	return vector3::are_equal(a.format, b.format);
 }
 
 void matrix::valid_cross_correlation(
@@ -608,7 +597,7 @@ void matrix::scalar_multiplication(float a)
 	if_not_initialized_throw();
 	for (int i = 0; i < item_count(); i++)
 	{
-		data[i] *= a;
+		host_data[i] *= a;
 	}
 }
 
@@ -617,7 +606,7 @@ void matrix::apply_activation_function(e_activation_t activation_fn)
 	if_not_initialized_throw();
 	for (int i = 0; i < item_count(); i++)
 	{
-		data[i] = ACTIVATION[activation_fn](data[i]);
+		host_data[i] = ACTIVATION[activation_fn](data[i]);
 	}
 }
 

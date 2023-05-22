@@ -4,19 +4,24 @@
 #include <string>
 #include "util.hpp"
 #include "math_functions.hpp"
+#include "vector3.hpp"
 
 class matrix {
 private:
-	size_t width;
-	size_t height;
-	size_t depth;
+	vector3 format;
 	
 	bool owning_data;
-	float* data;
-
-	size_t get_idx(size_t x, size_t y, size_t z) const;
 	
+	float* host_data;
+	float* device_data;
+	
+	bool is_initialized() const;
 	void if_not_initialized_throw() const;
+
+	void allocate_gpu_mem();
+	void free_gpu_mem_if_owned();
+	void copy_host_to_device();
+	void copy_device_to_host();
 
 	void check_for_valid_format() const;
 	void allocate_mem();
@@ -25,20 +30,9 @@ private:
 	void delete_data_if_owning();
 public:
 	matrix();
+	matrix(vector3 given_format);
 	matrix(
-		size_t width, 
-		size_t height, 
-		size_t depth);
-	matrix(
-		size_t width, 
-		size_t height, 
-		size_t depth,
-		float* given_ptr, 
-		bool copy);
-	matrix(
-		size_t width, 
-		size_t height, 
-		size_t depth,
+		vector3 given_format,
 		const std::vector<float>& given_vector);
 	matrix(const matrix& source);
 
@@ -47,7 +41,7 @@ public:
 	~matrix();	
 
 	//deletes the old data and allocates new memory
-	void initialize_format(size_t width, size_t height, size_t depth);
+	void initialize_format(vector3 new_format);
 	//deletes the old data and allocates new memory
 	//does not copy values
 	void initialize_format(const matrix& source);
@@ -58,6 +52,7 @@ public:
 	void apply_noise(float range);
 	void mutate(float range);
 
+	vector3 get_format() const;
 	size_t get_width() const;
 	size_t get_height() const;
 	size_t get_depth() const;
@@ -75,8 +70,8 @@ public:
 	float* get_ptr_item(size_t width_idx, size_t height_idx, size_t depth_idx);
 	
 	//setter
-	void set_at(size_t x, size_t y, size_t z, float value);
-	void add_at(size_t x, size_t y, size_t z, float value);
+	void set_at(vector3 position, float value);
+	void add_at(vector3 position, float value);
 	//setting value where z = 0
 	void set_at(size_t x, size_t y, float value);
 	void add_at(size_t x, size_t y, float value);

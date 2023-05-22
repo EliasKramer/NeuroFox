@@ -1,5 +1,5 @@
 #include "gpu_matrix.cuh"
-
+/*
 void gpu_matrix::if_not_initialized_throw() const
 {
 	if (gpu_ptr == nullptr ||
@@ -274,3 +274,4 @@ size_t gpu_matrix::item_count() const
 {
 	return width * height * depth;
 }
+*/

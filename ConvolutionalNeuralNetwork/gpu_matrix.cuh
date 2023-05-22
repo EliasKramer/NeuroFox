@@ -1,6 +1,6 @@
 #pragma once
 #include "matrix.hpp"
-
+/*
 class gpu_matrix
 {
 private:
@@ -62,3 +62,4 @@ public:
 
 	size_t item_count() const;
 };
+*/
