@@ -14,6 +14,65 @@ void matrix::if_not_initialized_throw() const
 	}
 }
 
+bool matrix::is_device_mem_allocated() const
+{
+	return device_data != nullptr;
+}
+
+void matrix::if_gpu_not_allocated_throw() const
+{
+	if (!is_device_mem_allocated())
+	{
+		throw std::runtime_error("matrix not using gpu");
+	}
+}
+
+void matrix::allocate_gpu_mem()
+{
+	if_not_initialized_throw();
+	if (is_device_mem_allocated())
+		throw std::runtime_error("gpu memory already allocated");
+
+	cudaMalloc(&device_data, item_count() * sizeof(float));
+	if_cuda_error_throw();
+}
+
+void matrix::copy_host_to_device()
+{
+	if_not_initialized_throw();
+	if_gpu_not_allocated_throw();
+
+	cudaMemcpy(
+		device_data,
+		host_data,
+		item_count() * sizeof(float),
+		cudaMemcpyHostToDevice);
+	if_cuda_error_throw();
+}
+void matrix::copy_device_to_host()
+{
+	if_not_initialized_throw();
+	if_gpu_not_allocated_throw();
+
+	cudaMemcpy(
+		host_data,
+		device_data,
+		item_count() * sizeof(float),
+		cudaMemcpyDeviceToHost);
+}
+
+void matrix::if_cuda_error_throw() const
+{
+	cudaError_t cuda_error = cudaGetLastError();
+	if (cuda_error != cudaSuccess)
+	{
+		std::string err_str = std::string(cudaGetErrorString(cuda_error));
+		throw std::runtime_error(
+			std::string("cuda error: ") +
+			err_str);
+	}
+}
+
 void matrix::check_for_valid_format() const
 {
 	if (format.item_count() == 0)
@@ -23,7 +82,7 @@ void matrix::check_for_valid_format() const
 	}
 }
 
-void matrix::allocate_mem()
+void matrix::allocate_host_mem()
 {
 	if (host_data != nullptr)
 	{
@@ -38,38 +97,77 @@ void matrix::allocate_mem()
 	set_all(0);
 }
 
-void matrix::set_own_data_from(const float* src)
+void matrix::set_own_host_data_from(const std::vector<float> src)
 {
-	if_not_initialized_throw();
+	if (src.empty())
+	{
+		throw std::runtime_error("cannot set data from empty vector");
+	}
 
-	if (src == nullptr)
-		throw std::runtime_error("src is null");
-	if (!owning_data)
-		throw std::runtime_error("cannot set data if not owned");
+	if (src.size() != item_count())
+	{
+		throw std::runtime_error("cannot set data from vector of different size");
+	}
+	delete_data_if_owning();
+	owning_data = true;
 
+	std::copy(src.data(), src.data()  + item_count(), this->host_data);
+	//TODO gpu
 }
 
-void matrix::set_own_data_from(const matrix& src)
+void matrix::set_own_host_data_from(const matrix& src)
 {
-	if_not_initialized_throw();
 	src.if_not_initialized_throw();
+	
+	if (host_data == nullptr)
+	{
+		throw std::runtime_error("cannot set data if no memory is allocated");
+	}
+	if (!matrix::equal_format(*this, src))
+	{
+		throw std::runtime_error("cannot copy data from one matrix to another if they are not in the same format");
+	}
 
-	if (src.item_count() != item_count())
-		throw std::runtime_error("cannot copy data if not the same size");
-	if (!owning_data)
-		throw std::runtime_error("cannot set data if not owned");
+	delete_data_if_owning();
+	owning_data = true;
 
 	std::copy(src.host_data, src.host_data + item_count(), this->host_data);
+	//TODO gpu
 }
 
 void matrix::delete_data_if_owning()
 {
-	if (owning_data && host_data != nullptr)
+	if (owning_data)
 	{
-		delete[] host_data;
-		host_data = nullptr;
+		if (host_data != nullptr)
+		{
+			delete[] host_data;
+			host_data = nullptr;
+		}
+		if (device_data != nullptr)
+		{
+			cudaFree(device_data);
+			if_cuda_error_throw();
+			device_data = nullptr;
+		}
 		owning_data = false;
 	}
+}
+
+float* matrix::get_ptr_layer(size_t depth_idx)
+{
+	if_not_initialized_throw();
+	return sub_ptr<float>(host_data, get_width() * get_height(), depth_idx);
+}
+
+float* matrix::get_ptr_row(size_t height_idx, size_t depth_idx)
+{
+	return get_ptr_layer(depth_idx) + height_idx * get_width();
+}
+
+float* matrix::get_ptr_item(size_t width_idx, size_t height_idx, size_t depth_idx)
+{
+	return get_ptr_row(height_idx, depth_idx) + width_idx;
 }
 
 matrix::matrix(
@@ -88,29 +186,8 @@ matrix::matrix(
 	device_data(nullptr)
 {
 	check_for_valid_format();
-	allocate_mem();
+	allocate_host_mem();
 }
-/*
-matrix::matrix(
-	size_t width,
-	size_t height,
-	size_t depth,
-	float* given_ptr,
-	bool copy
-) :
-	width(width),
-	height(height),
-	depth(depth),
-	owning_data(copy),
-	data(given_ptr)
-{
-	check_for_valid_format();
-	allocate_mem();
-	if (copy)
-	{
-		set_own_data_from(given_ptr);
-	}
-}*/
 
 matrix::matrix(
 	vector3 given_format,
@@ -118,7 +195,7 @@ matrix::matrix(
 ) :
 	matrix(given_format)
 {
-	set_own_data_from(given_vector.data());
+	set_own_host_data_from(given_vector);
 }
 
 matrix::matrix(const matrix& source)
@@ -126,8 +203,8 @@ matrix::matrix(const matrix& source)
 {
 	if (source.is_initialized())
 	{
-		allocate_mem();
-		set_own_data_from(source);
+		allocate_host_mem();
+		set_own_host_data_from(source);
 	}
 }
 
@@ -140,7 +217,8 @@ void matrix::copy_device_to_host()
 {
 }
 
-matrix& matrix::operator=(const matrix& other) 
+
+matrix& matrix::operator=(const matrix& other)
 {
 	other.if_not_initialized_throw();
 	//sets this matrix to the value of the other
@@ -150,27 +228,14 @@ matrix& matrix::operator=(const matrix& other)
 		delete_data_if_owning();
 		this->format = other.format;
 
-		if (other.is_initialized() && 
+		if (other.is_initialized() &&
 			other.format.item_count() != 0)
 		{
-			allocate_mem();
-			set_own_data_from(other);
+			allocate_host_mem();
+			set_own_host_data_from(other);
 		}
 	}
 	return *this;
-}
-
-void matrix::set_ptr_as_source(float* given_ptr)
-{
-	throw std::exception("overhauling this function");
-
-	delete_data_if_owning();
-
-	if (given_ptr == nullptr)
-	{
-		throw std::runtime_error("given ptr is null");
-	}
-	//data = given_ptr;
 }
 
 void matrix::set_all(float value)
@@ -260,86 +325,125 @@ void matrix::add_at_flat(size_t idx, float value)
 	host_data[idx] += value;
 }
 
+void matrix::use_gpu()
+{
+	//TODO
+}
+/*
 float* matrix::get_data()
 {
-	return data;
+	return host_data;
 }
 
 const float* matrix::get_data_readonly() const
 {
-	return data;
-}
-
-//THESE ARE NOT TESTED
-float* matrix::get_ptr_layer(size_t depth_idx)
-{
-	if_not_initialized_throw();
-	return sub_ptr<float>(data, width * height, depth_idx);
-}
-
-float* matrix::get_ptr_row(size_t height_idx, size_t depth_idx)
-{
-	return get_ptr_layer(depth_idx) + height_idx * width;
-}
-
-float* matrix::get_ptr_item(size_t width_idx, size_t height_idx, size_t depth_idx)
-{
-	return get_ptr_row(height_idx, depth_idx) + width_idx;
-}
-
-void matrix::set_at(size_t x, size_t y, size_t z, float value)
-{
-	if_not_initialized_throw();
-	data[get_idx(x, y, z)] = value;
-}
-
-void matrix::add_at(size_t x, size_t y, size_t z, float value)
-{
-	if_not_initialized_throw();
-	data[get_idx(x, y, z)] += value;
-}
-
-void matrix::set_at(size_t x, size_t y, float value)
-{
-	set_at(x, y, 0, value);
-}
-
-void matrix::add_at(size_t x, size_t y, float value)
-{
-	add_at(x, y, 0, value);
-}
-
-float matrix::get_at(size_t x, size_t y, int z) const
-{
-	if_not_initialized_throw();
-	return data[get_idx(x, y, z)];
-}
-
-float matrix::get_at(size_t x, size_t y) const
-{
-	return get_at(x, y, 0);
-}
-
-/*
-const matrix& matrix::rotate180copy() const
-{
-	//NOT TESTED
-	//ALSO - this is a very inefficient way to do this. I should be able to do this in-place
-
-	matrix result(width, height, depth);
-	for (int z = 0; z < depth; z++)
-	{
-		for (int y = 0; y < height; y++)
-		{
-			for (int x = 0; x < width; x++)
-			{
-				result.set_at(x, y, z, get_at(width - x - 1, height - y - 1, z));
-			}
-		}
-	}
-	return result;
+	return host_data;
 }
 */
+
+void matrix::observe_row(matrix& m, size_t row_idx)
+{
+	observe_row(m, row_idx, 0);
+}
+void matrix::observe_row(matrix& m, size_t row_idx, size_t item_idx)
+{
+	m.if_not_initialized_throw();
+
+	if (row_idx >= m.get_height())
+	{
+		throw std::invalid_argument("row_idx must be in range");
+	}
+	if (item_idx >= m.get_width())
+	{
+		throw std::invalid_argument("item_idx must be in range");
+	}
+	//if we have a matrix that is currently 3x3 it has an item count of 9
+	//lets say the given matrix is 12x12
+	//we select the current row of the given matrix
+	//this row has 12 items
+	//in order to set our 3x3 matrix, we need 9 items
+	//in a row of 12 items, you have to start at either the 1st, 2nd, 3rd or 4th item
+	//otherwise you would use more than 9 items
+	// 
+	//so the item_count() is 9
+	//m.get_width() is 12
+	//and now our item index has to be either 0, 1 or 2
+	//lets test it. 
+	//12 - 0 = 12 >= 9
+	//12 - 1 = 11 >= 9
+	//12 - 2 = 10 >= 9
+	//12 - 3 = 9 >= 9
+	//12 - 4 = 8 >= 9 (false)
+	//so as soon as
+	//12 - item_idx < 9 we throw an error
+	if ((m.get_width() - row_idx) >
+		item_count())
+	{
+		throw std::invalid_argument("the item count on this matrix must match the amount of items left in the given row");
+	}
+
+	float* new_ptr = m.get_ptr_item(item_idx, row_idx, 0);
+	delete_data_if_owning();
+	host_data = new_ptr;
+	owning_data = false;
+}
+
+void matrix::set_row_from_matrix(const matrix& m, size_t row_idx)
+{
+	set_row_from_matrix(m, row_idx, 0);
+}
+void matrix::set_row_from_matrix(const matrix& m, size_t row_idx, size_t item_idx)
+{
+	m.if_not_initialized_throw();
+	if_not_initialized_throw();
+	if (!owning_data)
+	{
+		throw std::invalid_argument("this matrix must own its data");
+	}
+	if (!matrix::equal_format(format, m.format))
+	{
+		throw std::invalid_argument("the given matrix must have the same format as this matrix");
+	}
+	if (row_idx >= m.get_height())
+	{
+		throw std::invalid_argument("row_idx must be in range");
+	}
+	if (item_idx >= m.get_width())
+	{
+		throw std::invalid_argument("item_idx must be in range");
+	}
+	if ((get_width() - row_idx) >
+		m.item_count())
+	{
+		throw std::invalid_argument("the item count on this matrix must match the amount of items left in the given row");
+	}
+
+	float* new_ptr = get_ptr_item(item_idx, row_idx, 0);
+	memcpy(new_ptr, m.host_data, m.item_count() * sizeof(float));
+	//TODO gpu
+}
+
+void matrix::set_at(vector3 pos, float value)
+{
+	if_not_initialized_throw();
+	host_data[pos.get_index(format)] = value;
+}
+
+void matrix::add_at(vector3 pos, float value)
+{
+	if_not_initialized_throw();
+
+	host_data[pos.get_index(format)] += value;
+}
+
+float matrix::get_at(vector3 pos) const
+{
+	if_not_initialized_throw();
+	if (!pos.is_in_bounds(format))
+		throw std::invalid_argument("pos must be in bounds");
+
+	return host_data[pos.get_index(format)];
+}
 
 void matrix::dot_product(const matrix& a, const matrix& b, matrix& result)
 {
@@ -347,27 +451,27 @@ void matrix::dot_product(const matrix& a, const matrix& b, matrix& result)
 	b.if_not_initialized_throw();
 	result.if_not_initialized_throw();
 
-	if (a.width != b.height || a.depth != b.depth)
+	if (a.get_width() != b.get_height() || a.get_depth() != b.get_depth())
 	{
 		throw std::invalid_argument("dot product could not be performed. input matrices are in the wrong format");
 	}
-	if (result.width != b.width || result.height != a.height || result.depth != a.depth)
+	if (result.get_width() != b.get_width() || result.get_height() != a.get_height() || result.get_depth() != a.get_depth())
 	{
 		throw std::invalid_argument("dot product could not be performed. result matrix is not the correct size");
 	}
 
-	for (int z = 0; z < result.depth; z++)
+	for (int z = 0; z < result.get_depth(); z++)
 	{
-		for (int y = 0; y < result.height; y++)
+		for (int y = 0; y < result.get_height(); y++)
 		{
-			for (int x = 0; x < result.width; x++)
+			for (int x = 0; x < result.get_width(); x++)
 			{
 				float sum = 0;
-				for (int i = 0; i < a.width; i++)
+				for (int i = 0; i < a.get_width(); i++)
 				{
-					sum += a.get_at(i, y, z) * b.get_at(x, i, z);
+					sum += a.get_at(vector3(i, y, z)) * b.get_at(vector3(x, i, z));
 				}
-				result.set_at(x, y, z, sum);
+				result.set_at(vector3(x, y, z), sum);
 			}
 		}
 	}
@@ -379,19 +483,19 @@ void matrix::dot_product_flat(const matrix& a, const matrix& flat, matrix& resul
 	flat.if_not_initialized_throw();
 	result_flat.if_not_initialized_throw();
 
-	if (a.width != flat.item_count() ||
-		a.height != result_flat.item_count() ||
-		a.depth != 1 ||
-		result_flat.depth != 1)
+	if (a.get_width() != flat.item_count() ||
+		a.get_height() != result_flat.item_count() ||
+		a.get_depth() != 1 ||
+		result_flat.get_depth() != 1)
 	{
 		throw std::invalid_argument("dot product could not be performed. input matrices are in the wrong format");
 	}
 
-	for (int x = 0; x < a.width; x++)
+	for (int x = 0; x < a.get_width(); x++)
 	{
-		for (int y = 0; y < a.height; y++)
+		for (int y = 0; y < a.get_height(); y++)
 		{
-			result_flat.add_at_flat(y, a.get_at(x, y) * flat.get_at_flat(x));
+			result_flat.add_at_flat(y, a.get_at(vector3(x, y)) * flat.get_at_flat(x));
 		}
 	}
 }
@@ -402,18 +506,18 @@ void matrix::add(const matrix& a, const matrix& b, matrix& result)
 	b.if_not_initialized_throw();
 	result.if_not_initialized_throw();
 
-	if (a.width != b.width || a.height != b.height || a.depth != b.depth)
+	if (a.get_width() != b.get_width() || a.get_height() != b.get_height() || a.get_depth() != b.get_depth())
 	{
 		throw std::invalid_argument("addition could not be performed. input matrices are in the wrong format");
 	}
-	if (result.width != a.width || result.height != a.height || result.depth != a.depth)
+	if (result.get_width() != a.get_width() || result.get_height() != a.get_height() || result.get_depth() != a.get_depth())
 	{
 		throw std::invalid_argument("addition could not be performed. result matrix is not the correct size");
 	}
 
 	for (int i = 0; i < a.item_count(); i++)
 	{
-		result.data[i] = a.data[i] + b.data[i];
+		result.host_data[i] = a.host_data[i] + b.host_data[i];
 	}
 }
 
@@ -430,7 +534,7 @@ void matrix::add_flat(const matrix& a, const matrix& b, matrix& result)
 
 	for (int i = 0; i < a.item_count(); i++)
 	{
-		result.data[i] = a.data[i] + b.data[i];
+		result.host_data[i] = a.host_data[i] + b.host_data[i];
 	}
 }
 
@@ -449,7 +553,7 @@ void matrix::subtract(const matrix& a, const matrix& b, matrix& result)
 
 	for (int i = 0; i < a.item_count(); i++)
 	{
-		result.data[i] = a.data[i] - b.data[i];
+		result.host_data[i] = a.host_data[i] - b.host_data[i];
 	}
 }
 
@@ -470,7 +574,7 @@ bool matrix::are_equal(const matrix& a, const matrix& b, float tolerance)
 
 	for (int i = 0; i < a.item_count(); i++)
 	{
-		if (std::abs(a.data[i] - b.data[i]) > tolerance)
+		if (std::abs(a.host_data[i] - b.host_data[i]) > tolerance)
 		{
 			return false;
 		}
@@ -513,12 +617,24 @@ void matrix::valid_cross_correlation(
 
 	output.set_all(0);
 
-	for (int z = 0; z < output.depth; z++)
+	//iterate over each
+	for (int z = 0; z < output.get_depth(); z++)
 	{
-		for (int y = 0; y < output.height; y++)
+		for (int y = 0; y < output.get_height(); y++)
 		{
-			for (int x = 0; x < output.width; x++)
+			for (int x = 0; x < output.get_width(); x++)
 			{
+				//iterate over the kernel and input.
+				//the overlaying values are multiplied and added to the output
+				//input		kernel
+				//+--+--+	+--+--+	  +--+--+
+				//|1 |2 |	|2 |3 |	  |2 |6 |
+				//+--+--+ * +--+--+ = +--+--+ = 2 + 6 + 12 + 20 = 40 
+				//|3 |4 |	|4 |5 |	  |12|20|
+				//+--+--+	+--+--+	  +--+--+
+				//
+				//40 is the sum
+
 				float sum = 0;
 				for (int curr_depth = 0; curr_depth < kernels[0].get_depth(); curr_depth++)
 				{
@@ -528,69 +644,24 @@ void matrix::valid_cross_correlation(
 						{
 							sum +=
 								input.get_at(
-									x * stride + i,
-									y * stride + j,
-									curr_depth) *
+									vector3(
+										x * stride + i,
+										y * stride + j,
+										curr_depth)) *
 								kernels[z].get_at(
-									i,
-									j,
-									curr_depth);
+									vector3(
+										i,
+										j,
+										curr_depth));
 						}
 					}
 				}
 				//if we do this, the output of all depths will be added together
-				output.add_at(x, y, z, sum);
+				output.add_at(vector3(x, y, z), sum);
 			}
 		}
 	}
 }
-
-//void matrix::valid_convolution(const matrix& input, const matrix& kernel, matrix& output)
-//{
-	//valid_cross_correlation(input, kernel.rotate180copy(), output);
-//}
-
-//void matrix::full_cross_correlation(const matrix& input, const matrix& kernel, matrix& output, int stride)
-//{
-	/*
-	//this only works with a stride of one
-	const size_t input_size = input.get_width();
-	const size_t kernel_size = kernel.get_width();
-	const size_t output_size = output.get_width();
-	const size_t expected_output_size = ((input_size - kernel_size) / float(stride)) + 1; //(input_width - kernel_width) / (float)stride + 1
-	if (output_size != expected_output_size)
-	{
-		throw std::invalid_argument("cross correlation could not be performed. output matrix is not the correct size");
-	}
-	if (input.get_depth() != kernel.get_depth() || input.get_depth() != output.get_depth())
-	{
-		throw std::invalid_argument("cross correlation could not be performed. input matrices are in the wrong format");
-	}
-	for (int z = 0; z < output.depth; z++)
-	{
-		for (int y = 0; y < output.height; y++)
-		{
-			for (int x = 0; x < output.width; x++)
-			{
-				float sum = 0;
-				for (int i = 0; i < kernel_size; i++)
-				{
-					for (int j = 0; j < kernel_size; j++)
-					{
-						sum +=
-							input.get_at(
-								x + i * stride,
-								y + j * stride,
-								z) *
-							kernel.get_at(i, j, z);
-					}
-				}
-				output.set_at(x, y, z, sum);
-			}
-		}
-	}
-	*/
-	//}
 
 void matrix::scalar_multiplication(float a)
 {
@@ -606,7 +677,7 @@ void matrix::apply_activation_function(e_activation_t activation_fn)
 	if_not_initialized_throw();
 	for (int i = 0; i < item_count(); i++)
 	{
-		host_data[i] = ACTIVATION[activation_fn](data[i]);
+		host_data[i] = ACTIVATION[activation_fn](host_data[i]);
 	}
 }
 
@@ -616,13 +687,13 @@ std::string matrix::get_string() const
 
 	std::string ret_val = "";
 
-	for (int z = 0; z < depth; z++)
+	for (int z = 0; z < get_depth(); z++)
 	{
-		for (int y = 0; y < height; y++)
+		for (int y = 0; y < get_height(); y++)
 		{
-			for (int x = 0; x < width; x++)
+			for (int x = 0; x < get_width(); x++)
 			{
-				ret_val += std::to_string(get_at(x, y, z)) + " ";
+				ret_val += std::to_string(get_at(vector3(x, y, z))) + " ";
 			}
 			ret_val += "\n";
 		}
@@ -631,3 +702,20 @@ std::string matrix::get_string() const
 
 	return ret_val;
 }
+
+matrix::matrix(int width, int height)
+{
+}
+
+void matrix::delete_data()
+{
+}
+
+void matrix::free_gpu_mem_if_owned(matrix& m, size_t row_idx, size_t item_idx)
+{
+}
+
+void matrix::copy_to_gpu_if_needed()
+{
+}
+

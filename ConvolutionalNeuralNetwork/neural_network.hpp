@@ -53,10 +53,9 @@ public:
 	void mutate(float range);
 
 	//test_result test(const std::vector<std::unique_ptr<nn_data>>& training_data);
-	void forward_propagation_cpu(const matrix& input);
-	void forward_propagation_gpu(const gpu_matrix& input);
-
-	void back_propagation_cpu(const matrix& given_data, const matrix& given_label);
+	void forward_propagation(const matrix& input);
+	
+	void back_propagation(const matrix& given_data, const matrix& given_label);
 
 	//we need the training_data_count for 
 	//calculating the average of the deltas

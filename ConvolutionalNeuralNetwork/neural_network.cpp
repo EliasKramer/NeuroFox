@@ -161,8 +161,10 @@ test_result neural_network::test(const std::vector<std::unique_ptr<nn_data>>& te
 	return result;
 }*/
 
-void neural_network::forward_propagation_cpu(const matrix& input)
+void neural_network::forward_propagation(const matrix& input)
 {
+	//IF GPU ENABLED  - USE GPU - TODO
+
 	matrix* last_layer = nullptr;
 	//std::vector<std::unique_ptr<layer>>::iterator::value_type
 	for (auto& l : layers)
@@ -176,20 +178,12 @@ void neural_network::forward_propagation_cpu(const matrix& input)
 	}
 }
 
-void neural_network::forward_propagation_gpu(const gpu_matrix& input)
+void neural_network::back_propagation(const matrix& given_data, const matrix& given_label)
 {
-	if (gpu_enabled == false)
-	{
-		enable_gpu();
-	}
+	//IF GPU ENABLED  - USE GPU - TODO
 
-
-}
-
-void neural_network::back_propagation_cpu(const matrix& given_data, const matrix& given_label)
-{
 	//feeding the data through
-	forward_propagation_cpu(given_data);
+	forward_propagation(given_data);
 
 	//calculating the cost derivative
 	//calculate_cost_derivative(training_data->get_label_p());

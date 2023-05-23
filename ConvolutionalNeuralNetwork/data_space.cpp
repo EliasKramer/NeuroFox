@@ -12,22 +12,27 @@ size_t data_space::data_item_count()
 
 void data_space::set_data_in_table_at(const matrix& m, size_t idx)
 {
+	/*
 	float* data_ptr = data_table.get_ptr_row(idx, 0);
 
 	for (size_t i = 0; i < m.item_count(); i++)
 	{
 		data_ptr[i] = m.get_at_flat(i);
-	}
+	}*/
+	data_table.set_row_from_matrix(m, idx);
 }
 
 void data_space::set_label_in_table_at(const matrix& m, size_t idx)
 {
+	/*
 	float* label_ptr = data_table.get_ptr_item(data_item_count(), idx, 0);
 
 	for (size_t i = 0; i < m.item_count(); i++)
 	{
 		label_ptr[i] = m.get_at_flat(i);
 	}
+	*/
+	data_table.set_row_from_matrix(m, data_item_count(), idx);
 }
 
 void data_space::if_not_initialized_throw() const
@@ -61,9 +66,10 @@ data_space::data_space(
 	}
 
 	data_table = matrix(
-		data_item_count() + label_item_count(),
-		given_data.size(),
-		1);
+		vector3(
+			(size_t)(data_item_count() + label_item_count()),
+			given_data.size(),
+			(size_t)1));
 
 	for (size_t i = 0; i < given_data.size(); i++)
 	{
@@ -85,9 +91,10 @@ data_space::data_space(
 	}
 
 	data_table = matrix(
-		data_item_count(),
-		given_data.size(),
-		1);
+		vector3(
+			data_item_count(),
+			given_data.size(),
+			1));
 
 	for (size_t i = 0; i < given_data.size(); i++)
 	{
@@ -157,9 +164,11 @@ void data_space::copy_to_gpu()
 const matrix& data_space::get_next_data()
 {
 	if_not_initialized_throw();
-
+	/*
 	float* data_ptr = data_table.get_ptr_row(iterator_idx, 0);
 	data_iterator.set_ptr_as_source(data_ptr);
+	*/
+	data_iterator.observe_row(data_table, iterator_idx);
 
 	return data_iterator;
 }
@@ -172,9 +181,11 @@ const matrix& data_space::get_next_label()
 	{
 		throw std::exception("trying to access label, which is not set");
 	}
-
+	/*
 	float* label_ptr = data_table.get_ptr_item(data_item_count(), iterator_idx, 0);
 	label_iterator.set_ptr_as_source(label_ptr);
+	*/
+	label_iterator.observe_row(data_table, iterator_idx, data_item_count());
 
 	return label_iterator;
 }

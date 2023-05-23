@@ -5,6 +5,8 @@
 #include "util.hpp"
 #include "math_functions.hpp"
 #include "vector3.hpp"
+//include cuda
+#include <cuda_runtime.h>
 
 class matrix {
 private:
@@ -14,20 +16,27 @@ private:
 	
 	float* host_data;
 	float* device_data;
-	
+
 	bool is_initialized() const;
 	void if_not_initialized_throw() const;
 
+	bool is_device_mem_allocated() const;
+	void if_gpu_not_allocated_throw() const;
 	void allocate_gpu_mem();
-	void free_gpu_mem_if_owned();
 	void copy_host_to_device();
 	void copy_device_to_host();
 
+	void if_cuda_error_throw() const;
+
 	void check_for_valid_format() const;
-	void allocate_mem();
-	void set_own_data_from(const float* src);
-	void set_own_data_from(const matrix& src);
+	void allocate_host_mem();
+	void set_own_host_data_from(const std::vector<float> src);
+	void set_own_host_data_from(const matrix& src);
 	void delete_data_if_owning();
+
+	float* get_ptr_layer(size_t depth_idx);
+	float* get_ptr_row(size_t height_idx, size_t depth_idx);
+	float* get_ptr_item(size_t width_idx, size_t height_idx, size_t depth_idx);
 public:
 	matrix();
 	matrix(vector3 given_format);
@@ -40,13 +49,16 @@ public:
 	
 	~matrix();	
 
+	void use_gpu();
+	/*
 	//deletes the old data and allocates new memory
 	void initialize_format(vector3 new_format);
 	//deletes the old data and allocates new memory
 	//does not copy values
 	void initialize_format(const matrix& source);
+	*/
 
-	void set_ptr_as_source(float* given_ptr);
+	//void set_ptr_as_source(float* given_ptr);
 
 	void set_all(float value);
 	void apply_noise(float range);
@@ -62,27 +74,30 @@ public:
 	void set_at_flat(size_t idx, float value);
 	void add_at_flat(size_t idx, float value);
 
+	/*
 	float* get_data();
 	const float* get_data_readonly() const;
-
-	float* get_ptr_layer(size_t depth_idx);
-	float* get_ptr_row(size_t height_idx, size_t depth_idx);
-	float* get_ptr_item(size_t width_idx, size_t height_idx, size_t depth_idx);
+	*/
 	
+	//the current matrix gets the data from a different matrix row
+	//the current matrix must have the same amount of elements as this row
+	//the current matrix will not own the data of the other matrix
+	void observe_row(matrix& m, size_t row_idx);
+	//the current matrix gets the data from a different matrix row at a certain element in this row
+	//the current matrix must have the same amount of elements as this row from the given item index on
+	//the current matrix will not own the data of the other matrix
+	void observe_row(matrix& m, size_t row_idx, size_t item_idx);
+
+	void set_row_from_matrix(const matrix& m, size_t row_idx);
+	void set_row_from_matrix(const matrix& m, size_t row_idx, size_t item_idx);
+
 	//setter
 	void set_at(vector3 position, float value);
 	void add_at(vector3 position, float value);
-	//setting value where z = 0
-	void set_at(size_t x, size_t y, float value);
-	void add_at(size_t x, size_t y, float value);
 
 	//getter
-	float get_at(size_t x, size_t y, int z) const;
-	//getting value where z = 0
-	float get_at(size_t x, size_t y) const;
-
-	//const matrix& rotate180copy() const;
-
+	float get_at(vector3 pos) const;
+	
 	static void dot_product(const matrix& a, const matrix& b, matrix& result);
 	static void dot_product_flat(const matrix& a, const matrix& flat, matrix& result_flat);
 
