@@ -16,14 +16,14 @@ vector3::vector3(size_t x)
 	:x(x), y(0), z(0)
 {}
 
-bool vector3::is_in_bounds(const vector3 & position) const
+bool vector3::is_in_bounds(const vector3& format) const
 {
-	return position.x < x && position.y < y && position.z < z;
+	return x < format.x && y < format.y && z < format.z;
 }
 
 size_t vector3::get_index(const vector3& format) const
 {
-	if(!format.is_in_bounds(*this))
+	if(!this->is_in_bounds(format))
 		throw std::invalid_argument("vector3::get_index: format is not in bounds");
 
 	//x + y * width + z * width * height

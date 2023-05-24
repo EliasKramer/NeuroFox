@@ -34,7 +34,7 @@ namespace CNNTest
 		}
 		TEST_METHOD(constructor_from_vector_test_2)
 		{
-			std::vector<float> inital_data = {
+			std::vector<float> initial_data = {
 				11, 22,
 				33, 44,
 
@@ -42,17 +42,17 @@ namespace CNNTest
 				77, 88
 			};
 
-			matrix inital_matrix(vector3(2, 2, 2), inital_data);
+			matrix initial_matrix(vector3(2, 2, 2), initial_data);
 
-			Assert::AreEqual(11.0f, inital_matrix.get_at(vector3(0, 0, 0)));
-			Assert::AreEqual(22.0f, inital_matrix.get_at(vector3(1, 0, 0)));
-			Assert::AreEqual(33.0f, inital_matrix.get_at(vector3(0, 1, 0)));
-			Assert::AreEqual(44.0f, inital_matrix.get_at(vector3(1, 1, 0)));
+			Assert::AreEqual(11.0f, initial_matrix.get_at(vector3(0, 0, 0)));
+			Assert::AreEqual(22.0f, initial_matrix.get_at(vector3(1, 0, 0)));
+			Assert::AreEqual(33.0f, initial_matrix.get_at(vector3(0, 1, 0)));
+			Assert::AreEqual(44.0f, initial_matrix.get_at(vector3(1, 1, 0)));
 			
-			Assert::AreEqual(55.0f, inital_matrix.get_at(vector3(0, 0, 1)));
-			Assert::AreEqual(66.0f, inital_matrix.get_at(vector3(1, 0, 1)));
-			Assert::AreEqual(77.0f, inital_matrix.get_at(vector3(0, 1, 1)));
-			Assert::AreEqual(88.0f, inital_matrix.get_at(vector3(1, 1, 1)));
+			Assert::AreEqual(55.0f, initial_matrix.get_at(vector3(0, 0, 1)));
+			Assert::AreEqual(66.0f, initial_matrix.get_at(vector3(1, 0, 1)));
+			Assert::AreEqual(77.0f, initial_matrix.get_at(vector3(0, 1, 1)));
+			Assert::AreEqual(88.0f, initial_matrix.get_at(vector3(1, 1, 1)));
 		}
 		TEST_METHOD(setting_getting)
 		{

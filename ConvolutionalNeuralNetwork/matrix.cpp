@@ -111,15 +111,18 @@ void matrix::set_own_host_data_from(const std::vector<float> src)
 	{
 		throw std::runtime_error("cannot set data from empty vector");
 	}
-
 	if (src.size() != item_count())
 	{
 		throw std::runtime_error("cannot set data from vector of different size");
 	}
+	if (!owning_data)
+	{
+		throw std::runtime_error("cannot set data if not owning data");
+	}
 	delete_data_if_owning();
-	owning_data = true;
+	allocate_host_mem();
 
-	std::copy(src.data(), src.data() + item_count(), this->host_data);
+	std::copy(src.data(), src.data() + item_count() - 1, this->host_data);
 
 	//TODO gpu
 	if (is_device_mem_allocated())

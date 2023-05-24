@@ -13,7 +13,7 @@ public:
 	vector3(size_t x, size_t y);
 	vector3(size_t x);
 
-	bool is_in_bounds(const vector3& position) const;
+	bool is_in_bounds(const vector3& format) const;
 	size_t get_index(const vector3& format) const;
 	size_t item_count() const;
 
