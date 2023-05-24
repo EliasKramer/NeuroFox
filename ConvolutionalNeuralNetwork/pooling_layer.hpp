@@ -31,11 +31,8 @@ public:
 	void apply_noise(float range) override;
 	void mutate(float range) override;
 
-	void forward_propagation_cpu(const matrix& input) override;
-	void back_propagation_cpu(const matrix& input, matrix* passing_error) override;
-
-	void forward_propagation_gpu(const gpu_matrix& input) override;
-	void back_propagation_gpu(const gpu_matrix& input, gpu_matrix* passing_error) override;
+	void forward_propagation(const matrix& input) override;
+	void back_propagation(const matrix& input, matrix* passing_error) override;
 
 	void apply_deltas(size_t training_data_count, float learning_rate) override;
 	

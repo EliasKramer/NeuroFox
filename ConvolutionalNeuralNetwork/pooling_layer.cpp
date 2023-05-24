@@ -24,10 +24,11 @@ void pooling_layer::set_input_format(const matrix& input_format)
 	int output_height = (input_format.get_height() - filter_size) / stride + 1;
 	int output_depth = input_format.get_depth();
 
-	activations.initialize_format(
-		output_width,
-		output_height,
-		output_depth);
+	activations = matrix(
+		vector3(
+			output_width,
+			output_height,
+			output_depth));
 }
 
 int pooling_layer::get_filter_size() const
@@ -60,9 +61,9 @@ void pooling_layer::mutate(float range)
 	throw std::invalid_argument("pooling layer does not have any parameters");
 }
 
-void pooling_layer::forward_propagation_cpu(const matrix& input)
+void pooling_layer::forward_propagation(const matrix& input)
 {
-	layer::forward_propagation_cpu(input);
+	layer::forward_propagation(input);
 
 	//iterate over each depth
 	for (int d = 0; d < activations.get_depth(); d++)
@@ -98,7 +99,7 @@ void pooling_layer::forward_propagation_cpu(const matrix& input)
 							break;
 
 						//get the value of the input at the current index
-						const float curr_val = input.get_at(j, i, d);
+						const float curr_val = input.get_at(vector3(j, i, d));
 
 						//if the current value is greater than the max value
 						//set the max value to the current value
@@ -117,13 +118,13 @@ void pooling_layer::forward_propagation_cpu(const matrix& input)
 				switch (pooling_fn)
 				{
 				case max_pooling:
-					activations.set_at(x, y, d, max);
+					activations.set_at(vector3(x, y, d), max);
 					break;
 				case min_pooling:
-					activations.set_at(x, y, d, min);
+					activations.set_at(vector3(x, y, d), min);
 					break;
 				case average_pooling:
-					activations.set_at(x, y, d, sum / (filter_size * filter_size));
+					activations.set_at(vector3(x, y, d), sum / (filter_size * filter_size));
 					break;
 				default:
 					throw std::runtime_error("Invalid pooling type");
@@ -134,12 +135,12 @@ void pooling_layer::forward_propagation_cpu(const matrix& input)
 	}
 }
 
-void pooling_layer::back_propagation_cpu(const matrix& input, matrix* passing_error)
+void pooling_layer::back_propagation(const matrix& input, matrix* passing_error)
 {
-	layer::back_propagation_cpu(input, passing_error);
+	layer::back_propagation(input, passing_error);
 	throw std::exception("not implemented");
 }
-
+/*
 void pooling_layer::forward_propagation_gpu(const gpu_matrix& input)
 {
 	layer::forward_propagation_gpu(input);
@@ -151,6 +152,7 @@ void pooling_layer::back_propagation_gpu(const gpu_matrix& input, gpu_matrix* pa
 	layer::back_propagation_gpu(input, passing_error);
 	throw std::exception("not implemented");
 }
+*/
 
 void pooling_layer::apply_deltas(size_t training_data_count, float learning_rate)
 {

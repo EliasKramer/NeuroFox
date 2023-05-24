@@ -20,16 +20,6 @@ void layer::valid_passing_error_check_cpu(const matrix* passing_error) const
 	valid_input_check_cpu(*passing_error);
 }
 
-void layer::valid_input_check_gpu(const gpu_matrix& input) const
-{
-	//TODO check if the input format is correct
-}
-
-void layer::valid_passing_error_check_gpu(const gpu_matrix* passing_error) const
-{
-	//TODO check if the passing error format is correct
-}
-
 layer::layer(e_layer_type_t given_layer_type)
 : type(given_layer_type)
 {}
@@ -50,7 +40,7 @@ const e_layer_type_t layer::get_layer_type() const
 
 void layer::set_input_format(const matrix& given_input_format)
 {
-	this->input_format.initialize_format(given_input_format);
+	this->input_format = given_input_format;
 }
 
 const matrix& layer::get_activations() const
@@ -86,26 +76,30 @@ void layer::set_error_for_last_layer_cpu(const matrix& expected)
 
 void layer::enable_gpu()
 {
-	gpu_activations = std::make_unique<gpu_matrix>(activations, true);
+	activations.enable_gpu();
+	error.enable_gpu();
+	
+	//input_format.enable_gpu();
+	//gpu_activations = std::make_unique<gpu_matrix>(activations, true);
 }
 
 void layer::disable_gpu()
 {
-	gpu_activations = nullptr;
-	gpu_error = nullptr;
+	//gpu_activations = nullptr;
+	//gpu_error = nullptr;
 }
 
-void layer::forward_propagation_cpu(const matrix& input)
+void layer::forward_propagation(const matrix& input)
 {
 	valid_input_check_cpu(input);
 }
 
-void layer::back_propagation_cpu(const matrix& input, matrix* passing_error)
+void layer::back_propagation(const matrix& input, matrix* passing_error)
 {
 	valid_input_check_cpu(input);
 	valid_passing_error_check_cpu(passing_error);
 }
-
+/*
 void layer::forward_propagation_gpu(const gpu_matrix& input)
 {
 	valid_input_check_gpu(input);
@@ -116,3 +110,4 @@ void layer::back_propagation_gpu(const gpu_matrix& input, gpu_matrix* passing_er
 	valid_input_check_gpu(input);
 	valid_passing_error_check_gpu(passing_error);
 }
+*/

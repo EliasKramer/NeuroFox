@@ -6,8 +6,8 @@
 
 void mnist_digit_overlord::label_to_matrix(unsigned char label, matrix& m) const
 {
-	m = matrix(1, 10, 1);
-	m.set_at(0, label, 1);
+	m = matrix(vector3(1, 10, 1));
+	m.set_at(vector3(0, label), 1);
 }
 
 float mnist_digit_overlord::get_digit_cost(const matrix& output, const matrix& label) const
@@ -28,7 +28,7 @@ void mnist_digit_overlord::print_digit_image(const matrix& m) const
 	{
 		for (int y = 0; y < m.get_height(); y++)
 		{
-			m.get_at(x,y) > 0.5 ? 
+			m.get_at(vector3(x,y)) > 0.5 ? 
 				std::cout << "# " : 
 				std::cout << ". ";
 		}
@@ -110,7 +110,7 @@ void mnist_digit_overlord::load_data(
 	char* label_buffer = new char[num_labels];
 	label_file.read(label_buffer, num_labels);
 
-	matrix current_image(28, 28, 1);
+	matrix current_image(vector3(28, 28, 1));
 
 	for (int i = 0; i < num_images; i++) {
 
@@ -121,7 +121,7 @@ void mnist_digit_overlord::load_data(
 				//why is this "reading invalid data from image_buffer" ?
 				unsigned char pixel = image_buffer[pixel_idx];
 
-				current_image.set_at(j, k, (float)pixel / 255.0f);
+				current_image.set_at(vector3(j, k), (float)pixel / 255.0f);
 			}
 		}
 
@@ -141,8 +141,8 @@ void mnist_digit_overlord::load_data(
 	label_file.close();
 
 	ds = data_space(
-		matrix(28, 28, 1),
-		matrix(1, 10, 1),
+		matrix(vector3(28, 28, 1)),
+		matrix(vector3(1, 10, 1)),
 		data_collection,
 		label_collection);
 }
@@ -150,7 +150,7 @@ void mnist_digit_overlord::load_data(
 size_t mnist_digit_overlord::idx_of_max(const matrix& m) const
 {
 	size_t max_idx = 0;
-	float max = m.get_at(0, 0);
+	float max = m.get_at(vector3(0, 0));
 	for (size_t idx = 1; idx < m.item_count(); idx++)
 	{
 		float curr = m.get_at_flat(idx);
@@ -175,10 +175,10 @@ mnist_digit_overlord::mnist_digit_overlord()
 		base_path + "\\t10k-images.idx3-ubyte",
 		base_path + "\\t10k-labels.idx1-ubyte");
 
-	nn.set_input_format(matrix(28, 28, 1));
+	nn.set_input_format(matrix(vector3(28, 28, 1)));
 	nn.add_fully_connected_layer(16, e_activation_t::sigmoid_fn);
 	nn.add_fully_connected_layer(16, e_activation_t::sigmoid_fn);
-	nn.add_fully_connected_layer(matrix(1, 10, 1), e_activation_t::sigmoid_fn);
+	nn.add_fully_connected_layer(matrix(vector3(1, 10, 1)), e_activation_t::sigmoid_fn);
 	nn.set_all_parameter(0);
 }
 
@@ -197,7 +197,7 @@ void mnist_digit_overlord::test()
 	{
 		matrix input = ds_test.get_next_data();
 		matrix label = ds_test.get_next_label();
-		nn.forward_propagation_cpu(input);
+		nn.forward_propagation(input);
 
 		cost_sum += get_digit_cost(nn.get_output(), label);
 

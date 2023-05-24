@@ -19,10 +19,11 @@ private:
 
 	bool is_initialized() const;
 	void if_not_initialized_throw() const;
+	void if_not_owning_throw() const;
 
 	bool is_device_mem_allocated() const;
 	void if_gpu_not_allocated_throw() const;
-	void allocate_gpu_mem();
+	void allocate_device_mem();
 	void copy_host_to_device();
 	void copy_device_to_host();
 
@@ -34,9 +35,10 @@ private:
 	void set_own_host_data_from(const matrix& src);
 	void delete_data_if_owning();
 
-	float* get_ptr_layer(size_t depth_idx);
-	float* get_ptr_row(size_t height_idx, size_t depth_idx);
-	float* get_ptr_item(size_t width_idx, size_t height_idx, size_t depth_idx);
+	//given_ptr must be either host or device pointer
+	float* get_ptr_layer(float* given_ptr, size_t depth_idx);
+	float* get_ptr_row(float* given_ptr, size_t height_idx, size_t depth_idx);
+	float* get_ptr_item(float* given_ptr, size_t width_idx, size_t height_idx, size_t depth_idx);
 public:
 	matrix();
 	matrix(vector3 given_format);
@@ -49,7 +51,7 @@ public:
 	
 	~matrix();	
 
-	void use_gpu();
+	void enable_gpu();
 	/*
 	//deletes the old data and allocates new memory
 	void initialize_format(vector3 new_format);
@@ -78,6 +80,9 @@ public:
 	float* get_data();
 	const float* get_data_readonly() const;
 	*/
+	float* get_device_ptr();
+	const float* get_device_ptr_readonly() const;
+	float* get_device_ptr_layer(size_t depth_idx);
 	
 	//the current matrix gets the data from a different matrix row
 	//the current matrix must have the same amount of elements as this row
@@ -98,6 +103,7 @@ public:
 	//getter
 	float get_at(vector3 pos) const;
 	
+	//TODO - implement for gpu
 	static void dot_product(const matrix& a, const matrix& b, matrix& result);
 	static void dot_product_flat(const matrix& a, const matrix& flat, matrix& result_flat);
 

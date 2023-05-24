@@ -74,16 +74,16 @@ void convolutional_layer::set_input_format(const matrix& input_format)
 		!is_whole_number(output_height))
 		throw std::invalid_argument("input format is not compatible with the kernel size and stride");
 
-	activations.initialize_format((int)output_width, (int)output_height, kernel_count);
+	activations = matrix(vector3((int)output_width, (int)output_height, kernel_count));
 
 	for (int i = 0; i < kernel_count; i++)
 	{
-		kernel_weights.push_back(matrix(kernel_size, kernel_size, input_depth));
-		kernel_weights_deltas.push_back(matrix(kernel_size, kernel_size, input_depth));
+		kernel_weights.push_back(matrix(vector3(kernel_size, kernel_size, input_depth)));
+		kernel_weights_deltas.push_back(matrix(vector3(kernel_size, kernel_size, input_depth)));
 
 	}
-	kernel_biases.initialize_format((int)output_width, (int)output_height, kernel_count);
-	kernel_bias_deltas.initialize_format((int)output_width, (int)output_height, kernel_count);
+	kernel_biases = matrix(vector3(((int)output_width, (int)output_height, kernel_count)));
+	kernel_bias_deltas = matrix(vector3(((int)output_width, (int)output_height, kernel_count)));
 }
 
 void convolutional_layer::set_all_parameter(float value)
@@ -125,9 +125,9 @@ void convolutional_layer::mutate(float range)
 	}
 }
 
-void convolutional_layer::forward_propagation_cpu(const matrix& input)
+void convolutional_layer::forward_propagation(const matrix& input)
 {
-	layer::forward_propagation_cpu(input);
+	layer::forward_propagation(input);
 
 	const int output_width = activations.get_width();
 	const int output_height = activations.get_height();
@@ -146,12 +146,12 @@ void convolutional_layer::forward_propagation_cpu(const matrix& input)
 	activations.apply_activation_function(activation_fn);
 }
 
-void convolutional_layer::back_propagation_cpu(const matrix& input, matrix* passing_error)
+void convolutional_layer::back_propagation(const matrix& input, matrix* passing_error)
 {
-	layer::back_propagation_cpu(input, passing_error);
+	layer::back_propagation(input, passing_error);
 	throw std::exception("not implemented");
 }
-
+/*
 void convolutional_layer::forward_propagation_gpu(const gpu_matrix& input)
 {
 	layer::forward_propagation_gpu(input);
@@ -181,6 +181,7 @@ void convolutional_layer::back_propagation_gpu(const gpu_matrix& input, gpu_matr
 	layer::back_propagation_gpu(input, passing_error);
 	throw std::exception("not implemented");
 }
+*/
 
 void convolutional_layer::apply_deltas(size_t training_data_count, float learning_rate)
 {
@@ -189,15 +190,17 @@ void convolutional_layer::apply_deltas(size_t training_data_count, float learnin
 
 void convolutional_layer::enable_gpu()
 {
+	/*
 	for (const matrix& curr : kernel_weights)
 	{
 		gpu_kernel_weights.emplace_back(std::make_unique<gpu_matrix>(curr, true));
 	}
 	gpu_kernel_biases = std::make_unique<gpu_matrix>(kernel_biases, true);
+	*/
 }
 
 void convolutional_layer::disable_gpu()
 {
-	gpu_kernel_weights.clear();
-	gpu_kernel_biases = nullptr;
+	//gpu_kernel_weights.clear();
+	//gpu_kernel_biases = nullptr;
 }

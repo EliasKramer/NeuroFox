@@ -14,6 +14,14 @@ void matrix::if_not_initialized_throw() const
 	}
 }
 
+void matrix::if_not_owning_throw() const
+{
+	if (!owning_data)
+	{
+		throw std::runtime_error("matrix not owning data");
+	}
+}
+
 bool matrix::is_device_mem_allocated() const
 {
 	return device_data != nullptr;
@@ -27,7 +35,7 @@ void matrix::if_gpu_not_allocated_throw() const
 	}
 }
 
-void matrix::allocate_gpu_mem()
+void matrix::allocate_device_mem()
 {
 	if_not_initialized_throw();
 	if (is_device_mem_allocated())
@@ -111,14 +119,19 @@ void matrix::set_own_host_data_from(const std::vector<float> src)
 	delete_data_if_owning();
 	owning_data = true;
 
-	std::copy(src.data(), src.data()  + item_count(), this->host_data);
+	std::copy(src.data(), src.data() + item_count(), this->host_data);
+
 	//TODO gpu
+	if (is_device_mem_allocated())
+	{
+		copy_host_to_device();
+	}
 }
 
 void matrix::set_own_host_data_from(const matrix& src)
 {
 	src.if_not_initialized_throw();
-	
+
 	if (host_data == nullptr)
 	{
 		throw std::runtime_error("cannot set data if no memory is allocated");
@@ -132,7 +145,16 @@ void matrix::set_own_host_data_from(const matrix& src)
 	owning_data = true;
 
 	std::copy(src.host_data, src.host_data + item_count(), this->host_data);
+
 	//TODO gpu
+	if (src.is_device_mem_allocated())
+	{
+		if (!is_device_mem_allocated())
+		{
+			allocate_device_mem();
+		}
+		copy_device_to_host();
+	}
 }
 
 void matrix::delete_data_if_owning()
@@ -154,20 +176,25 @@ void matrix::delete_data_if_owning()
 	}
 }
 
-float* matrix::get_ptr_layer(size_t depth_idx)
+float* matrix::get_ptr_layer(float* given_ptr, size_t depth_idx)
 {
 	if_not_initialized_throw();
-	return sub_ptr<float>(host_data, get_width() * get_height(), depth_idx);
+	if (given_ptr == nullptr)
+		throw std::invalid_argument("given_ptr is null");
+	if (given_ptr != host_data && given_ptr != device_data)
+		throw std::invalid_argument("given_ptr is not pointing to this matrix");
+
+	return sub_ptr<float>(given_ptr, get_width() * get_height(), depth_idx);
 }
 
-float* matrix::get_ptr_row(size_t height_idx, size_t depth_idx)
+float* matrix::get_ptr_row(float* given_ptr, size_t height_idx, size_t depth_idx)
 {
-	return get_ptr_layer(depth_idx) + height_idx * get_width();
+	return get_ptr_layer(given_ptr, depth_idx) + height_idx * get_width();
 }
 
-float* matrix::get_ptr_item(size_t width_idx, size_t height_idx, size_t depth_idx)
+float* matrix::get_ptr_item(float* given_ptr, size_t width_idx, size_t height_idx, size_t depth_idx)
 {
-	return get_ptr_row(height_idx, depth_idx) + width_idx;
+	return get_ptr_row(given_ptr, height_idx, depth_idx) + width_idx;
 }
 
 matrix::matrix(
@@ -213,11 +240,6 @@ matrix::~matrix()
 	delete_data_if_owning();
 }
 
-void matrix::copy_device_to_host()
-{
-}
-
-
 matrix& matrix::operator=(const matrix& other)
 {
 	other.if_not_initialized_throw();
@@ -233,6 +255,10 @@ matrix& matrix::operator=(const matrix& other)
 		{
 			allocate_host_mem();
 			set_own_host_data_from(other);
+			if (other.is_device_mem_allocated())
+			{
+				enable_gpu();
+			}
 		}
 	}
 	return *this;
@@ -290,7 +316,6 @@ size_t matrix::item_count() const
 	return format.item_count();
 }
 
-
 float matrix::get_at_flat(size_t idx) const
 {
 	if_not_initialized_throw();
@@ -325,9 +350,35 @@ void matrix::add_at_flat(size_t idx, float value)
 	host_data[idx] += value;
 }
 
-void matrix::use_gpu()
+float* matrix::get_device_ptr()
 {
-	//TODO
+	return device_data;
+}
+const float* matrix::get_device_ptr_readonly() const
+{
+	return device_data;
+}
+
+float* matrix::get_device_ptr_layer(size_t depth_idx)
+{
+	if_not_initialized_throw();
+	if_gpu_not_allocated_throw();
+
+	return get_ptr_layer(device_data, depth_idx);
+}
+
+void matrix::enable_gpu()
+{
+	if_not_initialized_throw();
+
+	if (!is_device_mem_allocated())
+	{
+		if (owning_data)
+		{
+			allocate_device_mem();
+			copy_host_to_device();
+		}
+	}
 }
 /*
 float* matrix::get_data()
@@ -382,9 +433,14 @@ void matrix::observe_row(matrix& m, size_t row_idx, size_t item_idx)
 		throw std::invalid_argument("the item count on this matrix must match the amount of items left in the given row");
 	}
 
-	float* new_ptr = m.get_ptr_item(item_idx, row_idx, 0);
 	delete_data_if_owning();
-	host_data = new_ptr;
+
+	host_data = m.get_ptr_item(m.host_data, item_idx, row_idx, 0);
+
+	if (m.is_device_mem_allocated())
+	{
+		device_data = m.get_ptr_item(m.device_data, item_idx, row_idx, 0);
+	}
 	owning_data = false;
 }
 
@@ -418,22 +474,36 @@ void matrix::set_row_from_matrix(const matrix& m, size_t row_idx, size_t item_id
 		throw std::invalid_argument("the item count on this matrix must match the amount of items left in the given row");
 	}
 
-	float* new_ptr = get_ptr_item(item_idx, row_idx, 0);
+	float* new_ptr = get_ptr_item(host_data, item_idx, row_idx, 0);
 	memcpy(new_ptr, m.host_data, m.item_count() * sizeof(float));
+
 	//TODO gpu
+	if (is_device_mem_allocated())
+	{
+		copy_host_to_device();
+	}
 }
 
 void matrix::set_at(vector3 pos, float value)
 {
 	if_not_initialized_throw();
+	if_not_owning_throw();
+
+	if (!pos.is_in_bounds(format))
+		throw std::invalid_argument("pos must be in bounds");
+
 	host_data[pos.get_index(format)] = value;
+
+	//could be improved by only setting the value
+	if (is_device_mem_allocated())
+	{
+		copy_host_to_device();
+	}
 }
 
 void matrix::add_at(vector3 pos, float value)
 {
-	if_not_initialized_throw();
-
-	host_data[pos.get_index(format)] += value;
+	set_at(pos, get_at(pos) + value);
 }
 
 float matrix::get_at(vector3 pos) const
@@ -543,6 +613,7 @@ void matrix::subtract(const matrix& a, const matrix& b, matrix& result)
 	a.if_not_initialized_throw();
 	b.if_not_initialized_throw();
 	result.if_not_initialized_throw();
+	result.if_not_owning_throw();
 
 	if (!equal_format(a, b) ||
 		!equal_format(b, result) ||
@@ -595,6 +666,7 @@ void matrix::valid_cross_correlation(
 {
 	input.if_not_initialized_throw();
 	output.if_not_initialized_throw();
+	output.if_not_owning_throw();
 	for (const auto& curr_kernel : kernels)
 	{
 		curr_kernel.if_not_initialized_throw();
@@ -666,6 +738,8 @@ void matrix::valid_cross_correlation(
 void matrix::scalar_multiplication(float a)
 {
 	if_not_initialized_throw();
+	if_not_owning_throw();
+
 	for (int i = 0; i < item_count(); i++)
 	{
 		host_data[i] *= a;
@@ -675,6 +749,8 @@ void matrix::scalar_multiplication(float a)
 void matrix::apply_activation_function(e_activation_t activation_fn)
 {
 	if_not_initialized_throw();
+	if_not_owning_throw();
+
 	for (int i = 0; i < item_count(); i++)
 	{
 		host_data[i] = ACTIVATION[activation_fn](host_data[i]);
@@ -702,20 +778,3 @@ std::string matrix::get_string() const
 
 	return ret_val;
 }
-
-matrix::matrix(int width, int height)
-{
-}
-
-void matrix::delete_data()
-{
-}
-
-void matrix::free_gpu_mem_if_owned(matrix& m, size_t row_idx, size_t item_idx)
-{
-}
-
-void matrix::copy_to_gpu_if_needed()
-{
-}
-

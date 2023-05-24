@@ -16,7 +16,7 @@ void neural_network::set_input_format(const matrix& given_input_format)
 	if (input_format.item_count() != 0)
 		throw std::runtime_error("Cannot set input format twice.");
 
-	this->input_format.initialize_format(given_input_format);
+	this->input_format = given_input_format;
 }
 
 const matrix& neural_network::get_output() const
@@ -169,7 +169,7 @@ void neural_network::forward_propagation(const matrix& input)
 	//std::vector<std::unique_ptr<layer>>::iterator::value_type
 	for (auto& l : layers)
 	{
-		l->forward_propagation_cpu(
+		l->forward_propagation(
 			last_layer == nullptr ?
 			input :
 			*last_layer
@@ -202,7 +202,7 @@ void neural_network::back_propagation(const matrix& given_data, const matrix& gi
 			nullptr :
 			layers[i - 1].get()->get_error_p();
 
-		layers[i].get()->back_propagation_cpu(input, passing_error);
+		layers[i].get()->back_propagation(input, passing_error);
 	}
 }
 

@@ -112,12 +112,6 @@ data_space& data_space::operator=(const data_space& other)
 		item_count = other.item_count;
 		iterator_idx = other.iterator_idx;
 		copied_to_gpu = other.copied_to_gpu;
-		if (copied_to_gpu)
-		{
-			gpu_data_table = other.gpu_data_table;
-			gpu_data_iterator = other.gpu_data_iterator;
-			gpu_label_iterator = other.gpu_label_iterator;
-		}
 	}
 	return *this;
 }
@@ -153,10 +147,9 @@ void data_space::copy_to_gpu()
 	if (copied_to_gpu)
 		return;
 
-	gpu_data_table = gpu_matrix(data_table, true);
-	//no need to be copied. they get their values from gpu_data_table
-	gpu_data_iterator = gpu_matrix(data_iterator, false);
-	gpu_label_iterator = gpu_matrix(label_iterator, false);
+	data_table.enable_gpu();
+	data_iterator.enable_gpu();
+	label_iterator.enable_gpu();
 
 	copied_to_gpu = true;
 }
@@ -188,35 +181,4 @@ const matrix& data_space::get_next_label()
 	label_iterator.observe_row(data_table, iterator_idx, data_item_count());
 
 	return label_iterator;
-}
-
-//not tested
-const gpu_matrix& data_space::get_next_gpu_data()
-{
-	if_not_initialized_throw();
-
-	copy_to_gpu();
-
-	float* data_ptr = gpu_data_table.get_gpu_ptr_row(iterator_idx, 0);
-	gpu_data_iterator.set_gpu_ptr_as_source(data_ptr);
-
-	return gpu_data_iterator;
-}
-
-//not tested
-const gpu_matrix& data_space::get_next_gpu_label()
-{
-	if_not_initialized_throw();
-
-	copy_to_gpu();
-
-	if (gpu_label_iterator.item_count() == 0)
-	{
-		throw std::exception("trying to access label, which is not set");
-	}
-
-	float* label_ptr = gpu_data_table.get_gpu_ptr_item(data_item_count(), iterator_idx, 0);
-	gpu_label_iterator.set_gpu_ptr_as_source(label_ptr);
-
-	return gpu_label_iterator;
 }

@@ -17,9 +17,6 @@ class layer {
 private:
 	void valid_input_check_cpu(const matrix& input) const;
 	void valid_passing_error_check_cpu(const matrix* passing_error) const;
-
-	void valid_input_check_gpu(const gpu_matrix& input) const;
-	void valid_passing_error_check_gpu(const gpu_matrix* passing_error) const;
 protected:
 	e_layer_type_t type;
 
@@ -29,9 +26,6 @@ protected:
 	matrix error;
 
 	matrix input_format;
-
-	std::unique_ptr<gpu_matrix> gpu_activations = nullptr;
-	std::unique_ptr<gpu_matrix> gpu_error = nullptr;
 
 public:
 	layer(e_layer_type_t given_layer_type);
@@ -57,11 +51,8 @@ public:
 	//add a random value between range and -range to one weight or bias 
 	virtual void mutate(float range) = 0;
 
-	virtual void forward_propagation_cpu(const matrix& input);
-	virtual	void back_propagation_cpu(const matrix& input, matrix* passing_error);
-
-	virtual void forward_propagation_gpu(const gpu_matrix& input);
-	virtual void back_propagation_gpu(const gpu_matrix& input, gpu_matrix* passing_error);
+	virtual void forward_propagation(const matrix& input);
+	virtual	void back_propagation(const matrix& input, matrix* passing_error);
 
 	//the deltas got calculated in the backprop function
 	//all the deltas got summed up. now we need to apply the

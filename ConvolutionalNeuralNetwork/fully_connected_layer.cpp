@@ -2,22 +2,22 @@
 
 float fully_connected_layer::get_weight_at(int input_layer_idx, int current_activation_idx) const
 {
-	return weights.get_at(input_layer_idx, current_activation_idx);
+	return weights.get_at(vector3(input_layer_idx, current_activation_idx));
 }
 
 void fully_connected_layer::set_weight_at(int input_layer_idx, int current_activation_idx, float value)
 {
-	weights.set_at(input_layer_idx, current_activation_idx, value);
+	weights.set_at(vector3(input_layer_idx, current_activation_idx), value);
 }
 
 float fully_connected_layer::get_weight_delta_at(int input_layer_idx, int current_activation_idx) const
 {
-	return weight_deltas.get_at(input_layer_idx, current_activation_idx);
+	return weight_deltas.get_at(vector3(input_layer_idx, current_activation_idx));
 }
 
 void fully_connected_layer::set_weight_delta_at(int input_layer_idx, int current_activation_idx, float value)
 {
-	weight_deltas.set_at(input_layer_idx, current_activation_idx, value);
+	weight_deltas.set_at(vector3(input_layer_idx, current_activation_idx), value);
 }
 
 fully_connected_layer::fully_connected_layer(
@@ -25,7 +25,7 @@ fully_connected_layer::fully_connected_layer(
 	e_activation_t activation_function
 )
 	:fully_connected_layer(
-		matrix(1, number_of_neurons, 1),
+		matrix(vector3(1, number_of_neurons, 1)),
 		activation_function)
 {}
 
@@ -43,11 +43,12 @@ void fully_connected_layer::set_input_format(const matrix& input_format)
 {
 	layer::set_input_format(input_format);
 
-	weights.initialize_format(
-		input_format.item_count(),
-		activations.item_count(),
-		(size_t)1);
-	weight_deltas.initialize_format(weights);
+	weights = matrix(
+		vector3(
+			input_format.item_count(),
+			activations.item_count(),
+			(size_t)1));
+	weight_deltas = matrix(weights.get_format());
 }
 
 const matrix& fully_connected_layer::get_weights() const
@@ -96,18 +97,18 @@ void fully_connected_layer::mutate(float range)
 	}
 }
 
-void fully_connected_layer::forward_propagation_cpu(const matrix& input)
+void fully_connected_layer::forward_propagation(const matrix& input)
 {
-	layer::forward_propagation_cpu(input);
+	layer::forward_propagation(input);
 
 	matrix::dot_product_flat(weights, input, activations);
 	matrix::add_flat(activations, biases, activations);
 	activations.apply_activation_function(activation_fn);
 }
 
-void fully_connected_layer::back_propagation_cpu(const matrix& input, matrix* passing_error)
+void fully_connected_layer::back_propagation(const matrix& input, matrix* passing_error)
 {
-	layer::back_propagation_cpu(input, passing_error);
+	layer::back_propagation(input, passing_error);
 
 	if (!matrix::equal_format(activations, error))
 	{
@@ -150,7 +151,7 @@ void fully_connected_layer::back_propagation_cpu(const matrix& input, matrix* pa
 		}
 	}
 }
-
+/*
 void fully_connected_layer::forward_propagation_gpu(const gpu_matrix& input)
 {
 	layer::forward_propagation_gpu(input);
@@ -169,7 +170,7 @@ void fully_connected_layer::back_propagation_gpu(const gpu_matrix& input, gpu_ma
 {
 	layer::back_propagation_gpu(input, passing_error);
 	throw std::exception("not implemented");
-}
+}*/
 
 void fully_connected_layer::apply_deltas(size_t training_data_count, float learning_rate)
 {
@@ -194,14 +195,12 @@ void fully_connected_layer::enable_gpu()
 {
 	layer::enable_gpu();
 
-	gpu_weights = std::make_unique<gpu_matrix>(weights, true);
-	gpu_biases = std::make_unique<gpu_matrix>(biases, true);
+	weights.enable_gpu();
+	biases.enable_gpu();
+	weight_deltas.enable_gpu();
+	bias_deltas.enable_gpu();
 }
 
 void fully_connected_layer::disable_gpu()
 {
-	layer::disable_gpu();
-
-	gpu_biases = nullptr;
-	gpu_weights = nullptr;
 }

@@ -16,9 +16,6 @@ private:
 	int stride;
 	int kernel_count;
 
-	std::vector<std::unique_ptr<gpu_matrix>> gpu_kernel_weights;
-	std::unique_ptr<gpu_matrix> gpu_kernel_biases;
-
 	e_activation_t activation_fn;
 public:
 	//constructor
@@ -48,11 +45,8 @@ public:
 	//add a random value between range and -range to one weight or bias 
 	void mutate(float range) override;
 
-	void forward_propagation_cpu(const matrix& input) override;
-	void back_propagation_cpu(const matrix& input, matrix* passing_error) override;
-
-	void forward_propagation_gpu(const gpu_matrix& input) override;
-	void back_propagation_gpu(const gpu_matrix& input, gpu_matrix* passing_error) override;
+	void forward_propagation(const matrix& input) override;
+	void back_propagation(const matrix& input, matrix* passing_error) override;
 
 	void apply_deltas(size_t training_data_count, float learning_rate) override;
 

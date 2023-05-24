@@ -27,17 +27,11 @@ private:
 		+-------------+-----+
 	*/
 	matrix data_table;
-	//gpu_data_table is made the exact same way as data_table
-	//just on the gpu
-	gpu_matrix gpu_data_table;
 
 	size_t iterator_idx = 0;
 	
 	matrix data_iterator;
 	matrix label_iterator;
-
-	gpu_matrix gpu_data_iterator;
-	gpu_matrix gpu_label_iterator;
 
 	size_t label_item_count();
 	size_t data_item_count();
@@ -74,7 +68,4 @@ public:
 
 	const matrix& get_next_data();
 	const matrix& get_next_label();
-	
-	const gpu_matrix& get_next_gpu_data();
-	const gpu_matrix& get_next_gpu_label();
 };
