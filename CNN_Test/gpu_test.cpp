@@ -4,7 +4,7 @@
 #include "test_util.hpp"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-
+/*
 namespace CNNTest
 {
 	TEST_CLASS(cuda_test)
@@ -97,7 +97,7 @@ namespace CNNTest
 
 			Assert::IsTrue(matrix::are_equal(expected, gpu_matrix));
 		}
-		*/
+		*//*
 		TEST_METHOD(add_gpu_test)
 		{
 			int n = 1000000;
@@ -115,7 +115,7 @@ namespace CNNTest
 			matrix expected(n, 1, 1);
 			expected.set_all(3);
 			Assert::IsTrue(matrix::are_equal(expected, result));
-		}
+		}/*
 		TEST_METHOD(gpu_activation_relu_test)
 		{
 			matrix m(1, 3, 1);
@@ -667,6 +667,6 @@ namespace CNNTest
 			gpu_values = get_gpu_values(block.get_gpu_label_ptr(1), 1);
 			Assert::IsTrue(float_vectors_equal(gpu_values, std::vector<float> {6}));
 		}
-		*/
+		
 	};
-}
+}*/

@@ -165,10 +165,12 @@
     <ClCompile Include="..\ConvolutionalNeuralNetwork\layer.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\math_functions.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\matrix.cpp" />
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\mnist_digit_overlord.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\neural_network.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\pooling_layer.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\test_result.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\util.cpp" />
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\vector3.cpp" />
     <ClCompile Include="CNN_Test.cpp" />
     <ClCompile Include="convolutional_layer_test.cpp" />
     <ClCompile Include="data_space_test.cpp" />
@@ -188,6 +190,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ConvolutionalNeuralNetwork\convolutional_layer.hpp" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\data_space.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\device_memory.cuh" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\fully_connected_layer.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\gpu_math.cuh" />
@@ -196,10 +199,12 @@
     <ClInclude Include="..\ConvolutionalNeuralNetwork\layer.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\math_functions.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\matrix.hpp" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\mnist_digit_overlord.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\neural_network.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\pooling_layer.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\test_result.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\util.hpp" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\vector3.hpp" />
     <ClInclude Include="test_util.hpp" />
   </ItemGroup>
   <ItemGroup>

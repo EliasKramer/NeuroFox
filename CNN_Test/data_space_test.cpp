@@ -9,7 +9,7 @@ namespace CNNTest
 	public:
 		TEST_METHOD(onlydata_data_space_constructor_test)
 		{
-			matrix data_format(2, 2, 1);
+			matrix data_format(vector3(2, 2, 1));
 
 			std::vector<matrix> data;
 
@@ -24,8 +24,8 @@ namespace CNNTest
 		}
 		TEST_METHOD(data_space_constructor_test)
 		{
-			matrix data_format(2, 2, 3);
-			matrix label_format(1, 1, 1);
+			matrix data_format(vector3(2, 2, 3));
+			matrix label_format(vector3(1, 1, 1));
 
 			std::vector<matrix> data;
 			std::vector<matrix> label;
@@ -43,7 +43,7 @@ namespace CNNTest
 		}
 		TEST_METHOD(get_only_data)
 		{
-			matrix data_format(2, 2, 1);
+			matrix data_format(vector3(2, 2, 1));
 
 			std::vector<matrix> data;
 
@@ -54,9 +54,9 @@ namespace CNNTest
 
 			data_space ds(data_format, data);
 
-			matrix m1 = matrix(2, 2, 1);
+			matrix m1 = matrix(vector3(2, 2, 1));
 			m1.set_all(1.0f);
-			matrix m2 = matrix(2, 2, 1);
+			matrix m2 = matrix(vector3(2, 2, 1));
 			m2.set_all(2.0f);
 
 
@@ -69,8 +69,8 @@ namespace CNNTest
 		}
 		TEST_METHOD(get_data_and_label_test)
 		{
-			matrix data_format(2, 2, 3);
-			matrix label_format(1, 2, 1);
+			matrix data_format(vector3(2, 2, 3));
+			matrix label_format(vector3(1, 2, 1));
 
 			std::vector<matrix> data;
 			std::vector<matrix> label;
@@ -93,8 +93,8 @@ namespace CNNTest
 
 			data_space ds(data_format, label_format, data, label);
 
-			matrix expected_data(2, 2, 3);
-			matrix expected_label(1, 2, 1);
+			matrix expected_data(vector3(2, 2, 3));
+			matrix expected_label(vector3(1, 2, 1));
 
 			matrix m = ds.get_next_data();
 			matrix l = ds.get_next_label();
