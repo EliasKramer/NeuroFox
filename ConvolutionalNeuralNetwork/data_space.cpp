@@ -32,7 +32,7 @@ void data_space::set_label_in_table_at(const matrix& m, size_t idx)
 		label_ptr[i] = m.get_at_flat(i);
 	}
 	*/
-	data_table.set_row_from_matrix(m, data_item_count(), idx);
+	data_table.set_row_from_matrix(m, idx, data_item_count());
 }
 
 void data_space::if_not_initialized_throw() const
@@ -154,7 +154,7 @@ void data_space::copy_to_gpu()
 	copied_to_gpu = true;
 }
 
-const matrix& data_space::get_next_data()
+const matrix& data_space::get_current_data()
 {
 	if_not_initialized_throw();
 	/*
@@ -166,7 +166,7 @@ const matrix& data_space::get_next_data()
 	return data_iterator;
 }
 
-const matrix& data_space::get_next_label()
+const matrix& data_space::get_current_label()
 {
 	if_not_initialized_throw();
 

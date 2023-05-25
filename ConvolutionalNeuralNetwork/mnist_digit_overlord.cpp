@@ -53,8 +53,8 @@ void mnist_digit_overlord::load_data(
 	std::string full_data_path = path1.string();
 	std::string full_label_path = path2.string();
 
-	std::cout << "reading images from " << full_data_path << std::endl;
-	std::cout << "reading labels from " << full_label_path << std::endl;
+	//std::cout << "reading images from " << full_data_path << std::endl;
+	//std::cout << "reading labels from " << full_label_path << std::endl;
 
 	//check if files exists
 	if (!std::filesystem::exists(std::filesystem::path(full_data_path)) ||
@@ -166,14 +166,22 @@ size_t mnist_digit_overlord::idx_of_max(const matrix& m) const
 mnist_digit_overlord::mnist_digit_overlord()
 {
 	std::string base_path = "..\\data\\digit_recognition";
+	std::cout << "loading training data"<< std::endl;
+	auto start = std::chrono::high_resolution_clock::now();
 	load_data(
 		ds_training,
 		base_path + "\\train-images.idx3-ubyte",
 		base_path + "\\train-labels.idx1-ubyte");
+	std::cout << "loading test data" << std::endl;
 	load_data(
 		ds_test,
 		base_path + "\\t10k-images.idx3-ubyte",
 		base_path + "\\t10k-labels.idx1-ubyte");
+	auto end = std::chrono::high_resolution_clock::now();
+	std::cout << "data loaded, took " <<
+		std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() <<
+		"ms" <<
+		std::endl;
 
 	nn.set_input_format(matrix(vector3(28, 28, 1)));
 	nn.add_fully_connected_layer(16, e_activation_t::sigmoid_fn);
@@ -182,7 +190,7 @@ mnist_digit_overlord::mnist_digit_overlord()
 	nn.set_all_parameter(0);
 }
 
-void mnist_digit_overlord::test()
+test_result mnist_digit_overlord::test()
 {
 	ds_test.iterator_reset();
 	test_result result;
@@ -195,8 +203,8 @@ void mnist_digit_overlord::test()
 
 	do
 	{
-		matrix input = ds_test.get_next_data();
-		matrix label = ds_test.get_next_label();
+		const matrix& input = ds_test.get_current_data();
+		const matrix& label = ds_test.get_current_label();
 		nn.forward_propagation(input);
 
 		cost_sum += get_digit_cost(nn.get_output(), label);
@@ -206,9 +214,6 @@ void mnist_digit_overlord::test()
 		if (idx == label_idx)
 		{
 			correct++;
-		}
-		else {
-			print_digit_image(input);
 		}
 		ds_test.iterator_next();
 		total++;
@@ -220,7 +225,7 @@ void mnist_digit_overlord::test()
 	result.time_in_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 	result.avg_cost = (float)cost_sum / float(total);
 
-	std::cout << "test result: " << std::endl << result.to_string() << std::endl;
+	return result;
 }
 
 void mnist_digit_overlord::train()

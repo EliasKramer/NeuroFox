@@ -66,6 +66,6 @@ public:
 
 	void copy_to_gpu();
 
-	const matrix& get_next_data();
-	const matrix& get_next_label();
+	const matrix& get_current_data();
+	const matrix& get_current_label();
 };

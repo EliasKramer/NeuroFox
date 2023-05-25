@@ -21,6 +21,6 @@ private:
 public:
 	mnist_digit_overlord();
 
-	void test();
+	test_result test();
 	void train();
 };

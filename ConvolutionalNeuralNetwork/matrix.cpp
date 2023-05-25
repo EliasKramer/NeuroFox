@@ -122,7 +122,7 @@ void matrix::set_own_host_data_from(const std::vector<float> src)
 	delete_data_if_owning();
 	allocate_host_mem();
 
-	std::copy(src.data(), src.data() + item_count() - 1, this->host_data);
+	std::copy(src.data(), src.data() + item_count(), this->host_data);
 
 	//TODO gpu
 	if (is_device_mem_allocated())
@@ -145,7 +145,7 @@ void matrix::set_own_host_data_from(const matrix& src)
 	}
 
 	delete_data_if_owning();
-	owning_data = true;
+	allocate_host_mem();
 
 	std::copy(src.host_data, src.host_data + item_count(), this->host_data);
 
@@ -233,6 +233,7 @@ matrix::matrix(const matrix& source)
 {
 	if (source.is_initialized())
 	{
+		this->format = source.format;
 		allocate_host_mem();
 		set_own_host_data_from(source);
 	}
@@ -412,7 +413,7 @@ void matrix::observe_row(matrix& m, size_t row_idx, size_t item_idx)
 		throw std::invalid_argument("item_idx must be in range");
 	}
 	//if we have a matrix that is currently 3x3 it has an item count of 9
-	//lets say the given matrix is 12x12
+	//lets say the given matrix is 12x12 (the given matrix is named m)
 	//we select the current row of the given matrix
 	//this row has 12 items
 	//in order to set our 3x3 matrix, we need 9 items
@@ -421,17 +422,17 @@ void matrix::observe_row(matrix& m, size_t row_idx, size_t item_idx)
 	// 
 	//so the item_count() is 9
 	//m.get_width() is 12
-	//and now our item index has to be either 0, 1 or 2
+	//and now our item index has to be either 0, 1, 2 or 3
 	//lets test it. 
-	//12 - 0 = 12 >= 9
-	//12 - 1 = 11 >= 9
-	//12 - 2 = 10 >= 9
-	//12 - 3 = 9 >= 9
-	//12 - 4 = 8 >= 9 (false)
+	//12 - 9 - 0 = 3 >= 0
+	//12 - 9 - 1 = 2 >= 0
+	//12 - 9 - 2 = 1 >= 0
+	//12 - 9 - 3 = 0 >= 0
+	//12 - 9 - 4 = -1 >= 0 (false)
+	// 
 	//so as soon as
-	//12 - item_idx < 9 we throw an error
-	if ((m.get_width() - row_idx) >
-		item_count())
+	//12 - 9 - item_idx < 0 we throw an error
+	if ((m.get_width() - item_count() - item_idx) < 0)
 	{
 		throw std::invalid_argument("the item count on this matrix must match the amount of items left in the given row");
 	}
@@ -459,20 +460,75 @@ void matrix::set_row_from_matrix(const matrix& m, size_t row_idx, size_t item_id
 	{
 		throw std::invalid_argument("this matrix must own its data");
 	}
-	if (!matrix::equal_format(format, m.format))
-	{
-		throw std::invalid_argument("the given matrix must have the same format as this matrix");
-	}
-	if (row_idx >= m.get_height())
+	if (row_idx >= get_height())
 	{
 		throw std::invalid_argument("row_idx must be in range");
 	}
-	if (item_idx >= m.get_width())
+	if (item_idx >= get_width())
 	{
 		throw std::invalid_argument("item_idx must be in range");
 	}
-	if ((get_width() - row_idx) >
-		m.item_count())
+	//lets say our matrix is 5x5, the item count is 25
+	//if our given matrix (named m) is 2x2, the item count is 4
+	//we select the current row of our matrix (row idx)
+	//this row has 5 items
+	//in order to set our 2x2 matrix in this row, we need 4 items
+	//in a row of 5 items, you have to start at either the 1st or 2nd item
+	//otherwise you would use more than 5 items
+	//
+	//our 5x5 matrix (the first two rows). (the values in the matrix are the item indices)
+	//+--+--+--+--+--+
+	//|00|01|02|03|04|
+	//+--+--+--+--+--+
+	//|05|06|07|08|09|
+	//+--+--+--+--+--+
+	// 
+	//the given matrix looks like this
+	//+--+--+
+	//|00|01|
+	//+--+--+
+	//|02|03|
+	//+--+--+
+	//
+	//we want to write the given matrix into the second row of our matrix
+	// 
+	//+--+--+--+--+
+	//|00|01|02|03| (flat representation of the give matrix)
+	//+--+--+--+--+
+	// |  |  |  |
+	// V  V  V  V
+	//+--+--+--+--+--+
+	//|05|06|07|08|09| (second row of our matrix)
+	//+--+--+--+--+--+
+	// 
+	// as you can see, it works if we start at the 0th item in the row, 
+	// but this can also be done starting at the 1st item in the row
+	// 
+	//	 +--+--+--+--+
+	//	 |00|01|02|03| (flat representation of the give matrix)
+	//	 +--+--+--+--+
+	//	  |  |  |  |
+	//	  V  V  V  V
+	//+--+--+--+--+--+
+	//|05|06|07|08|09| (second row of our matrix)
+	//+--+--+--+--+--+
+	// 
+	//
+	//get_width() is 5
+	//so the m.item_count() is 4
+	//and now our item index has to be either 0 or 1
+	//lets test it. 
+	// 
+	// 5 - 4 - 0 = 1 >= 0
+	// 5 - 4 - 1 = 0 >= 0
+	// 5 - 4 - 2 = -1 >= 0 (false)
+	// 
+	//so as soon as
+	//12 - 9 - item_idx < 0 we throw an error
+	//or in more general terms
+	//get_width() - m.item_count() - item_idx < 0
+
+	if ((get_width() - m.item_count() - item_idx) < 0)
 	{
 		throw std::invalid_argument("the item count on this matrix must match the amount of items left in the given row");
 	}

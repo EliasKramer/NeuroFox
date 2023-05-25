@@ -82,8 +82,16 @@ void convolutional_layer::set_input_format(const matrix& input_format)
 		kernel_weights_deltas.push_back(matrix(vector3(kernel_size, kernel_size, input_depth)));
 
 	}
-	kernel_biases = matrix(vector3(((int)output_width, (int)output_height, kernel_count)));
-	kernel_bias_deltas = matrix(vector3(((int)output_width, (int)output_height, kernel_count)));
+	kernel_biases = matrix(
+		vector3(
+			(size_t)output_width, 
+			(size_t)output_height, 
+			kernel_count));
+	kernel_bias_deltas = matrix(
+		vector3(
+			(size_t)output_width, 
+			(size_t)output_height, 
+			kernel_count));
 }
 
 void convolutional_layer::set_all_parameter(float value)
