@@ -33,7 +33,8 @@ public:
 	//sets the input matrix to a certain format
 	void set_input_format(vector3 input_format);
 
-	const matrix& get_output() const;
+	const matrix& get_output_readonly() const;
+	matrix& get_output();
 
 	void add_fully_connected_layer(int num_neurons, e_activation_t activation_fn);
 	void add_fully_connected_layer(vector3 neuron_format, e_activation_t activation_fn);
@@ -61,5 +62,5 @@ public:
 	//calculating the average of the deltas
 	void apply_deltas(size_t training_data_count, float learning_rate);
 
-	void enable_gpu();
+	void enable_gpu_mode();
 };

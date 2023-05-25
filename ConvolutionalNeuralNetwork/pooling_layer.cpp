@@ -99,7 +99,7 @@ void pooling_layer::forward_propagation(const matrix& input)
 							break;
 
 						//get the value of the input at the current index
-						const float curr_val = input.get_at(vector3(j, i, d));
+						const float curr_val = input.get_at_host(vector3(j, i, d));
 
 						//if the current value is greater than the max value
 						//set the max value to the current value
@@ -159,7 +159,7 @@ void pooling_layer::apply_deltas(size_t training_data_count, float learning_rate
 	throw std::invalid_argument("pooling layer does not have any parameters");
 }
 
-void pooling_layer::enable_gpu()
+void pooling_layer::enable_gpu_mode()
 {
 	throw std::runtime_error("pooling layer has no implementation of enable gpu");
 }

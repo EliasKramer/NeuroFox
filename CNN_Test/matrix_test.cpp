@@ -44,15 +44,15 @@ namespace CNNTest
 
 			matrix initial_matrix(vector3(2, 2, 2), initial_data);
 
-			Assert::AreEqual(11.0f, initial_matrix.get_at(vector3(0, 0, 0)));
-			Assert::AreEqual(22.0f, initial_matrix.get_at(vector3(1, 0, 0)));
-			Assert::AreEqual(33.0f, initial_matrix.get_at(vector3(0, 1, 0)));
-			Assert::AreEqual(44.0f, initial_matrix.get_at(vector3(1, 1, 0)));
+			Assert::AreEqual(11.0f, initial_matrix.get_at_host(vector3(0, 0, 0)));
+			Assert::AreEqual(22.0f, initial_matrix.get_at_host(vector3(1, 0, 0)));
+			Assert::AreEqual(33.0f, initial_matrix.get_at_host(vector3(0, 1, 0)));
+			Assert::AreEqual(44.0f, initial_matrix.get_at_host(vector3(1, 1, 0)));
 			
-			Assert::AreEqual(55.0f, initial_matrix.get_at(vector3(0, 0, 1)));
-			Assert::AreEqual(66.0f, initial_matrix.get_at(vector3(1, 0, 1)));
-			Assert::AreEqual(77.0f, initial_matrix.get_at(vector3(0, 1, 1)));
-			Assert::AreEqual(88.0f, initial_matrix.get_at(vector3(1, 1, 1)));
+			Assert::AreEqual(55.0f, initial_matrix.get_at_host(vector3(0, 0, 1)));
+			Assert::AreEqual(66.0f, initial_matrix.get_at_host(vector3(1, 0, 1)));
+			Assert::AreEqual(77.0f, initial_matrix.get_at_host(vector3(0, 1, 1)));
+			Assert::AreEqual(88.0f, initial_matrix.get_at_host(vector3(1, 1, 1)));
 		}
 		TEST_METHOD(setting_getting)
 		{
@@ -81,30 +81,30 @@ namespace CNNTest
 			m.set_at(vector3(1, 1, 3), 22);
 			m.set_at(vector3(0, 2, 3), 23);
 			m.set_at(vector3(1, 2, 3), 24);
-			Assert::AreEqual(2, (int)m.get_at(vector3(1, 0, 0)));
-			Assert::AreEqual(1, (int)m.get_at(vector3(0, 0, 0)));
-			Assert::AreEqual(3, (int)m.get_at(vector3(0, 1, 0)));
-			Assert::AreEqual(4, (int)m.get_at(vector3(1, 1, 0)));
-			Assert::AreEqual(5, (int)m.get_at(vector3(0, 2, 0)));
-			Assert::AreEqual(6, (int)m.get_at(vector3(1, 2, 0)));
-			Assert::AreEqual(7, (int)m.get_at(vector3(0, 0, 1)));
-			Assert::AreEqual(8, (int)m.get_at(vector3(1, 0, 1)));
-			Assert::AreEqual(9, (int)m.get_at(vector3(0, 1, 1)));
-			Assert::AreEqual(10, (int)m.get_at(vector3(1, 1, 1)));
-			Assert::AreEqual(11, (int)m.get_at(vector3(0, 2, 1)));
-			Assert::AreEqual(12, (int)m.get_at(vector3(1, 2, 1)));
-			Assert::AreEqual(13, (int)m.get_at(vector3(0, 0, 2)));
-			Assert::AreEqual(14, (int)m.get_at(vector3(1, 0, 2)));
-			Assert::AreEqual(15, (int)m.get_at(vector3(0, 1, 2)));
-			Assert::AreEqual(16, (int)m.get_at(vector3(1, 1, 2)));
-			Assert::AreEqual(17, (int)m.get_at(vector3(0, 2, 2)));
-			Assert::AreEqual(18, (int)m.get_at(vector3(1, 2, 2)));
-			Assert::AreEqual(19, (int)m.get_at(vector3(0, 0, 3)));
-			Assert::AreEqual(20, (int)m.get_at(vector3(1, 0, 3)));
-			Assert::AreEqual(21, (int)m.get_at(vector3(0, 1, 3)));
-			Assert::AreEqual(22, (int)m.get_at(vector3(1, 1, 3)));
-			Assert::AreEqual(23, (int)m.get_at(vector3(0, 2, 3)));
-			Assert::AreEqual(24, (int)m.get_at(vector3(1, 2, 3)));
+			Assert::AreEqual(2, (int)m.get_at_host(vector3(1, 0, 0)));
+			Assert::AreEqual(1, (int)m.get_at_host(vector3(0, 0, 0)));
+			Assert::AreEqual(3, (int)m.get_at_host(vector3(0, 1, 0)));
+			Assert::AreEqual(4, (int)m.get_at_host(vector3(1, 1, 0)));
+			Assert::AreEqual(5, (int)m.get_at_host(vector3(0, 2, 0)));
+			Assert::AreEqual(6, (int)m.get_at_host(vector3(1, 2, 0)));
+			Assert::AreEqual(7, (int)m.get_at_host(vector3(0, 0, 1)));
+			Assert::AreEqual(8, (int)m.get_at_host(vector3(1, 0, 1)));
+			Assert::AreEqual(9, (int)m.get_at_host(vector3(0, 1, 1)));
+			Assert::AreEqual(10, (int)m.get_at_host(vector3(1, 1, 1)));
+			Assert::AreEqual(11, (int)m.get_at_host(vector3(0, 2, 1)));
+			Assert::AreEqual(12, (int)m.get_at_host(vector3(1, 2, 1)));
+			Assert::AreEqual(13, (int)m.get_at_host(vector3(0, 0, 2)));
+			Assert::AreEqual(14, (int)m.get_at_host(vector3(1, 0, 2)));
+			Assert::AreEqual(15, (int)m.get_at_host(vector3(0, 1, 2)));
+			Assert::AreEqual(16, (int)m.get_at_host(vector3(1, 1, 2)));
+			Assert::AreEqual(17, (int)m.get_at_host(vector3(0, 2, 2)));
+			Assert::AreEqual(18, (int)m.get_at_host(vector3(1, 2, 2)));
+			Assert::AreEqual(19, (int)m.get_at_host(vector3(0, 0, 3)));
+			Assert::AreEqual(20, (int)m.get_at_host(vector3(1, 0, 3)));
+			Assert::AreEqual(21, (int)m.get_at_host(vector3(0, 1, 3)));
+			Assert::AreEqual(22, (int)m.get_at_host(vector3(1, 1, 3)));
+			Assert::AreEqual(23, (int)m.get_at_host(vector3(0, 2, 3)));
+			Assert::AreEqual(24, (int)m.get_at_host(vector3(1, 2, 3)));
 		}
 		TEST_METHOD(equal_test)
 		{
@@ -144,7 +144,7 @@ namespace CNNTest
 
 			for (int i = 0; i < m3.item_count(); i++)
 			{
-				Assert::AreEqual(12.0f, m3.get_at_flat(i));
+				Assert::AreEqual(12.0f, m3.get_at_flat_host(i));
 			}
 		}
 		TEST_METHOD(dot_test_3D)
@@ -160,7 +160,7 @@ namespace CNNTest
 
 			for (int i = 0; i < m3.item_count(); i++)
 			{
-				Assert::AreEqual(12.0f, m3.get_at_flat(i));
+				Assert::AreEqual(12.0f, m3.get_at_flat_host(i));
 			}
 		}
 		TEST_METHOD(valid_cross_correlation_test)
@@ -222,10 +222,10 @@ namespace CNNTest
 
 			matrix::valid_cross_correlation(input, kernels, output, 1);
 
-			Assert::AreEqual(37, (int)output.get_at(vector3(0, 0)));
-			Assert::AreEqual(67, (int)output.get_at(vector3(1, 0)));
-			Assert::AreEqual(47, (int)output.get_at(vector3(0, 1)));
-			Assert::AreEqual(77, (int)output.get_at(vector3(1, 1)));
+			Assert::AreEqual(37, (int)output.get_at_host(vector3(0, 0)));
+			Assert::AreEqual(67, (int)output.get_at_host(vector3(1, 0)));
+			Assert::AreEqual(47, (int)output.get_at_host(vector3(0, 1)));
+			Assert::AreEqual(77, (int)output.get_at_host(vector3(1, 1)));
 		}
 		TEST_METHOD(test_copy)
 		{
@@ -235,10 +235,10 @@ namespace CNNTest
 			Assert::IsTrue(matrix::are_equal(m, m2));
 
 			m2.set_at(vector3(0, 0, 0), 2);
-			Assert::AreNotEqual(2.0f, m.get_at(vector3(0, 0, 0)));
+			Assert::AreNotEqual(2.0f, m.get_at_host(vector3(0, 0, 0)));
 
 			m.set_at(vector3(0, 0, 1), 3);
-			Assert::AreNotEqual(3.0f, m2.get_at(vector3(0, 0, 1)));
+			Assert::AreNotEqual(3.0f, m2.get_at_host(vector3(0, 0, 1)));
 		}
 	};
 }

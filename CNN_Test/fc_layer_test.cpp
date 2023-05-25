@@ -12,7 +12,7 @@ namespace CNNTest
 			fully_connected_layer fc_layer(5, relu_fn);
 			fc_layer.set_input_format(vector3(1, 1, 1));
 
-			matrix output = fc_layer.get_activations();
+			matrix output = fc_layer.get_activations_readonly();
 
 			Assert::AreEqual((size_t)5, output.get_height());
 		}
@@ -21,7 +21,7 @@ namespace CNNTest
 			fully_connected_layer fc_layer(5, relu_fn);
 			fc_layer.set_input_format(vector3(1,4,1));
 
-			Assert::AreEqual((size_t)5, fc_layer.get_activations().get_height());
+			Assert::AreEqual((size_t)5, fc_layer.get_activations_readonly().get_height());
 
 			Assert::AreEqual((size_t)5, fc_layer.get_weights().get_height());
 			Assert::AreEqual((size_t)4, fc_layer.get_weights().get_width());
@@ -41,7 +41,7 @@ namespace CNNTest
 
 			fc_layer.forward_propagation(input);
 
-			Assert::AreEqual(7.0f, fc_layer.get_activations().get_at_flat(0));
+			Assert::AreEqual(7.0f, fc_layer.get_activations_readonly().get_at_flat_host(0));
 		}
 		TEST_METHOD(propagating_forward_5node_input_3node_layer)
 		{
@@ -63,9 +63,9 @@ namespace CNNTest
 
 			fc_layer.forward_propagation(input);
 
-			Assert::AreEqual(35.0f, fc_layer.get_activations().get_at_flat(0));
-			Assert::AreEqual(41.0f, fc_layer.get_activations().get_at_flat(1));
-			Assert::AreEqual(41.0f, fc_layer.get_activations().get_at_flat(2));
+			Assert::AreEqual(35.0f, fc_layer.get_activations_readonly().get_at_flat_host(0));
+			Assert::AreEqual(41.0f, fc_layer.get_activations_readonly().get_at_flat_host(1));
+			Assert::AreEqual(41.0f, fc_layer.get_activations_readonly().get_at_flat_host(2));
 		}
 	};
 }

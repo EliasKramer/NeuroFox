@@ -18,6 +18,8 @@ private:
 
 	//returns the flat index of the float with the highest value in the matrix
 	size_t idx_of_max(const matrix& m) const;
+
+	void enable_gpu();
 public:
 	mnist_digit_overlord();
 

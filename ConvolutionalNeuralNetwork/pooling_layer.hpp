@@ -36,6 +36,6 @@ public:
 
 	void apply_deltas(size_t training_data_count, float learning_rate) override;
 	
-	void enable_gpu() override;
+	void enable_gpu_mode() override;
 	void disable_gpu() override;
 };

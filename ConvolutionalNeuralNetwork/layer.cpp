@@ -43,7 +43,12 @@ void layer::set_input_format(vector3 given_input_format)
 	this->input_format = given_input_format;
 }
 
-const matrix& layer::get_activations() const
+const matrix& layer::get_activations_readonly() const
+{
+	return activations;
+}
+
+matrix& layer::get_activations()
 {
 	return activations;
 }
@@ -74,10 +79,10 @@ void layer::set_error_for_last_layer_cpu(const matrix& expected)
 	error.scalar_multiplication(2);
 }
 
-void layer::enable_gpu()
+void layer::enable_gpu_mode()
 {
-	activations.enable_gpu();
-	error.enable_gpu();
+	activations.enable_gpu_mode();
+	error.enable_gpu_mode();
 	
 	//input_format.enable_gpu();
 	//gpu_activations = std::make_unique<gpu_matrix>(activations, true);

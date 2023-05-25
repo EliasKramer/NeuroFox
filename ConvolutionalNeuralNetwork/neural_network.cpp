@@ -19,9 +19,16 @@ void neural_network::set_input_format(vector3 given_input_format)
 	this->input_format = given_input_format;
 }
 
-const matrix& neural_network::get_output() const
+const matrix& neural_network::get_output_readonly() const
 {
-	if(layers.empty())
+	if (layers.empty())
+		throw std::runtime_error("Cannot get output of neural network with no layers.");
+	return layers.back().get()->get_activations_readonly();
+}
+
+matrix& neural_network::get_output()
+{
+	if (layers.empty())
 		throw std::runtime_error("Cannot get output of neural network with no layers.");
 	return layers.back().get()->get_activations();
 }
@@ -46,7 +53,7 @@ void neural_network::add_layer(std::unique_ptr<layer>&& given_layer)
 	{
 		//if there are already layers,
 		//set the previous layer of the new layer to the last layer
-		given_layer->set_input_format(get_last_layer()->get_activations().get_format());
+		given_layer->set_input_format(get_last_layer()->get_activations_readonly().get_format());
 	}
 
 	//putting the new layer into the vector of layers
@@ -55,7 +62,7 @@ void neural_network::add_layer(std::unique_ptr<layer>&& given_layer)
 
 float neural_network::calculate_cost(const matrix& expected_output)
 {
-	if (matrix::equal_format(get_output(), expected_output) == false)
+	if (matrix::equal_format(get_output_readonly(), expected_output) == false)
 	{
 		throw std::runtime_error("Output format does not match expected output format.");
 	}
@@ -63,8 +70,8 @@ float neural_network::calculate_cost(const matrix& expected_output)
 	float cost = 0.0f;
 	for (int i = 0; i < expected_output.item_count(); i++)
 	{
-		float expected = expected_output.get_at_flat(i);
-		float actual = get_output().get_at_flat(i);
+		float expected = expected_output.get_at_flat_host(i);
+		float actual = get_output_readonly().get_at_flat_host(i);
 		cost += ((actual - expected) * (actual - expected));
 	}
 	return cost;
@@ -195,7 +202,7 @@ void neural_network::back_propagation(const matrix& given_data, const matrix& gi
 		const matrix& input =
 			i == 0 ?
 			given_data :
-			layers[i - 1].get()->get_activations();
+			layers[i - 1].get()->get_activations_readonly();
 
 		matrix* passing_error =
 			i == 0 ?
@@ -215,7 +222,7 @@ void neural_network::apply_deltas(size_t training_data_count, float learning_rat
 		layers[l]->apply_deltas(training_data_count, learning_rate);
 	}
 }
-void neural_network::enable_gpu()
+void neural_network::enable_gpu_mode()
 {
 	int device_count = 0;
 	cudaError_t error = cudaGetDeviceCount(&device_count);
@@ -232,7 +239,7 @@ void neural_network::enable_gpu()
 
 	for (auto& l : layers)
 	{
-		l->enable_gpu();
+		l->enable_gpu_mode();
 	}
 
 	gpu_enabled = true;

@@ -2,7 +2,7 @@
 
 float fully_connected_layer::get_weight_at(int input_layer_idx, int current_activation_idx) const
 {
-	return weights.get_at(vector3(input_layer_idx, current_activation_idx));
+	return weights.get_at_host(vector3(input_layer_idx, current_activation_idx));
 }
 
 void fully_connected_layer::set_weight_at(int input_layer_idx, int current_activation_idx, float value)
@@ -12,7 +12,7 @@ void fully_connected_layer::set_weight_at(int input_layer_idx, int current_activ
 
 float fully_connected_layer::get_weight_delta_at(int input_layer_idx, int current_activation_idx) const
 {
-	return weight_deltas.get_at(vector3(input_layer_idx, current_activation_idx));
+	return weight_deltas.get_at_host(vector3(input_layer_idx, current_activation_idx));
 }
 
 void fully_connected_layer::set_weight_delta_at(int input_layer_idx, int current_activation_idx, float value)
@@ -117,11 +117,11 @@ void fully_connected_layer::back_propagation(const matrix& input, matrix* passin
 
 	for (int current_neuron_idx = 0; current_neuron_idx < activations.item_count(); current_neuron_idx++)
 	{
-		float error_value = error.get_at_flat(current_neuron_idx);
+		float error_value = error.get_at_flat_host(current_neuron_idx);
 		//clear the error
 		error.set_at_flat(current_neuron_idx, 0.0f);
 
-		float current_activation_value = activations.get_at_flat(current_neuron_idx);
+		float current_activation_value = activations.get_at_flat_host(current_neuron_idx);
 		float unactivated_activation = INVERSE[activation_fn](current_activation_value);
 		float activation_derivative = DERIVATIVE[activation_fn](unactivated_activation);
 
@@ -132,7 +132,7 @@ void fully_connected_layer::back_propagation(const matrix& input, matrix* passin
 		//iterate input layer
 		for (int current_input_idx = 0; current_input_idx < input.item_count(); current_input_idx++)
 		{
-			float current_previous_activation = input.get_at_flat(current_input_idx);
+			float current_previous_activation = input.get_at_flat_host(current_input_idx);
 
 			//this weight connects the current input node to the current neuron
 			float current_weight = get_weight_at(current_input_idx, current_neuron_idx);
@@ -176,29 +176,29 @@ void fully_connected_layer::apply_deltas(size_t training_data_count, float learn
 {
 	for (int i = 0; i < biases.item_count(); i++)
 	{
-		float current_bias = biases.get_at_flat(i);
-		float avg_bias_delta = bias_deltas.get_at_flat(i) / training_data_count;
+		float current_bias = biases.get_at_flat_host(i);
+		float avg_bias_delta = bias_deltas.get_at_flat_host(i) / training_data_count;
 		biases.set_at_flat(i, current_bias - (avg_bias_delta * learning_rate));
 		bias_deltas.set_at_flat(i, 0.0f);
 	}
 
 	for (int i = 0; i < weights.item_count(); i++)
 	{
-		float current_weight = weights.get_at_flat(i);
-		float avg_weight_delta = weight_deltas.get_at_flat(i) / training_data_count;
+		float current_weight = weights.get_at_flat_host(i);
+		float avg_weight_delta = weight_deltas.get_at_flat_host(i) / training_data_count;
 		weights.set_at_flat(i, current_weight - (avg_weight_delta * learning_rate));
 		weight_deltas.set_at_flat(i, 0.0f);
 	}
 }
 
-void fully_connected_layer::enable_gpu()
+void fully_connected_layer::enable_gpu_mode()
 {
-	layer::enable_gpu();
+	layer::enable_gpu_mode();
 
-	weights.enable_gpu();
-	biases.enable_gpu();
-	weight_deltas.enable_gpu();
-	bias_deltas.enable_gpu();
+	weights.enable_gpu_mode();
+	biases.enable_gpu_mode();
+	weight_deltas.enable_gpu_mode();
+	bias_deltas.enable_gpu_mode();
 }
 
 void fully_connected_layer::disable_gpu()

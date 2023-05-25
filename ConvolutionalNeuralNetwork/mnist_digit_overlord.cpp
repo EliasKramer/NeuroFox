@@ -16,8 +16,8 @@ float mnist_digit_overlord::get_digit_cost(const matrix& output, const matrix& l
 	for (size_t i = 0; i < output.item_count(); i++)
 	{
 		cost += 
-			(output.get_at_flat(i) - label.get_at_flat(i)) * 
-			(output.get_at_flat(i) - label.get_at_flat(i));
+			(output.get_at_flat_host(i) - label.get_at_flat_host(i)) * 
+			(output.get_at_flat_host(i) - label.get_at_flat_host(i));
 	}
 	return cost;
 }
@@ -28,7 +28,7 @@ void mnist_digit_overlord::print_digit_image(const matrix& m) const
 	{
 		for (int y = 0; y < m.get_height(); y++)
 		{
-			m.get_at(vector3(x,y)) > 0.5 ? 
+			m.get_at_host(vector3(x,y)) > 0.5 ? 
 				std::cout << "# " : 
 				std::cout << ". ";
 		}
@@ -133,7 +133,9 @@ void mnist_digit_overlord::load_data(
 		label_to_matrix(label, curr_label);
 		ds.set_current_label(curr_label);
 		ds.set_current_data(current_image);
+		ds.iterator_next();
 	}
+	ds.iterator_reset();
 
 	delete[] image_buffer;
 	delete[] label_buffer;
@@ -145,10 +147,10 @@ void mnist_digit_overlord::load_data(
 size_t mnist_digit_overlord::idx_of_max(const matrix& m) const
 {
 	size_t max_idx = 0;
-	float max = m.get_at(vector3(0, 0));
+	float max = m.get_at_host(vector3(0, 0));
 	for (size_t idx = 1; idx < m.item_count(); idx++)
 	{
-		float curr = m.get_at_flat(idx);
+		float curr = m.get_at_flat_host(idx);
 		if (curr > max)
 		{
 			max = curr;
@@ -156,6 +158,20 @@ size_t mnist_digit_overlord::idx_of_max(const matrix& m) const
 		}
 	}
 	return max_idx;
+}
+
+void mnist_digit_overlord::enable_gpu()
+{
+	auto start = std::chrono::high_resolution_clock::now();
+	std::cout << "copying to gpu" << std::endl;
+	ds_training.copy_to_gpu();
+	ds_test.copy_to_gpu();
+	nn.enable_gpu_mode();
+	auto end = std::chrono::high_resolution_clock::now();
+	std::cout 
+		<< "copied to gpu, took " 
+		<< std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() 
+		<< "ms" << std::endl;
 }
 
 mnist_digit_overlord::mnist_digit_overlord()
@@ -168,6 +184,7 @@ mnist_digit_overlord::mnist_digit_overlord()
 		base_path + "\\train-images.idx3-ubyte",
 		base_path + "\\train-labels.idx1-ubyte");
 	std::cout << "loading test data" << std::endl;
+
 	load_data(
 		ds_test,
 		base_path + "\\t10k-images.idx3-ubyte",
@@ -179,10 +196,12 @@ mnist_digit_overlord::mnist_digit_overlord()
 		std::endl;
 
 	nn.set_input_format(vector3(28, 28, 1));
-	nn.add_fully_connected_layer(16, e_activation_t::sigmoid_fn);
-	nn.add_fully_connected_layer(16, e_activation_t::sigmoid_fn);
+	nn.add_fully_connected_layer(256, e_activation_t::sigmoid_fn);
+	nn.add_fully_connected_layer(256, e_activation_t::sigmoid_fn);
 	nn.add_fully_connected_layer(vector3(1, 10, 1), e_activation_t::sigmoid_fn);
 	nn.set_all_parameter(0);
+
+	enable_gpu();
 }
 
 test_result mnist_digit_overlord::test()
@@ -201,10 +220,11 @@ test_result mnist_digit_overlord::test()
 		const matrix& input = ds_test.get_current_data();
 		const matrix& label = ds_test.get_current_label();
 		nn.forward_propagation(input);
+		nn.get_output().sync_device_and_host();
 
-		cost_sum += get_digit_cost(nn.get_output(), label);
+		cost_sum += get_digit_cost(nn.get_output_readonly(), label);
 
-		size_t idx = idx_of_max(nn.get_output());
+		size_t idx = idx_of_max(nn.get_output_readonly());
 		size_t label_idx = idx_of_max(label);
 		if (idx == label_idx)
 		{
@@ -218,7 +238,7 @@ test_result mnist_digit_overlord::test()
 	result.accuracy = (float)correct / (float)total;
 	result.data_count = total;
 	result.time_in_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-	result.avg_cost = (float)cost_sum / float(total);
+	result.avg_cost = (float)cost_sum / (float)total;
 
 	return result;
 }

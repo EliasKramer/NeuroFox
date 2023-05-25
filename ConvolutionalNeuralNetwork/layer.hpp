@@ -35,7 +35,8 @@ public:
 
 	virtual void set_input_format(vector3 given_input_format);
 	
-	const matrix& get_activations() const;
+	const matrix& get_activations_readonly() const;
+	matrix& get_activations();
 	matrix* get_activations_p();
 
 	const matrix& get_error() const;
@@ -59,6 +60,6 @@ public:
 	//average. this is done by dividing the deltas by the number of inputs
 	virtual void apply_deltas(size_t training_data_count, float learning_rate) = 0;
 
-	virtual void enable_gpu();
+	virtual void enable_gpu_mode();
 	virtual void disable_gpu();
 };

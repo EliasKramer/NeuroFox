@@ -1,6 +1,35 @@
 #include "matrix.hpp"
 #include <numeric>
 
+void matrix::set_host_as_last_updated()
+{
+	if_not_initialized_throw();
+	if (!gpu_enabled)
+	{
+		last_updated_data = nullptr;
+		return;
+	}
+	if (last_updated_data == device_data)
+	{
+		throw std::exception("cannot set host as last updated, you have to sync first");
+	}
+	last_updated_data = host_data;
+}
+
+void matrix::set_device_as_last_updated()
+{
+	if_not_initialized_throw();
+	if (!gpu_enabled)
+	{
+		throw std::exception("no device can set, if gpu is disabled");
+	}
+	if (last_updated_data == host_data)
+	{
+		throw std::exception("cannot set device as last updated, you have to sync first");
+	}
+	last_updated_data = device_data;
+}
+
 bool matrix::is_initialized() const
 {
 	return host_data != nullptr && format.item_count() != 0;
@@ -22,14 +51,9 @@ void matrix::if_not_owning_throw() const
 	}
 }
 
-bool matrix::is_device_mem_allocated() const
-{
-	return device_data != nullptr;
-}
-
 void matrix::if_gpu_not_allocated_throw() const
 {
-	if (!is_device_mem_allocated())
+	if (!gpu_enabled)
 	{
 		throw std::runtime_error("matrix not using gpu");
 	}
@@ -38,11 +62,12 @@ void matrix::if_gpu_not_allocated_throw() const
 void matrix::allocate_device_mem()
 {
 	if_not_initialized_throw();
-	if (is_device_mem_allocated())
+	if (gpu_enabled)
 		throw std::runtime_error("gpu memory already allocated");
 
 	cudaMalloc(&device_data, item_count() * sizeof(float));
 	if_cuda_error_throw();
+	gpu_enabled = true;
 }
 
 void matrix::copy_host_to_device()
@@ -119,12 +144,6 @@ void matrix::set_own_host_data_from(const std::vector<float> src)
 	allocate_host_mem();
 
 	std::copy(src.data(), src.data() + item_count(), this->host_data);
-
-	//TODO gpu
-	if (is_device_mem_allocated())
-	{
-		copy_host_to_device();
-	}
 }
 
 void matrix::set_own_host_data_from(const matrix& src)
@@ -146,6 +165,7 @@ void matrix::set_own_host_data_from(const matrix& src)
 	std::copy(src.host_data, src.host_data + item_count(), this->host_data);
 
 	//TODO gpu
+	/*
 	if (src.is_device_mem_allocated())
 	{
 		if (!is_device_mem_allocated())
@@ -153,7 +173,7 @@ void matrix::set_own_host_data_from(const matrix& src)
 			allocate_device_mem();
 		}
 		copy_device_to_host();
-	}
+	}*/
 }
 
 void matrix::delete_data_if_owning()
@@ -199,6 +219,7 @@ float* matrix::get_ptr_item(float* given_ptr, size_t width_idx, size_t height_id
 matrix::matrix(
 ) :
 	owning_data(false),
+	gpu_enabled(false),
 	host_data(nullptr),
 	device_data(nullptr)
 {}
@@ -215,7 +236,7 @@ matrix::matrix(
 	{
 		allocate_host_mem();
 	}
-	else 
+	else
 	{
 		format = vector3(0, 0, 0);
 		owning_data = false;
@@ -247,6 +268,28 @@ matrix::~matrix()
 	delete_data_if_owning();
 }
 
+void matrix::sync_device_and_host()
+{
+	if (last_updated_data == nullptr || !gpu_enabled)
+	{
+		last_updated_data = nullptr;
+		return;
+	}
+	else if (last_updated_data == host_data)
+	{
+		copy_host_to_device();
+	}
+	else if (last_updated_data == device_data)
+	{
+		copy_device_to_host();
+	}
+	else
+	{
+		throw std::runtime_error("last_updated_data is not pointing to host or device");
+	}
+	last_updated_data = nullptr;
+}
+
 matrix& matrix::operator=(const matrix& other)
 {
 	other.if_not_initialized_throw();
@@ -262,9 +305,9 @@ matrix& matrix::operator=(const matrix& other)
 		{
 			allocate_host_mem();
 			set_own_host_data_from(other);
-			if (other.is_device_mem_allocated())
+			if (other.gpu_enabled)
 			{
-				enable_gpu();
+				enable_gpu_mode();
 			}
 		}
 	}
@@ -279,6 +322,11 @@ void matrix::set_all(float value)
 	{
 		host_data[i] = value;
 	}
+
+	if (gpu_enabled)
+	{
+		copy_host_to_device();
+	}
 }
 
 void matrix::apply_noise(float range)
@@ -289,6 +337,7 @@ void matrix::apply_noise(float range)
 	{
 		host_data[i] += random_float_incl(-range, range);
 	}
+	set_host_as_last_updated();
 }
 
 void matrix::mutate(float range)
@@ -298,6 +347,8 @@ void matrix::mutate(float range)
 	add_at_flat(
 		random_idx((int)item_count()),
 		random_float_incl(-range, range));
+
+	set_host_as_last_updated();
 }
 
 vector3 matrix::get_format() const
@@ -323,7 +374,7 @@ size_t matrix::item_count() const
 	return format.item_count();
 }
 
-float matrix::get_at_flat(size_t idx) const
+float matrix::get_at_flat_host(size_t idx) const
 {
 	if_not_initialized_throw();
 
@@ -343,18 +394,15 @@ void matrix::set_at_flat(size_t idx, float value)
 	{
 		throw std::invalid_argument("idx must be in range");
 	}
+
 	host_data[idx] = value;
+
+	set_host_as_last_updated();
 }
 
 void matrix::add_at_flat(size_t idx, float value)
 {
-	if_not_initialized_throw();
-
-	if (idx >= item_count())
-	{
-		throw std::invalid_argument("idx must be in range");
-	}
-	host_data[idx] += value;
+	set_at_flat(idx, get_at_flat_host(idx) + value);
 }
 
 float* matrix::get_device_ptr()
@@ -374,11 +422,11 @@ float* matrix::get_device_ptr_layer(size_t depth_idx)
 	return get_ptr_layer(device_data, depth_idx);
 }
 
-void matrix::enable_gpu()
+void matrix::enable_gpu_mode()
 {
 	if_not_initialized_throw();
 
-	if (!is_device_mem_allocated())
+	if (device_data == nullptr)
 	{
 		if (owning_data)
 		{
@@ -444,7 +492,7 @@ void matrix::observe_row(matrix& m, size_t row_idx, size_t item_idx)
 
 	host_data = m.get_ptr_item(m.host_data, item_idx, row_idx, 0);
 
-	if (m.is_device_mem_allocated())
+	if (gpu_enabled)
 	{
 		device_data = m.get_ptr_item(m.device_data, item_idx, row_idx, 0);
 	}
@@ -539,11 +587,7 @@ void matrix::set_row_from_matrix(const matrix& m, size_t row_idx, size_t item_id
 	float* new_ptr = get_ptr_item(host_data, item_idx, row_idx, 0);
 	memcpy(new_ptr, m.host_data, m.item_count() * sizeof(float));
 
-	//TODO gpu
-	if (is_device_mem_allocated())
-	{
-		copy_host_to_device();
-	}
+	set_host_as_last_updated();
 }
 
 void matrix::set_at(vector3 pos, float value)
@@ -556,21 +600,18 @@ void matrix::set_at(vector3 pos, float value)
 
 	host_data[pos.get_index(format)] = value;
 
-	//could be improved by only setting the value
-	if (is_device_mem_allocated())
-	{
-		copy_host_to_device();
-	}
+	set_host_as_last_updated();
 }
 
-void matrix::add_at(vector3 pos, float value)
+void matrix::add_at_host(vector3 pos, float value)
 {
-	set_at(pos, get_at(pos) + value);
+	set_at(pos, get_at_host(pos) + value);
 }
 
-float matrix::get_at(vector3 pos) const
+float matrix::get_at_host(vector3 pos) const
 {
 	if_not_initialized_throw();
+
 	if (!pos.is_in_bounds(format))
 		throw std::invalid_argument("pos must be in bounds");
 
@@ -592,6 +633,13 @@ void matrix::dot_product(const matrix& a, const matrix& b, matrix& result)
 		throw std::invalid_argument("dot product could not be performed. result matrix is not the correct size");
 	}
 
+	if (a.gpu_enabled || b.gpu_enabled || result.gpu_enabled)
+	{
+		throw std::exception("no proper dot product implemented on the gpu. use dot_product_flat");
+		result.set_device_as_last_updated();
+		return;
+	}
+
 	for (int z = 0; z < result.get_depth(); z++)
 	{
 		for (int y = 0; y < result.get_height(); y++)
@@ -601,12 +649,13 @@ void matrix::dot_product(const matrix& a, const matrix& b, matrix& result)
 				float sum = 0;
 				for (int i = 0; i < a.get_width(); i++)
 				{
-					sum += a.get_at(vector3(i, y, z)) * b.get_at(vector3(x, i, z));
+					sum += a.get_at_host(vector3(i, y, z)) * b.get_at_host(vector3(x, i, z));
 				}
 				result.set_at(vector3(x, y, z), sum);
 			}
 		}
 	}
+	result.set_host_as_last_updated();
 }
 
 void matrix::dot_product_flat(const matrix& a, const matrix& flat, matrix& result_flat)
@@ -623,13 +672,24 @@ void matrix::dot_product_flat(const matrix& a, const matrix& flat, matrix& resul
 		throw std::invalid_argument("dot product could not be performed. input matrices are in the wrong format");
 	}
 
-	for (int x = 0; x < a.get_width(); x++)
+	if (a.gpu_enabled &&
+		flat.gpu_enabled &&
+		result_flat.gpu_enabled)
 	{
-		for (int y = 0; y < a.get_height(); y++)
+		gpu_dot_product(a, flat, result_flat);
+		result_flat.set_device_as_last_updated();
+		return;
+	}
+
+	for (int y = 0; y < a.get_height(); y++)
+	{
+		result_flat.set_at_flat(y, 0);
+		for (int x = 0; x < a.get_width(); x++)
 		{
-			result_flat.add_at_flat(y, a.get_at(vector3(x, y)) * flat.get_at_flat(x));
+			result_flat.add_at_flat(y, a.get_at_host(vector3(x, y)) * flat.get_at_flat_host(x));
 		}
 	}
+	result_flat.set_host_as_last_updated();
 }
 
 void matrix::add(const matrix& a, const matrix& b, matrix& result)
@@ -647,10 +707,20 @@ void matrix::add(const matrix& a, const matrix& b, matrix& result)
 		throw std::invalid_argument("addition could not be performed. result matrix is not the correct size");
 	}
 
+	if (a.gpu_enabled &&
+		b.gpu_enabled &&
+		result.gpu_enabled)
+	{
+		gpu_add(a, b, result);
+		result.set_device_as_last_updated();
+		return;
+	}
+
 	for (int i = 0; i < a.item_count(); i++)
 	{
 		result.host_data[i] = a.host_data[i] + b.host_data[i];
 	}
+	result.set_host_as_last_updated();
 }
 
 void matrix::add_flat(const matrix& a, const matrix& b, matrix& result)
@@ -664,10 +734,20 @@ void matrix::add_flat(const matrix& a, const matrix& b, matrix& result)
 		throw std::invalid_argument("addition could not be performed. input matrices are not the same size");
 	}
 
+	if (a.gpu_enabled &&
+		b.gpu_enabled &&
+		result.gpu_enabled)
+	{
+		gpu_add(a, b, result);
+		result.set_device_as_last_updated();
+		return;
+	}
+
 	for (int i = 0; i < a.item_count(); i++)
 	{
 		result.host_data[i] = a.host_data[i] + b.host_data[i];
 	}
+	result.set_host_as_last_updated();
 }
 
 void matrix::subtract(const matrix& a, const matrix& b, matrix& result)
@@ -684,10 +764,21 @@ void matrix::subtract(const matrix& a, const matrix& b, matrix& result)
 		throw std::invalid_argument("subtraction could not be performed. input matrices are in the wrong format");
 	}
 
+	if (a.gpu_enabled &&
+		b.gpu_enabled &&
+		result.gpu_enabled)
+	{
+		//gpu_subtract(a, b, result);
+		throw std::exception("gpu subtract not implemented");
+		result.set_device_as_last_updated();
+		return;
+	}
+
 	for (int i = 0; i < a.item_count(); i++)
 	{
 		result.host_data[i] = a.host_data[i] - b.host_data[i];
 	}
+	result.set_host_as_last_updated();
 }
 
 bool matrix::are_equal(const matrix& a, const matrix& b)
@@ -729,9 +820,15 @@ void matrix::valid_cross_correlation(
 	input.if_not_initialized_throw();
 	output.if_not_initialized_throw();
 	output.if_not_owning_throw();
+
+	bool use_gpu = true;
+	use_gpu = use_gpu && input.gpu_enabled;
+	use_gpu = use_gpu && output.gpu_enabled;
+
 	for (const auto& curr_kernel : kernels)
 	{
 		curr_kernel.if_not_initialized_throw();
+		use_gpu = use_gpu && curr_kernel.gpu_enabled;
 	}
 
 	//this only works with a stride of one
@@ -750,6 +847,23 @@ void matrix::valid_cross_correlation(
 	}
 
 	output.set_all(0);
+
+	if (use_gpu)
+	{
+		gpu_valid_cross_correlation(
+			input,
+			kernels,
+			output,
+			stride,
+			input.get_depth(),
+			kernels[0].get_width(),
+			kernels.size(),
+			stride,
+			output.get_width());
+
+		output.set_device_as_last_updated();
+		return;
+	}
 
 	//iterate over each
 	for (int z = 0; z < output.get_depth(); z++)
@@ -777,12 +891,12 @@ void matrix::valid_cross_correlation(
 						for (int j = 0; j < kernel_size; j++)
 						{
 							sum +=
-								input.get_at(
+								input.get_at_host(
 									vector3(
 										x * stride + i,
 										y * stride + j,
 										curr_depth)) *
-								kernels[z].get_at(
+								kernels[z].get_at_host(
 									vector3(
 										i,
 										j,
@@ -791,10 +905,12 @@ void matrix::valid_cross_correlation(
 					}
 				}
 				//if we do this, the output of all depths will be added together
-				output.add_at(vector3(x, y, z), sum);
+				output.add_at_host(vector3(x, y, z), sum);
 			}
 		}
 	}
+
+	output.set_host_as_last_updated();
 }
 
 void matrix::scalar_multiplication(float a)
@@ -802,10 +918,20 @@ void matrix::scalar_multiplication(float a)
 	if_not_initialized_throw();
 	if_not_owning_throw();
 
+	if (gpu_enabled)
+	{
+		//TODO
+		throw std::exception("not implemented");
+		set_device_as_last_updated();
+		return;
+	}
+
+
 	for (int i = 0; i < item_count(); i++)
 	{
 		host_data[i] *= a;
 	}
+	set_host_as_last_updated();
 }
 
 void matrix::apply_activation_function(e_activation_t activation_fn)
@@ -813,10 +939,19 @@ void matrix::apply_activation_function(e_activation_t activation_fn)
 	if_not_initialized_throw();
 	if_not_owning_throw();
 
+	if (gpu_enabled)
+	{
+		//NOT TESTED
+		GPU_ACTIVATION[activation_fn](*this);
+		set_device_as_last_updated();
+		return;
+	}
+
 	for (int i = 0; i < item_count(); i++)
 	{
 		host_data[i] = ACTIVATION[activation_fn](host_data[i]);
 	}
+	set_host_as_last_updated();
 }
 
 std::string matrix::get_string() const
@@ -831,7 +966,7 @@ std::string matrix::get_string() const
 		{
 			for (int x = 0; x < get_width(); x++)
 			{
-				ret_val += std::to_string(get_at(vector3(x, y, z))) + " ";
+				ret_val += std::to_string(get_at_host(vector3(x, y, z))) + " ";
 			}
 			ret_val += "\n";
 		}

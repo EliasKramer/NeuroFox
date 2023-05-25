@@ -196,7 +196,7 @@ void convolutional_layer::apply_deltas(size_t training_data_count, float learnin
 	//TODO
 }
 
-void convolutional_layer::enable_gpu()
+void convolutional_layer::enable_gpu_mode()
 {
 	/*
 	for (const matrix& curr : kernel_weights)

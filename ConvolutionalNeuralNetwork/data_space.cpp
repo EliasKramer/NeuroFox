@@ -146,9 +146,9 @@ void data_space::copy_to_gpu()
 	if (copied_to_gpu)
 		return;
 
-	data_table.enable_gpu();
-	data_iterator.enable_gpu();
-	label_iterator.enable_gpu();
+	data_table.enable_gpu_mode();
+	data_iterator.enable_gpu_mode();
+	label_iterator.enable_gpu_mode();
 
 	copied_to_gpu = true;
 }

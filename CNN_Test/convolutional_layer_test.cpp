@@ -62,10 +62,10 @@ namespace CNNTest
 			layer.set_input_format(input_format);
 			//the width and the heigh are
 			//the (input_size - kernel_size) / stride + 1
-			Assert::AreEqual((size_t)4, layer.get_activations().get_width());
-			Assert::AreEqual((size_t)4, layer.get_activations().get_height());
+			Assert::AreEqual((size_t)4, layer.get_activations_readonly().get_width());
+			Assert::AreEqual((size_t)4, layer.get_activations_readonly().get_height());
 			//the depth is the number of kernels
-			Assert::AreEqual((size_t)3, layer.get_activations().get_depth());
+			Assert::AreEqual((size_t)3, layer.get_activations_readonly().get_depth());
 
 			//the kernel depth is the input depth
 			Assert::AreEqual(
@@ -142,16 +142,16 @@ namespace CNNTest
 
 			Assert::AreEqual(
 				ACTIVATION[sigmoid_fn](-23.0f),
-				layer.get_activations().get_at(vector3(0, 0)));
+				layer.get_activations_readonly().get_at_host(vector3(0, 0)));
 			Assert::AreEqual(
 				ACTIVATION[sigmoid_fn](7.0f),
-				layer.get_activations().get_at(vector3(1, 0)));
+				layer.get_activations_readonly().get_at_host(vector3(1, 0)));
 			Assert::AreEqual(
 				ACTIVATION[sigmoid_fn](-13.0f),
-				layer.get_activations().get_at(vector3(0, 1)));
+				layer.get_activations_readonly().get_at_host(vector3(0, 1)));
 			Assert::AreEqual(
 				ACTIVATION[sigmoid_fn](17.0f),
-				layer.get_activations().get_at(vector3(1, 1)));
+				layer.get_activations_readonly().get_at_host(vector3(1, 1)));
 		}
 	};
 }
