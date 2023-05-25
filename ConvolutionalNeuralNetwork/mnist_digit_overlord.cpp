@@ -42,9 +42,6 @@ void mnist_digit_overlord::load_data(
 	std::string data_path,
 	std::string label_path)
 {
-	std::vector<matrix> data_collection;
-	std::vector<matrix> label_collection;
-
 	std::filesystem::path path1 = std::filesystem::current_path();
 	path1 = path1.lexically_normal() / data_path;
 	std::filesystem::path path2 = std::filesystem::current_path();
@@ -110,7 +107,14 @@ void mnist_digit_overlord::load_data(
 	char* label_buffer = new char[num_labels];
 	label_file.read(label_buffer, num_labels);
 
-	matrix current_image(vector3(28, 28, 1));
+
+	vector3 image_format(28, 28, 1);
+	vector3 label_format(1, 10, 1);
+
+	matrix current_image(image_format);
+	matrix curr_label(label_format);
+
+	ds = data_space(num_images, image_format, label_format);
 
 	for (int i = 0; i < num_images; i++) {
 
@@ -126,12 +130,9 @@ void mnist_digit_overlord::load_data(
 		}
 
 		unsigned char label = label_buffer[i];
-		matrix curr_label;
 		label_to_matrix(label, curr_label);
-		label_collection.push_back(curr_label);
-
-		//push back creates a copy of the object
-		data_collection.push_back(current_image);
+		ds.set_current_label(curr_label);
+		ds.set_current_data(current_image);
 	}
 
 	delete[] image_buffer;
@@ -139,12 +140,6 @@ void mnist_digit_overlord::load_data(
 
 	data_file.close();
 	label_file.close();
-
-	ds = data_space(
-		matrix(vector3(28, 28, 1)),
-		matrix(vector3(1, 10, 1)),
-		data_collection,
-		label_collection);
 }
 
 size_t mnist_digit_overlord::idx_of_max(const matrix& m) const
@@ -183,10 +178,10 @@ mnist_digit_overlord::mnist_digit_overlord()
 		"ms" <<
 		std::endl;
 
-	nn.set_input_format(matrix(vector3(28, 28, 1)));
+	nn.set_input_format(vector3(28, 28, 1));
 	nn.add_fully_connected_layer(16, e_activation_t::sigmoid_fn);
 	nn.add_fully_connected_layer(16, e_activation_t::sigmoid_fn);
-	nn.add_fully_connected_layer(matrix(vector3(1, 10, 1)), e_activation_t::sigmoid_fn);
+	nn.add_fully_connected_layer(vector3(1, 10, 1), e_activation_t::sigmoid_fn);
 	nn.set_all_parameter(0);
 }
 

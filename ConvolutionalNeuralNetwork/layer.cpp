@@ -25,7 +25,7 @@ layer::layer(e_layer_type_t given_layer_type)
 {}
 
 layer::layer(
-	matrix activation_format,
+	vector3 activation_format,
 	e_layer_type_t given_layer_type
 ) :
 	type(given_layer_type),
@@ -38,7 +38,7 @@ const e_layer_type_t layer::get_layer_type() const
 	return type;
 }
 
-void layer::set_input_format(const matrix& given_input_format)
+void layer::set_input_format(vector3 given_input_format)
 {
 	this->input_format = given_input_format;
 }

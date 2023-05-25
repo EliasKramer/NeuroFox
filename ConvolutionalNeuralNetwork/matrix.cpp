@@ -81,13 +81,9 @@ void matrix::if_cuda_error_throw() const
 	}
 }
 
-void matrix::check_for_valid_format() const
+bool matrix::format_is_valid() const
 {
-	if (format.item_count() == 0)
-	{
-		throw std::invalid_argument(
-			"invalid format");
-	}
+	return  format.item_count() != 0;
 }
 
 void matrix::allocate_host_mem()
@@ -215,8 +211,15 @@ matrix::matrix(
 	host_data(nullptr),
 	device_data(nullptr)
 {
-	check_for_valid_format();
-	allocate_host_mem();
+	if (format_is_valid())
+	{
+		allocate_host_mem();
+	}
+	else 
+	{
+		format = vector3(0, 0, 0);
+		owning_data = false;
+	}
 }
 
 matrix::matrix(

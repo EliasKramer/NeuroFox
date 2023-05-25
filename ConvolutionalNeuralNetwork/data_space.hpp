@@ -40,16 +40,19 @@ private:
 	void set_label_in_table_at(const matrix& m, size_t idx);
 
 	void if_not_initialized_throw() const;
+	void allocate_data_table();
 public:
 	data_space();
+	data_space(size_t given_item_count, vector3 data_format);
+	data_space(size_t given_item_count, vector3 data_format, vector3 label_format);
 	data_space(
-		const matrix& data_format,
-		const matrix& label_format,
+		vector3 data_format,
+		vector3 label_format,
 		const std::vector<matrix>& given_data,
 		const std::vector<matrix>& given_label);
 
 	data_space(
-		const matrix& data_format,
+		vector3 data_format,
 		const std::vector<matrix>& given_data);
 
 	data_space& operator=(const data_space& other);
@@ -68,4 +71,6 @@ public:
 
 	const matrix& get_current_data();
 	const matrix& get_current_label();
+	void set_current_data(const matrix& m);
+	void set_current_label(const matrix& m);
 };

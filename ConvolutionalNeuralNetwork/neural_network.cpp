@@ -11,7 +11,7 @@ layer* neural_network::get_last_layer()
 neural_network::neural_network()
 {}
 
-void neural_network::set_input_format(const matrix& given_input_format)
+void neural_network::set_input_format(vector3 given_input_format)
 {
 	if (input_format.item_count() != 0)
 		throw std::runtime_error("Cannot set input format twice.");
@@ -46,7 +46,7 @@ void neural_network::add_layer(std::unique_ptr<layer>&& given_layer)
 	{
 		//if there are already layers,
 		//set the previous layer of the new layer to the last layer
-		given_layer->set_input_format(get_last_layer()->get_activations());
+		given_layer->set_input_format(get_last_layer()->get_activations().get_format());
 	}
 
 	//putting the new layer into the vector of layers
@@ -78,7 +78,7 @@ void neural_network::add_fully_connected_layer(int num_neurons, e_activation_t a
 	add_layer(std::move(new_layer));
 }
 
-void neural_network::add_fully_connected_layer(const matrix& neuron_format, e_activation_t activation_fn)
+void neural_network::add_fully_connected_layer(vector3 neuron_format, e_activation_t activation_fn)
 {
 	std::unique_ptr<fully_connected_layer> new_layer =
 		std::make_unique<fully_connected_layer>(neuron_format, activation_fn);

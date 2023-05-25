@@ -10,9 +10,8 @@ namespace CNNTest
 
 		TEST_METHOD(pooling_constructor_test_1)
 		{
-			matrix input(vector3(2, 2, 1));
 			pooling_layer pooling(1, 1, max_pooling);
-			pooling.set_input_format(input);
+			pooling.set_input_format(vector3(2, 2, 1));
 
 			Assert::AreEqual((size_t)2, pooling.get_activations().get_height());
 			Assert::AreEqual((size_t)2, pooling.get_activations().get_width());
@@ -24,9 +23,8 @@ namespace CNNTest
 		}
 		TEST_METHOD(pooling_constructor_test_2)
 		{
-			matrix input(vector3(6, 6, 2));
 			pooling_layer pooling(2, 2, average_pooling);
-			pooling.set_input_format(input);
+			pooling.set_input_format(vector3(6,6,2));
 
 			Assert::AreEqual((size_t)3, pooling.get_activations().get_height());
 			Assert::AreEqual((size_t)3, pooling.get_activations().get_width());
@@ -69,7 +67,7 @@ namespace CNNTest
 			input.set_at(vector3(0, 0, 0), 0);
 
 			pooling_layer pooling(2, 2, min_pooling);
-			pooling.set_input_format(input);
+			pooling.set_input_format(input.get_format());
 
 			pooling.forward_propagation(input);
 			Assert::AreEqual((size_t)3, pooling.get_activations().get_height());

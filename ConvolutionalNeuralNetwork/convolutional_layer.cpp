@@ -58,17 +58,17 @@ const matrix& convolutional_layer::get_kernel_biases_readonly() const
 	return kernel_biases;
 }
 
-void convolutional_layer::set_input_format(const matrix& input_format)
+void convolutional_layer::set_input_format(vector3 input_format)
 {
 	layer::set_input_format(input_format);
 
-	const int input_depth = input_format.get_depth();
+	const int input_depth = input_format.z;
 
 	const float output_width =
-		(input_format.get_width() - kernel_size) / (float)stride + 1;
+		(input_format.x - kernel_size) / (float)stride + 1;
 
 	const float output_height =
-		(input_format.get_height() - kernel_size) / (float)stride + 1;
+		(input_format.y - kernel_size) / (float)stride + 1;
 
 	if (!is_whole_number(output_width) ||
 		!is_whole_number(output_height))

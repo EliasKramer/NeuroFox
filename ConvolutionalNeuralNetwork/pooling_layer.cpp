@@ -16,13 +16,13 @@ pooling_layer::pooling_layer(
 		throw std::invalid_argument("stride must be greater than 0");
 }
 
-void pooling_layer::set_input_format(const matrix& input_format)
+void pooling_layer::set_input_format(vector3 input_format)
 {
 	layer::set_input_format(input_format);
 
-	int output_width = (input_format.get_width() - filter_size) / stride + 1;
-	int output_height = (input_format.get_height() - filter_size) / stride + 1;
-	int output_depth = input_format.get_depth();
+	int output_width = (input_format.x - filter_size) / stride + 1;
+	int output_height = (input_format.y - filter_size) / stride + 1;
+	int output_depth = input_format.z;
 
 	activations = matrix(
 		vector3(

@@ -29,7 +29,7 @@ private:
 
 	void if_cuda_error_throw() const;
 
-	void check_for_valid_format() const;
+	bool format_is_valid() const;
 	void allocate_host_mem();
 	void set_own_host_data_from(const std::vector<float> src);
 	void set_own_host_data_from(const matrix& src);

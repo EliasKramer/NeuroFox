@@ -18,7 +18,7 @@ namespace CNNTest
 			data_format.set_all(2.0f);
 			data.push_back(data_format);
 
-			data_space ds(data_format, data);
+			data_space ds(data_format.get_format(), data);
 
 			Assert::AreEqual((size_t)2, ds.get_item_count());
 		}
@@ -36,7 +36,11 @@ namespace CNNTest
 			label_format.set_all(1.5f);
 			label.push_back(label_format);
 
-			data_space ds(data_format, label_format, data, label);
+			data_space ds(
+				data_format.get_format(),
+				label_format.get_format(),
+				data,
+				label);
 
 
 			Assert::AreEqual((size_t)1, ds.get_item_count());
@@ -52,7 +56,7 @@ namespace CNNTest
 			data_format.set_all(2.0f);
 			data.push_back(data_format);
 
-			data_space ds(data_format, data);
+			data_space ds(data_format.get_format(), data);
 
 			matrix m1 = matrix(vector3(2, 2, 1));
 			m1.set_all(1.0f);
@@ -91,7 +95,11 @@ namespace CNNTest
 			label_format.set_at_flat(0, 5.4f);
 			label.push_back(label_format);
 
-			data_space ds(data_format, label_format, data, label);
+			data_space ds(
+				data_format.get_format(), 
+				label_format.get_format(), 
+				data, 
+				label);
 
 			matrix expected_data(vector3(2, 2, 3));
 			matrix expected_label(vector3(1, 2, 1));

@@ -25,12 +25,12 @@ fully_connected_layer::fully_connected_layer(
 	e_activation_t activation_function
 )
 	:fully_connected_layer(
-		matrix(vector3(1, number_of_neurons, 1)),
+		vector3(1, number_of_neurons, 1),
 		activation_function)
 {}
 
 fully_connected_layer::fully_connected_layer(
-	const matrix& activation_format,
+	vector3 activation_format,
 	e_activation_t activation_function
 ) :
 	layer(activation_format, e_layer_type_t::fully_connected),
@@ -39,7 +39,7 @@ fully_connected_layer::fully_connected_layer(
 	bias_deltas(activation_format)
 {}
 
-void fully_connected_layer::set_input_format(const matrix& input_format)
+void fully_connected_layer::set_input_format(vector3 input_format)
 {
 	layer::set_input_format(input_format);
 

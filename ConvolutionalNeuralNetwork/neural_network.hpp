@@ -12,7 +12,7 @@
 
 class neural_network {
 private:
-	matrix input_format;
+	vector3 input_format;
 
 	std::vector<std::unique_ptr<layer>> layers;
 	//saves the indices of all layers tha have parameter
@@ -31,12 +31,12 @@ public:
 	neural_network();
 
 	//sets the input matrix to a certain format
-	void set_input_format(const matrix& given_input_format);
+	void set_input_format(vector3 input_format);
 
 	const matrix& get_output() const;
 
 	void add_fully_connected_layer(int num_neurons, e_activation_t activation_fn);
-	void add_fully_connected_layer(const matrix& neuron_format, e_activation_t activation_fn);
+	void add_fully_connected_layer(vector3 neuron_format, e_activation_t activation_fn);
 	
 	void add_convolutional_layer(
 		int number_of_kernels, 

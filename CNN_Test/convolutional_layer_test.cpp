@@ -58,7 +58,7 @@ namespace CNNTest
 		TEST_METHOD(set_input_format_test)
 		{
 			convolutional_layer layer(3, 2, 1, e_activation_t::relu_fn);
-			matrix input_format(vector3(5, 5, 6));
+			vector3 input_format(5, 5, 6);
 			layer.set_input_format(input_format);
 			//the width and the heigh are
 			//the (input_size - kernel_size) / stride + 1
@@ -78,7 +78,7 @@ namespace CNNTest
 		{
 			convolutional_layer layer(1, 2, 1, e_activation_t::sigmoid_fn);
 			matrix input(vector3(3, 3, 1));
-			layer.set_input_format(input);
+			layer.set_input_format(input.get_format());
 
 			/* weight matrix
 				+ - + - +

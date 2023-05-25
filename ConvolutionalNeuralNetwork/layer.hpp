@@ -25,15 +25,15 @@ protected:
 	//the current error - the same format as the activations
 	matrix error;
 
-	matrix input_format;
+	vector3 input_format;
 
 public:
 	layer(e_layer_type_t given_layer_type);
-	layer(matrix activation_format, e_layer_type_t given_layer_type);
+	layer(vector3 activation_format, e_layer_type_t given_layer_type);
 
 	const e_layer_type_t get_layer_type() const;
 
-	virtual void set_input_format(const matrix& given_input_format);
+	virtual void set_input_format(vector3 given_input_format);
 	
 	const matrix& get_activations() const;
 	matrix* get_activations_p();

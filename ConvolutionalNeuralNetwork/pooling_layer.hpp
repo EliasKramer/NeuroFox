@@ -21,7 +21,7 @@ public:
 		int stride,
 		e_pooling_type_t pooling_fn
 	);
-	void set_input_format(const matrix& input_format) override;
+	void set_input_format(vector3 input_format) override;
 
 	int get_filter_size() const;
 	int get_stride() const;

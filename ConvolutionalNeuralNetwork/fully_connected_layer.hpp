@@ -30,11 +30,11 @@ public:
 	);
 	
 	fully_connected_layer(
-		const matrix& activation_format,
+		vector3 activation_format,
 		e_activation_t activation_function
 	);
 
-	void set_input_format(const matrix& input_format) override;
+	void set_input_format(vector3 input_format) override;
 
 	const matrix& get_weights() const;
 	const matrix& get_biases() const;

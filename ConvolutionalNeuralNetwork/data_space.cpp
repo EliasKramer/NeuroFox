@@ -12,26 +12,13 @@ size_t data_space::data_item_count()
 
 void data_space::set_data_in_table_at(const matrix& m, size_t idx)
 {
-	/*
-	float* data_ptr = data_table.get_ptr_row(idx, 0);
-
-	for (size_t i = 0; i < m.item_count(); i++)
-	{
-		data_ptr[i] = m.get_at_flat(i);
-	}*/
+	//checking for format issues is done in the matrix itself
 	data_table.set_row_from_matrix(m, idx);
 }
 
 void data_space::set_label_in_table_at(const matrix& m, size_t idx)
 {
-	/*
-	float* label_ptr = data_table.get_ptr_item(data_item_count(), idx, 0);
-
-	for (size_t i = 0; i < m.item_count(); i++)
-	{
-		label_ptr[i] = m.get_at_flat(i);
-	}
-	*/
+	//checking for format issues is done in the matrix itself
 	data_table.set_row_from_matrix(m, idx, data_item_count());
 }
 
@@ -43,33 +30,55 @@ void data_space::if_not_initialized_throw() const
 	}
 }
 
+void data_space::allocate_data_table()
+{
+	data_table = matrix(
+		vector3(
+			(size_t)(data_item_count() + label_item_count()),
+			item_count,
+			(size_t)1));
+}
+
 data_space::data_space()
 {}
 
 data_space::data_space(
-	const matrix& data_format,
-	const matrix& label_format,
-	const std::vector<matrix>& given_data,
-	const std::vector<matrix>& given_label
+	size_t given_item_count,
+	vector3 data_format
+) :
+	data_space(
+		given_item_count,
+		data_format,
+		vector3(0, 0, 0))
+{}
+
+data_space::data_space(
+	size_t given_item_count,
+	vector3 data_format,
+	vector3 label_format
 ) :
 	data_iterator(data_format),
 	label_iterator(label_format),
-	item_count(given_data.size())
+	item_count(given_item_count)
 {
-	if (given_data.size() == 0)
-	{
-		throw std::exception("no data given");
-	}
+	allocate_data_table();
+}
+
+data_space::data_space(
+	vector3 data_format,
+	vector3 label_format,
+	const std::vector<matrix>& given_data,
+	const std::vector<matrix>& given_label
+) :
+	data_space(
+		given_data.size(),
+		data_format,
+		label_format)
+{
 	if (given_data.size() != given_label.size())
 	{
 		throw std::exception("data and label size mismatch");
 	}
-
-	data_table = matrix(
-		vector3(
-			(size_t)(data_item_count() + label_item_count()),
-			given_data.size(),
-			(size_t)1));
 
 	for (size_t i = 0; i < given_data.size(); i++)
 	{
@@ -79,23 +88,13 @@ data_space::data_space(
 }
 
 data_space::data_space(
-	const matrix& data_format,
+	vector3 data_format,
 	const std::vector<matrix>& given_data
 ) :
-	data_iterator(data_format),
-	item_count(given_data.size())
+	data_space(
+		given_data.size(),
+		data_format)
 {
-	if (given_data.size() == 0)
-	{
-		throw std::exception("no data given");
-	}
-
-	data_table = matrix(
-		vector3(
-			data_item_count(),
-			given_data.size(),
-			1));
-
 	for (size_t i = 0; i < given_data.size(); i++)
 	{
 		set_data_in_table_at(given_data[i], i);
@@ -181,4 +180,16 @@ const matrix& data_space::get_current_label()
 	label_iterator.observe_row(data_table, iterator_idx, data_item_count());
 
 	return label_iterator;
+}
+
+void data_space::set_current_data(const matrix& m)
+{
+	if_not_initialized_throw();
+	set_data_in_table_at(m, iterator_idx);
+}
+
+void data_space::set_current_label(const matrix& m)
+{
+	if_not_initialized_throw();
+	set_label_in_table_at(m, iterator_idx);
 }

@@ -36,7 +36,7 @@ public:
 	matrix& get_kernel_biases();
 	const matrix& get_kernel_biases_readonly() const;
 
-	void set_input_format(const matrix& input_format) override;
+	void set_input_format(vector3 input_format) override;
 
 	//set all weights and biases to that value
 	void set_all_parameter(float value) override;
