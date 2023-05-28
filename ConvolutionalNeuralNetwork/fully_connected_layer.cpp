@@ -39,6 +39,17 @@ fully_connected_layer::fully_connected_layer(
 	bias_deltas(activation_format)
 {}
 
+fully_connected_layer::fully_connected_layer(
+	const fully_connected_layer & other
+) : 
+	layer(other),
+	weights(other.weights),
+	biases(other.biases),
+	weight_deltas(other.weight_deltas.get_format()), //do not copy the deltas
+	bias_deltas(other.bias_deltas.get_format()), //do not copy the deltas
+	activation_fn(other.activation_fn)
+{}
+
 void fully_connected_layer::set_input_format(vector3 input_format)
 {
 	layer::set_input_format(input_format);

@@ -21,7 +21,7 @@ void layer::valid_passing_error_check_cpu(const matrix* passing_error) const
 }
 
 layer::layer(e_layer_type_t given_layer_type)
-: type(given_layer_type)
+	: type(given_layer_type)
 {}
 
 layer::layer(
@@ -31,6 +31,15 @@ layer::layer(
 	type(given_layer_type),
 	activations(activation_format),
 	error(activation_format)
+{}
+
+layer::layer(
+	const layer& other
+) :
+	type(other.type),
+	activations(other.activations.get_format()), // copy the format - not the values
+	error(other.error.get_format()), //copy the format - not the values
+	input_format(other.input_format)
 {}
 
 const e_layer_type_t layer::get_layer_type() const
@@ -83,7 +92,7 @@ void layer::enable_gpu_mode()
 {
 	activations.enable_gpu_mode();
 	error.enable_gpu_mode();
-	
+
 	//input_format.enable_gpu();
 	//gpu_activations = std::make_unique<gpu_matrix>(activations, true);
 }

@@ -26,6 +26,8 @@ public:
 		e_activation_t activation_function
 	);
 
+	convolutional_layer(const convolutional_layer& other);
+
 	//getters
 	int get_kernel_size() const;
 	int get_stride() const;

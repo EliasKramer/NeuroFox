@@ -31,6 +31,9 @@ public:
 	layer(e_layer_type_t given_layer_type);
 	layer(vector3 activation_format, e_layer_type_t given_layer_type);
 
+	//copy
+	layer(const layer& other);
+	
 	const e_layer_type_t get_layer_type() const;
 
 	virtual void set_input_format(vector3 given_input_format);

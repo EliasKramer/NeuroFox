@@ -34,6 +34,8 @@ public:
 		e_activation_t activation_function
 	);
 
+	fully_connected_layer(const fully_connected_layer& other);
+
 	void set_input_format(vector3 input_format) override;
 
 	const matrix& get_weights() const;

@@ -23,6 +23,23 @@ convolutional_layer::convolutional_layer(
 		throw std::invalid_argument("stride must be smaller or equal than the kernel_size");
 }
 
+convolutional_layer::convolutional_layer(
+	const convolutional_layer& other
+) : 
+	layer(other),
+	kernel_size(other.kernel_size),
+	stride(other.stride),
+	kernel_count(other.kernel_count),
+	activation_fn(other.activation_fn),
+	kernel_biases(other.kernel_biases),
+	kernel_bias_deltas(other.kernel_bias_deltas) // do not copy the deltas
+{
+	for (const auto& kernel : other.kernel_weights)
+		kernel_weights.push_back(kernel);
+	for(const auto& kernel : other.kernel_weights_deltas)
+		kernel_weights_deltas.push_back(kernel.get_format()); // do noty copy the deltas
+}
+
 int convolutional_layer::get_kernel_size() const
 {
 	return kernel_size;
@@ -84,13 +101,13 @@ void convolutional_layer::set_input_format(vector3 input_format)
 	}
 	kernel_biases = matrix(
 		vector3(
-			(size_t)output_width, 
-			(size_t)output_height, 
+			(size_t)output_width,
+			(size_t)output_height,
 			kernel_count));
 	kernel_bias_deltas = matrix(
 		vector3(
-			(size_t)output_width, 
-			(size_t)output_height, 
+			(size_t)output_width,
+			(size_t)output_height,
 			kernel_count));
 }
 

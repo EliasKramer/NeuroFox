@@ -260,6 +260,10 @@ matrix::matrix(const matrix& source)
 		this->format = source.format;
 		allocate_host_mem();
 		set_own_host_data_from(source);
+		if (source.gpu_enabled)
+		{
+			enable_gpu_mode();
+		}
 	}
 }
 
