@@ -47,6 +47,11 @@ const e_layer_type_t layer::get_layer_type() const
 	return type;
 }
 
+size_t layer::get_param_byte_size() const
+{
+	return get_parameter_count() * sizeof(float);
+}
+
 void layer::set_input_format(vector3 given_input_format)
 {
 	this->input_format = given_input_format;

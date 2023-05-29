@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <random>
+#include <string>
 
 constexpr float FLOAT_TOLERANCE = 0.000001f;
 
@@ -35,3 +36,5 @@ T* sub_ptr(T* ptr, size_t elements, size_t index)
 int swap_endian(int value);
 //determins wether the system is little endian or big endian
 bool is_little_endian();
+
+std::string byte_size_to_str(size_t byte_size);

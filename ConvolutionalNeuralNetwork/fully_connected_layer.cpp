@@ -50,6 +50,11 @@ fully_connected_layer::fully_connected_layer(
 	activation_fn(other.activation_fn)
 {}
 
+size_t fully_connected_layer::get_parameter_count() const
+{
+	return weights.item_count() + biases.item_count();
+}
+
 void fully_connected_layer::set_input_format(vector3 input_format)
 {
 	layer::set_input_format(input_format);

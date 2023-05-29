@@ -196,13 +196,21 @@ mnist_digit_overlord::mnist_digit_overlord()
 		std::endl;
 
 	nn.set_input_format(vector3(28, 28, 1));
-	nn.add_convolutional_layer(2, 3, 1, e_activation_t::sigmoid_fn);
-	nn.add_fully_connected_layer(256, e_activation_t::sigmoid_fn);
-	nn.add_fully_connected_layer(256, e_activation_t::sigmoid_fn);
+	nn.add_fully_connected_layer(16, e_activation_t::sigmoid_fn);
+	nn.add_fully_connected_layer(16, e_activation_t::sigmoid_fn);
 	nn.add_fully_connected_layer(vector3(1, 10, 1), e_activation_t::sigmoid_fn);
 	nn.set_all_parameter(0);
 
-	enable_gpu();
+	//enable_gpu();
+}
+
+void mnist_digit_overlord::print_nn_size() const
+{
+	std::cout
+		<< "the network has " << nn.get_param_count()
+		<< " parameters and is "
+		<< byte_size_to_str(nn.get_param_byte_size())
+		<< "big" << std::endl;
 }
 
 test_result mnist_digit_overlord::test()

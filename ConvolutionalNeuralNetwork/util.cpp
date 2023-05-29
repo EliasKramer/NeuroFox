@@ -49,3 +49,27 @@ bool is_little_endian()
 	int num = 1;
 	return (*(char*)&num == 1);
 }
+
+std::string byte_size_to_str(size_t byte_size)
+{
+	size_t giga = 1024 * 1024 * 1024;
+	size_t mega = 1024 * 1024;
+	size_t kilo = 1024;
+
+	size_t giga_count = byte_size / giga;
+	size_t mega_count = (byte_size - giga_count * giga) / mega;
+	size_t kilo_count = (byte_size - giga_count * giga - mega_count * mega) / kilo;
+	size_t byte_count = byte_size - giga_count * giga - mega_count * mega - kilo_count * kilo;
+
+	std::string result = "";
+	if (giga_count > 0)
+		result += std::to_string(giga_count) + "GB ";
+	if (mega_count > 0)
+		result += std::to_string(mega_count) + "MB ";
+	if (kilo_count > 0)
+		result += std::to_string(kilo_count) + "KB ";
+	if (byte_count > 0)
+		result += std::to_string(byte_count) + "B ";
+
+	return result == "" ? "0 B " : result;
+}

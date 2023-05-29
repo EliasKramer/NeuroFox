@@ -36,6 +36,9 @@ public:
 	
 	const e_layer_type_t get_layer_type() const;
 
+	virtual size_t get_parameter_count() const = 0;
+	size_t get_param_byte_size() const;
+
 	virtual void set_input_format(vector3 given_input_format);
 	
 	const matrix& get_activations_readonly() const;

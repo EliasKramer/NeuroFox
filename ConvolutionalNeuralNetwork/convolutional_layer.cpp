@@ -40,6 +40,19 @@ convolutional_layer::convolutional_layer(
 		kernel_weights_deltas.push_back(kernel.get_format()); // do noty copy the deltas
 }
 
+
+size_t convolutional_layer::get_parameter_count() const
+{
+	size_t result = 0;
+
+	for (const auto& kernel : kernel_weights)
+		result += kernel.item_count();
+
+	result += kernel_biases.item_count();
+
+	return result;
+}
+
 int convolutional_layer::get_kernel_size() const
 {
 	return kernel_size;

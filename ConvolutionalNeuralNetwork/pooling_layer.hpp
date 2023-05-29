@@ -21,6 +21,9 @@ public:
 		int stride,
 		e_pooling_type_t pooling_fn
 	);
+
+	size_t get_parameter_count() const override;
+
 	void set_input_format(vector3 input_format) override;
 
 	int get_filter_size() const;

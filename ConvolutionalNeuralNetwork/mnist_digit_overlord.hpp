@@ -23,6 +23,8 @@ private:
 public:
 	mnist_digit_overlord();
 
+	void print_nn_size() const;
+
 	test_result test();
 	void train();
 };
