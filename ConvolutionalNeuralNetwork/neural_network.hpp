@@ -33,6 +33,11 @@ public:
 	neural_network();
 	neural_network(const neural_network& source);
 
+	//returns the number of parameters (weights and biases) of the nn
+	size_t get_param_count() const;
+	//returns the number of bytes the nn needs to store all parameters (weights and biases)
+	size_t get_param_byte_size() const;
+
 	//sets the input matrix to a certain format
 	void set_input_format(vector3 input_format);
 

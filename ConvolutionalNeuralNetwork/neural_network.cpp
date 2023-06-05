@@ -35,6 +35,23 @@ neural_network::neural_network(const neural_network & source)
 	gpu_enabled = source.gpu_enabled;
 }
 
+size_t neural_network::get_param_count() const
+{
+	size_t result = 0;
+
+	for (int i = 0; i < parameter_layer_indices.size(); i++)
+	{
+		result += layers[parameter_layer_indices[i]].get()->get_parameter_count();
+	}
+
+	return result;
+}
+
+size_t neural_network::get_param_byte_size() const
+{
+	return get_param_count() * sizeof(float);
+}
+
 void neural_network::set_input_format(vector3 given_input_format)
 {
 	if (input_format.item_count() != 0)

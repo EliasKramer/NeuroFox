@@ -16,6 +16,11 @@ pooling_layer::pooling_layer(
 		throw std::invalid_argument("stride must be greater than 0");
 }
 
+size_t pooling_layer::get_parameter_count() const
+{
+	throw std::invalid_argument("pooling layer does not have any parameters");
+}
+
 pooling_layer::pooling_layer(const pooling_layer& other)
 	:layer(other),
 	filter_size(other.filter_size),

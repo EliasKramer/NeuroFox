@@ -28,6 +28,8 @@ public:
 
 	convolutional_layer(const convolutional_layer& other);
 
+	size_t get_parameter_count() const override;
+
 	//getters
 	int get_kernel_size() const;
 	int get_stride() const;
