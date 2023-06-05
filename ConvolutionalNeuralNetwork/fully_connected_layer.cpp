@@ -45,8 +45,8 @@ fully_connected_layer::fully_connected_layer(
 	layer(other),
 	weights(other.weights),
 	biases(other.biases),
-	weight_deltas(other.weight_deltas.get_format()), //do not copy the deltas
-	bias_deltas(other.bias_deltas.get_format()), //do not copy the deltas
+	weight_deltas(other.weight_deltas, false), //do not copy the deltas
+	bias_deltas(other.bias_deltas, false), //do not copy the deltas
 	activation_fn(other.activation_fn)
 {}
 
@@ -106,6 +106,16 @@ void fully_connected_layer::mutate(float range)
 	{
 		biases.mutate(range);
 	}
+}
+
+void fully_connected_layer::sync_device_and_host()
+{
+	layer::sync_device_and_host();
+
+	weights.sync_device_and_host();
+	biases.sync_device_and_host();
+	weight_deltas.sync_device_and_host();
+	bias_deltas.sync_device_and_host();
 }
 
 void fully_connected_layer::forward_propagation(const matrix& input)

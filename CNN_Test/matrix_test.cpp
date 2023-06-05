@@ -220,7 +220,7 @@ namespace CNNTest
 			std::vector <matrix> kernels;
 			kernels.push_back(kernel);
 
-			matrix::valid_cross_correlation(input, kernels, output, 1);
+			matrix::cross_correlation(input, kernels, output, 1);
 
 			Assert::AreEqual(37, (int)output.get_at_host(vector3(0, 0)));
 			Assert::AreEqual(67, (int)output.get_at_host(vector3(1, 0)));

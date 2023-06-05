@@ -19,16 +19,19 @@ private:
 	//convolutional and fully connected 
 	std::vector<int> parameter_layer_indices;
 
+	bool gpu_enabled = false;
+
 	layer* get_last_layer();
 
 	void add_layer(std::unique_ptr<layer>&& given_layer);
 
 	float calculate_cost(const matrix& expected_output);
 
-	bool gpu_enabled = false;
+	void sync_device_and_host();
 public:
 
 	neural_network();
+	neural_network(const neural_network& source);
 
 	//sets the input matrix to a certain format
 	void set_input_format(vector3 input_format);

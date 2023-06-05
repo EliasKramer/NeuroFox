@@ -14,6 +14,8 @@ private:
 	int filter_size;
 	int stride;
 	e_pooling_type_t pooling_fn;
+
+	bool gpu_enabled = false;
 public:
 	//constructor
 	pooling_layer(
@@ -21,6 +23,8 @@ public:
 		int stride,
 		e_pooling_type_t pooling_fn
 	);
+	pooling_layer(const pooling_layer& other);
+
 	void set_input_format(vector3 input_format) override;
 
 	int get_filter_size() const;
@@ -30,6 +34,8 @@ public:
 	void set_all_parameter(float value) override;
 	void apply_noise(float range) override;
 	void mutate(float range) override;
+
+	void sync_device_and_host() override;
 
 	void forward_propagation(const matrix& input) override;
 	void back_propagation(const matrix& input, matrix* passing_error) override;

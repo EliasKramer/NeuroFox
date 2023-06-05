@@ -252,20 +252,29 @@ matrix::matrix(
 	set_own_host_data_from(given_vector);
 }
 
-matrix::matrix(const matrix& source)
+
+matrix::matrix(const matrix& source, bool copy_values)
 	:matrix()
 {
 	if (source.is_initialized())
 	{
 		this->format = source.format;
 		allocate_host_mem();
-		set_own_host_data_from(source);
+		if (copy_values)
+		{
+			set_own_host_data_from(source);
+		}
 		if (source.gpu_enabled)
 		{
 			enable_gpu_mode();
 		}
 	}
 }
+
+matrix::matrix(const matrix& source)
+	:matrix(source, true)
+{}
+
 
 matrix::~matrix()
 {
@@ -815,7 +824,7 @@ bool matrix::equal_format(const matrix& a, const matrix& b)
 	return vector3::are_equal(a.format, b.format);
 }
 
-void matrix::valid_cross_correlation(
+void matrix::cross_correlation(
 	const matrix& input,
 	const std::vector<matrix>& kernels,
 	matrix& output,
@@ -858,7 +867,7 @@ void matrix::valid_cross_correlation(
 			input,
 			kernels,
 			output,
-			stride,
+			input.get_width(),
 			input.get_depth(),
 			kernels[0].get_width(),
 			kernels.size(),

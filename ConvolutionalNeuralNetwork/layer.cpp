@@ -1,6 +1,6 @@
 #include "layer.hpp"
 
-void layer::valid_input_check_cpu(const matrix& input) const
+void layer::valid_input_check(const matrix& input) const
 {
 	if (input_format.item_count() == 0 || // the input format is not set
 		matrix::equal_format(input_format, input) == false)
@@ -17,7 +17,7 @@ void layer::valid_passing_error_check_cpu(const matrix* passing_error) const
 		return;
 	}
 	//the passing error has the same format as the input format
-	valid_input_check_cpu(*passing_error);
+	valid_input_check(*passing_error);
 }
 
 layer::layer(e_layer_type_t given_layer_type)
@@ -37,8 +37,8 @@ layer::layer(
 	const layer& other
 ) :
 	type(other.type),
-	activations(other.activations.get_format()), // copy the format - not the values
-	error(other.error.get_format()), //copy the format - not the values
+	activations(other.activations, false), // copy the format - not the values
+	error(other.error, false), //copy the format - not the values
 	input_format(other.input_format)
 {}
 
@@ -103,14 +103,20 @@ void layer::disable_gpu()
 	//gpu_error = nullptr;
 }
 
+void layer::sync_device_and_host()
+{
+	activations.sync_device_and_host();
+	error.sync_device_and_host();
+}
+
 void layer::forward_propagation(const matrix& input)
 {
-	valid_input_check_cpu(input);
+	valid_input_check(input);
 }
 
 void layer::back_propagation(const matrix& input, matrix* passing_error)
 {
-	valid_input_check_cpu(input);
+	valid_input_check(input);
 	valid_passing_error_check_cpu(passing_error);
 }
 

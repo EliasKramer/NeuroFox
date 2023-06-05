@@ -11,6 +11,30 @@ layer* neural_network::get_last_layer()
 neural_network::neural_network()
 {}
 
+neural_network::neural_network(const neural_network & source)
+{
+	//if same return
+	if (this == &source)
+		return;
+
+	//copy all layers
+	for (auto& curr : source.layers)
+	{
+		layers.push_back(std::move(
+			std::make_unique<layer>(*curr.get())
+		));
+	}
+
+	//copy the input format
+	input_format = source.input_format;
+
+	//copy the parameter layer indices
+	parameter_layer_indices = source.parameter_layer_indices;
+
+	//copy the gpu_enabled flag
+	gpu_enabled = source.gpu_enabled;
+}
+
 void neural_network::set_input_format(vector3 given_input_format)
 {
 	if (input_format.item_count() != 0)
@@ -77,6 +101,17 @@ float neural_network::calculate_cost(const matrix& expected_output)
 	return cost;
 }
 
+void neural_network::sync_device_and_host()
+{
+	if (gpu_enabled)
+	{
+		for (auto& l : parameter_layer_indices)
+		{
+			layers[l]->sync_device_and_host();
+		}
+	}
+}
+
 void neural_network::add_fully_connected_layer(int num_neurons, e_activation_t activation_fn)
 {
 	std::unique_ptr<fully_connected_layer> new_layer =
@@ -129,6 +164,7 @@ void neural_network::apply_noise(float range)
 	{
 		layers[l]->apply_noise(range);
 	}
+	sync_device_and_host();
 }
 
 void neural_network::mutate(float range)
@@ -139,6 +175,11 @@ void neural_network::mutate(float range)
 	}
 	int layer_idx = parameter_layer_indices[random_idx((int)parameter_layer_indices.size())];
 	layers[layer_idx]->mutate(range);
+
+	if (gpu_enabled)
+	{
+		layers[layer_idx]->sync_device_and_host();
+	}
 }
 /*
 test_result neural_network::test(const std::vector<std::unique_ptr<nn_data>>& test_data)
@@ -170,8 +211,6 @@ test_result neural_network::test(const std::vector<std::unique_ptr<nn_data>>& te
 
 void neural_network::forward_propagation(const matrix& input)
 {
-	//IF GPU ENABLED  - USE GPU - TODO
-
 	matrix* last_layer = nullptr;
 	//std::vector<std::unique_ptr<layer>>::iterator::value_type
 	for (auto& l : layers)
@@ -187,8 +226,6 @@ void neural_network::forward_propagation(const matrix& input)
 
 void neural_network::back_propagation(const matrix& given_data, const matrix& given_label)
 {
-	//IF GPU ENABLED  - USE GPU - TODO
-
 	//feeding the data through
 	forward_propagation(given_data);
 
@@ -243,4 +280,6 @@ void neural_network::enable_gpu_mode()
 	}
 
 	gpu_enabled = true;
+
+	sync_device_and_host();
 }

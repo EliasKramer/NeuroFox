@@ -16,6 +16,13 @@ pooling_layer::pooling_layer(
 		throw std::invalid_argument("stride must be greater than 0");
 }
 
+pooling_layer::pooling_layer(const pooling_layer& other)
+	:layer(other),
+	filter_size(other.filter_size),
+	stride(other.stride),
+	pooling_fn(other.pooling_fn)
+{}
+
 void pooling_layer::set_input_format(vector3 input_format)
 {
 	layer::set_input_format(input_format);
@@ -59,6 +66,11 @@ void pooling_layer::apply_noise(float range)
 void pooling_layer::mutate(float range)
 {
 	throw std::invalid_argument("pooling layer does not have any parameters");
+}
+
+void pooling_layer::sync_device_and_host()
+{
+	layer::sync_device_and_host();
 }
 
 void pooling_layer::forward_propagation(const matrix& input)
@@ -161,10 +173,12 @@ void pooling_layer::apply_deltas(size_t training_data_count, float learning_rate
 
 void pooling_layer::enable_gpu_mode()
 {
+	gpu_enabled = true;
 	throw std::runtime_error("pooling layer has no implementation of enable gpu");
 }
 
 void pooling_layer::disable_gpu()
 {
+	gpu_enabled = false;
 	throw std::runtime_error("pooling layer has no implementation of disable gpu");
 }

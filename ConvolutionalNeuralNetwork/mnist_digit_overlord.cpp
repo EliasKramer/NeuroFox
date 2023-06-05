@@ -15,8 +15,8 @@ float mnist_digit_overlord::get_digit_cost(const matrix& output, const matrix& l
 	float cost = 0;
 	for (size_t i = 0; i < output.item_count(); i++)
 	{
-		cost += 
-			(output.get_at_flat_host(i) - label.get_at_flat_host(i)) * 
+		cost +=
+			(output.get_at_flat_host(i) - label.get_at_flat_host(i)) *
 			(output.get_at_flat_host(i) - label.get_at_flat_host(i));
 	}
 	return cost;
@@ -28,8 +28,8 @@ void mnist_digit_overlord::print_digit_image(const matrix& m) const
 	{
 		for (int y = 0; y < m.get_height(); y++)
 		{
-			m.get_at_host(vector3(x,y)) > 0.5 ? 
-				std::cout << "# " : 
+			m.get_at_host(vector3(x, y)) > 0.5 ?
+				std::cout << "# " :
 				std::cout << ". ";
 		}
 		std::cout << std::endl;
@@ -168,16 +168,16 @@ void mnist_digit_overlord::enable_gpu()
 	ds_test.copy_to_gpu();
 	nn.enable_gpu_mode();
 	auto end = std::chrono::high_resolution_clock::now();
-	std::cout 
-		<< "copied to gpu, took " 
-		<< std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() 
+	std::cout
+		<< "copied to gpu, took "
+		<< std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()
 		<< "ms" << std::endl;
 }
 
 mnist_digit_overlord::mnist_digit_overlord()
 {
 	std::string base_path = "..\\data\\digit_recognition";
-	std::cout << "loading training data"<< std::endl;
+	std::cout << "loading training data" << std::endl;
 	auto start = std::chrono::high_resolution_clock::now();
 	load_data(
 		ds_training,
@@ -196,24 +196,25 @@ mnist_digit_overlord::mnist_digit_overlord()
 		std::endl;
 
 	nn.set_input_format(vector3(28, 28, 1));
-	nn.add_convolutional_layer(2, 3, 1, e_activation_t::sigmoid_fn);
-	nn.add_fully_connected_layer(256, e_activation_t::sigmoid_fn);
-	nn.add_fully_connected_layer(256, e_activation_t::sigmoid_fn);
+	//nn.add_convolutional_layer(2, 3, 1, e_activation_t::sigmoid_fn);
+	//nn.add_fully_connected_layer(16, e_activation_t::sigmoid_fn);
+	//nn.add_fully_connected_layer(16, e_activation_t::sigmoid_fn);
 	nn.add_fully_connected_layer(vector3(1, 10, 1), e_activation_t::sigmoid_fn);
 	nn.set_all_parameter(0);
 
-	enable_gpu();
+	nn.apply_noise(0.1f);
+	//enable_gpu();
 }
 
 test_result mnist_digit_overlord::test()
 {
 	ds_test.iterator_reset();
 	test_result result;
-	
+
 	size_t correct = 0;
-	size_t cost_sum = 0;
+	float cost_sum = 0;
 	size_t total = 0;
-	
+
 	auto start = std::chrono::high_resolution_clock::now();
 
 	do
@@ -244,6 +245,37 @@ test_result mnist_digit_overlord::test()
 	return result;
 }
 
-void mnist_digit_overlord::train()
+void mnist_digit_overlord::train(
+	size_t epochs,
+	size_t batch_size,
+	float learning_rate)
 {
+	std::cout 
+		<< "start training... " 
+		<< "(epochs:" << epochs
+		<< ", batch_size:" << batch_size
+		<< ", learning_rate:" << learning_rate
+		<< ")"
+		<< std::endl;
+
+	auto start = std::chrono::high_resolution_clock::now();
+
+	for (size_t curr_epoch = 0; curr_epoch < epochs; curr_epoch++)
+	{
+		for (size_t i = 0; i < batch_size; i++)
+		{
+			const matrix& input = ds_training.get_current_data();
+			const matrix& label = ds_training.get_current_label();
+			nn.back_propagation(input, label);
+			ds_training.iterator_next();
+		}
+		nn.apply_deltas(batch_size, learning_rate);
+	}
+
+	auto end = std::chrono::high_resolution_clock::now();
+
+	std::cout << "training finished, took " <<
+		std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() <<
+		"ms" <<
+		std::endl;
 }

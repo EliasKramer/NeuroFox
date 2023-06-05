@@ -164,8 +164,8 @@ __global__ void gpu_valid_cross_correlation_kernel(
 	if (result_idx < output_width * output_width)
 	{
 		//print all arguments
-		printf("input_depth: %d, input_width: %d, kernel_width: %d, output_width: %d, stride: %d\n",
-			input_depth, input_width, kernel_width, output_width, stride);
+		//printf("input_depth: %d, input_width: %d, kernel_width: %d, output_width: %d, stride: %d\n",
+		//	input_depth, input_width, kernel_width, output_width, stride);
 
 		int input_x = (result_idx % output_width) * stride;
 		int input_y = (result_idx / output_width) * stride;
@@ -183,7 +183,7 @@ __global__ void gpu_valid_cross_correlation_kernel(
 				}
 			}
 		}
-		printf("result: %f\n", sum);
+		//printf("result: %f\n", sum);
 		result[result_idx] = sum;
 	}
 }

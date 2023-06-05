@@ -15,7 +15,7 @@ typedef enum _layer_type {
 class layer {
 
 private:
-	void valid_input_check_cpu(const matrix& input) const;
+	void valid_input_check(const matrix& input) const;
 	void valid_passing_error_check_cpu(const matrix* passing_error) const;
 protected:
 	e_layer_type_t type;
@@ -54,6 +54,8 @@ public:
 	virtual void apply_noise(float range) = 0;
 	//add a random value between range and -range to one weight or bias 
 	virtual void mutate(float range) = 0;
+
+	virtual void sync_device_and_host();
 
 	virtual void forward_propagation(const matrix& input);
 	virtual	void back_propagation(const matrix& input, matrix* passing_error);

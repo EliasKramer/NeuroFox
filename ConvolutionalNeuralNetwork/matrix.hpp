@@ -49,6 +49,7 @@ public:
 	matrix(
 		vector3 given_format,
 		const std::vector<float>& given_vector);
+	matrix(const matrix& source, bool copy_values);
 	matrix(const matrix& source);
 
 	matrix& operator=(const matrix& other);
@@ -122,7 +123,7 @@ public:
 	static bool are_equal(const matrix& a, const matrix& b, float tolerance);
 	static bool equal_format(const matrix& a, const matrix& b);
 
-	static void valid_cross_correlation(
+	static void cross_correlation(
 		const matrix& input,
 		const std::vector<matrix>& kernels,
 		matrix& output,

@@ -24,5 +24,5 @@ public:
 	mnist_digit_overlord();
 
 	test_result test();
-	void train();
+	void train(size_t epochs, size_t batch_size, float learning_rate);
 };
