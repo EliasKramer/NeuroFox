@@ -33,6 +33,8 @@ public:
 
 	//copy
 	layer(const layer& other);
+	//clone
+	virtual std::unique_ptr<layer> clone() const = 0;
 	
 	const e_layer_type_t get_layer_type() const;
 
@@ -49,7 +51,7 @@ public:
 	matrix* get_error_p();
 
 	//TODO - make this separate
-	void set_error_for_last_layer_cpu(const matrix& expected);
+	virtual void set_error_for_last_layer_cpu(const matrix& expected);
 
 	//set all weights and biases to that value
 	virtual void set_all_parameter(float value) = 0;

@@ -25,6 +25,8 @@ public:
 	);
 	pooling_layer(const pooling_layer& other);
 
+	//clone
+	std::unique_ptr<layer> clone() const override;
 
 	size_t get_parameter_count() const override;
 

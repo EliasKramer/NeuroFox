@@ -206,6 +206,11 @@ mnist_digit_overlord::mnist_digit_overlord()
 	//enable_gpu();
 }
 
+void mnist_digit_overlord::print_nn_size() const
+{
+	std::cout << "nn size: " << nn.get_param_count() << std::endl;
+}
+
 test_result mnist_digit_overlord::test()
 {
 	ds_test.iterator_reset();

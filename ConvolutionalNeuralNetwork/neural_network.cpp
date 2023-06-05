@@ -20,9 +20,7 @@ neural_network::neural_network(const neural_network & source)
 	//copy all layers
 	for (auto& curr : source.layers)
 	{
-		layers.push_back(std::move(
-			std::make_unique<layer>(*curr.get())
-		));
+		layers.push_back(std::move(curr->clone()));
 	}
 
 	//copy the input format

@@ -40,6 +40,11 @@ convolutional_layer::convolutional_layer(
 		kernel_weights_deltas.push_back(matrix(kernel, false)); // do noty copy the deltas
 }
 
+std::unique_ptr<layer> convolutional_layer::clone() const
+{
+	return std::make_unique<convolutional_layer>(*this);
+}
+
 
 size_t convolutional_layer::get_parameter_count() const
 {

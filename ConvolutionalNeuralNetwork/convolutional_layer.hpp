@@ -28,6 +28,8 @@ public:
 
 	convolutional_layer(const convolutional_layer& other);
 
+	std::unique_ptr<layer> clone() const override;
+
 	size_t get_parameter_count() const override;
 
 	//getters
