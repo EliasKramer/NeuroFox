@@ -5,6 +5,7 @@
 #include "util.hpp"
 #include "math_functions.hpp"
 #include "vector3.hpp"
+#include "gpu_math.cuh"
 #include <cuda_runtime.h>
 
 class matrix {

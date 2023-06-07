@@ -1,7 +1,5 @@
 #pragma once
 #include "matrix.hpp"
-#include "gpu_matrix.cuh"
-#include "gpu_math.cuh"
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 

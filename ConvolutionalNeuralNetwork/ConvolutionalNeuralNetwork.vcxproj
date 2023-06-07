@@ -28,7 +28,6 @@
   <ItemGroup>
     <ClInclude Include="convolutional_layer.hpp" />
     <ClInclude Include="data_space.hpp" />
-    <ClInclude Include="gpu_matrix.cuh" />
     <ClInclude Include="fully_connected_layer.hpp" />
     <ClInclude Include="gpu_math.cuh" />
     <ClInclude Include="layer.hpp" />
@@ -43,7 +42,6 @@
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="gpu_math.cu" />
-    <CudaCompile Include="gpu_matrix.cu" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D8C885F6-007A-45AF-A38F-B60CE38A9F9D}</ProjectGuid>

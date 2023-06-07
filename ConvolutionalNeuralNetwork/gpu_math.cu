@@ -1,5 +1,4 @@
-#include "matrix.hpp"
-#include "device_launch_parameters.h"
+#include "gpu_math.cuh"
 
 #define THREADS_PER_BLOCK 1024
 

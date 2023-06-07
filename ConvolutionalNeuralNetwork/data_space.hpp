@@ -1,5 +1,5 @@
 #pragma once
-#include "gpu_matrix.cuh"
+#include "matrix.hpp"
 class data_space
 {
 private:
