@@ -12,17 +12,16 @@ private:
 	std::vector<matrix> kernel_weights_deltas;
 	matrix kernel_bias_deltas;
 
-	int kernel_size;
-	int stride;
-	int kernel_count;
+	size_t kernel_size;
+	size_t stride;
+	size_t kernel_count;
 
 	e_activation_t activation_fn;
 public:
-	//constructor
 	convolutional_layer(
-		int number_of_kernels,
-		int kernel_size,
-		int stride,
+		size_t number_of_kernels,
+		size_t kernel_size,
+		size_t stride,
 		e_activation_t activation_function
 	);
 
@@ -33,9 +32,9 @@ public:
 	size_t get_parameter_count() const override;
 
 	//getters
-	int get_kernel_size() const;
-	int get_stride() const;
-	int get_kernel_count() const;
+	size_t get_kernel_size() const;
+	size_t get_stride() const;
+	size_t get_kernel_count() const;
 
 	std::vector<matrix>& get_kernel_weights();
 	const std::vector<matrix>& get_kernel_weights_readonly() const;

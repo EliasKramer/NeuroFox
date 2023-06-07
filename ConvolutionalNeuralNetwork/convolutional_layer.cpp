@@ -1,9 +1,9 @@
 #include "convolutional_layer.hpp"
 
 convolutional_layer::convolutional_layer(
-	int number_of_kernels,
-	int kernel_size,
-	int stride,
+	size_t number_of_kernels,
+	size_t kernel_size,
+	size_t stride,
 	e_activation_t activation_function
 )
 	:layer(e_layer_type_t::convolution),
@@ -12,11 +12,11 @@ convolutional_layer::convolutional_layer(
 	activation_fn(activation_function),
 	kernel_count(number_of_kernels)
 {
-	if (number_of_kernels <= 0)
+	if (number_of_kernels == 0)
 		throw std::invalid_argument("number_of_kernels must be greater than 0");
-	if (kernel_size <= 0)
+	if (kernel_size == 0)
 		throw std::invalid_argument("kernel_size must be greater than 0");
-	if (stride <= 0)
+	if (stride == 0)
 		throw std::invalid_argument("stride must be greater than 0");
 
 	if (stride > kernel_size)
@@ -58,17 +58,17 @@ size_t convolutional_layer::get_parameter_count() const
 	return result;
 }
 
-int convolutional_layer::get_kernel_size() const
+size_t convolutional_layer::get_kernel_size() const
 {
 	return kernel_size;
 }
 
-int convolutional_layer::get_stride() const
+size_t convolutional_layer::get_stride() const
 {
 	return stride;
 }
 
-int convolutional_layer::get_kernel_count() const
+size_t convolutional_layer::get_kernel_count() const
 {
 	return kernel_count;
 }
@@ -212,37 +212,6 @@ void convolutional_layer::back_propagation(const matrix& input, matrix* passing_
 	throw std::exception("not implemented");
 	layer::back_propagation(input, passing_error);
 }
-/*
-void convolutional_layer::forward_propagation_gpu(const gpu_matrix& input)
-{
-	layer::forward_propagation_gpu(input);
-
-	gpu_valid_cross_correlation(
-		input,
-		gpu_kernel_weights,
-		*gpu_activations.get(),
-		input.get_width(),
-		input.get_depth(),
-		kernel_size,
-		kernel_weights.size(),
-		stride,
-		activations.get_width());
-
-	gpu_add(
-		*gpu_activations.get(),
-		*gpu_kernel_biases.get(),
-		*gpu_activations.get()
-	);
-
-	GPU_ACTIVATION[activation_fn](*gpu_activations.get());
-}
-
-void convolutional_layer::back_propagation_gpu(const gpu_matrix& input, gpu_matrix* passing_error)
-{
-	layer::back_propagation_gpu(input, passing_error);
-	throw std::exception("not implemented");
-}
-*/
 
 void convolutional_layer::apply_deltas(size_t training_data_count, float learning_rate)
 {
@@ -260,13 +229,6 @@ void convolutional_layer::enable_gpu_mode()
 	}
 	kernel_biases.enable_gpu_mode();
 	kernel_bias_deltas.enable_gpu_mode();
-	/*
-	for (const matrix& curr : kernel_weights)
-	{
-		gpu_kernel_weights.emplace_back(std::make_unique<gpu_matrix>(curr, true));
-	}
-	gpu_kernel_biases = std::make_unique<gpu_matrix>(kernel_biases, true);
-	*/
 }
 
 void convolutional_layer::disable_gpu()

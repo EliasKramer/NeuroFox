@@ -37,15 +37,23 @@ void pooling_layer::set_input_format(vector3 input_format)
 {
 	layer::set_input_format(input_format);
 
-	int output_width = (input_format.x - filter_size) / stride + 1;
-	int output_height = (input_format.y - filter_size) / stride + 1;
-	int output_depth = input_format.z;
+	float output_width = ((float)input_format.x - (float)filter_size) / (float)stride + 1;
+	float output_height = ((float)input_format.y - (float)filter_size) / (float)stride + 1;
+	size_t output_depth = input_format.z;
+
+	//TODO create test case for this scenario
+	if (!is_whole_number(output_width) ||
+		!is_whole_number(output_height))
+	{
+		throw std::invalid_argument("input format is not compatible with the kernel size and stride");
+		return;
+	}
 
 	activations = matrix(
 		vector3(
-			output_width,
-			output_height,
-			output_depth));
+			(size_t)output_width,
+			(size_t)output_height,
+					output_depth));
 }
 
 size_t pooling_layer::get_filter_size() const
@@ -162,19 +170,6 @@ void pooling_layer::back_propagation(const matrix& input, matrix* passing_error)
 	layer::back_propagation(input, passing_error);
 	throw std::exception("not implemented");
 }
-/*
-void pooling_layer::forward_propagation_gpu(const gpu_matrix& input)
-{
-	layer::forward_propagation_gpu(input);
-	throw std::exception("not implemented");
-}
-
-void pooling_layer::back_propagation_gpu(const gpu_matrix& input, gpu_matrix* passing_error)
-{
-	layer::back_propagation_gpu(input, passing_error);
-	throw std::exception("not implemented");
-}
-*/
 
 void pooling_layer::apply_deltas(size_t training_data_count, float learning_rate)
 {
