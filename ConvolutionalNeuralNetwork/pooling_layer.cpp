@@ -1,8 +1,8 @@
 #include "pooling_layer.hpp"
 
 pooling_layer::pooling_layer(
-	int filter_size,
-	int stride,
+	size_t filter_size,
+	size_t stride,
 	e_pooling_type_t pooling_fn
 )
 	:layer(e_layer_type_t::pooling),
@@ -10,9 +10,9 @@ pooling_layer::pooling_layer(
 	stride(stride),
 	pooling_fn(pooling_fn)
 {
-	if (filter_size <= 0)
+	if (filter_size == 0)
 		throw std::invalid_argument("filter size must be greater than 0");
-	if (stride <= 0)
+	if (stride == 0)
 		throw std::invalid_argument("stride must be greater than 0");
 }
 
@@ -48,12 +48,12 @@ void pooling_layer::set_input_format(vector3 input_format)
 			output_depth));
 }
 
-int pooling_layer::get_filter_size() const
+size_t pooling_layer::get_filter_size() const
 {
 	return filter_size;
 }
 
-int pooling_layer::get_stride() const
+size_t pooling_layer::get_stride() const
 {
 	return stride;
 }
@@ -88,20 +88,20 @@ void pooling_layer::forward_propagation(const matrix& input)
 	layer::forward_propagation(input);
 
 	//iterate over each depth
-	for (int d = 0; d < activations.get_depth(); d++)
+	for (size_t d = 0; d < activations.get_depth(); d++)
 	{
 		//iterate over each row of the output
-		for (int y = 0; y < activations.get_height(); y++)
+		for (size_t y = 0; y < activations.get_height(); y++)
 		{
 			//calculate the start and end index of the filter on the y axis
-			const int start_idx_y = y * stride;
-			const int end_idx_y = start_idx_y + filter_size;
+			const size_t start_idx_y = y * stride;
+			const size_t end_idx_y = start_idx_y + filter_size;
 
-			for (int x = 0; x < activations.get_width(); x++)
+			for (size_t x = 0; x < activations.get_width(); x++)
 			{
 				//calculate the start and end index of the filter on the x axis
-				const int start_idx_x = x * stride;
-				const int end_idx_x = start_idx_x + filter_size;
+				const size_t start_idx_x = x * stride;
+				const size_t end_idx_x = start_idx_x + filter_size;
 
 				//calculating the max, min, and average values
 				//this could be improved by only calculating one of these values
@@ -110,12 +110,12 @@ void pooling_layer::forward_propagation(const matrix& input)
 				float sum = 0;
 
 				//iterate over the filter
-				for (int i = start_idx_y; i <= end_idx_y; i++)
+				for (size_t i = start_idx_y; i <= end_idx_y; i++)
 				{
 					if (i >= input.get_height())
 						break;
 
-					for (int j = start_idx_x; j <= end_idx_x; j++)
+					for (size_t j = start_idx_x; j <= end_idx_x; j++)
 					{
 						if (j >= input.get_width())
 							break;

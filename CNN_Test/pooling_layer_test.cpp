@@ -17,8 +17,8 @@ namespace CNNTest
 			Assert::AreEqual((size_t)2, pooling.get_activations_readonly().get_width());
 			Assert::AreEqual((size_t)1, pooling.get_activations_readonly().get_depth());
 
-			Assert::AreEqual(1, pooling.get_stride());
-			Assert::AreEqual(1, pooling.get_filter_size());
+			Assert::AreEqual((size_t)1, pooling.get_stride());
+			Assert::AreEqual((size_t)1, pooling.get_filter_size());
 			Assert::AreEqual((int)max_pooling, (int)pooling.get_pooling_fn());
 		}
 		TEST_METHOD(pooling_constructor_test_2)
@@ -30,8 +30,8 @@ namespace CNNTest
 			Assert::AreEqual((size_t)3, pooling.get_activations_readonly().get_width());
 			Assert::AreEqual((size_t)2, pooling.get_activations_readonly().get_depth());
 
-			Assert::AreEqual(2, pooling.get_stride());
-			Assert::AreEqual(2, pooling.get_filter_size());
+			Assert::AreEqual((size_t)2, pooling.get_stride());
+			Assert::AreEqual((size_t)2, pooling.get_filter_size());
 			Assert::AreEqual((int)average_pooling, (int)pooling.get_pooling_fn());
 		}
 		TEST_METHOD(pooling_constructor_test_invalid_arguments)

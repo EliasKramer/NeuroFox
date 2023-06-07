@@ -11,16 +11,16 @@ enum _pooling_type
 
 class pooling_layer : public layer {
 private:
-	int filter_size;
-	int stride;
+	size_t filter_size;
+	size_t stride;
 	e_pooling_type_t pooling_fn;
 
 	bool gpu_enabled = false;
 public:
 	//constructor
 	pooling_layer(
-		int filter_size,
-		int stride,
+		size_t filter_size,
+		size_t stride,
 		e_pooling_type_t pooling_fn
 	);
 	pooling_layer(const pooling_layer& other);
@@ -32,8 +32,8 @@ public:
 
 	void set_input_format(vector3 input_format) override;
 
-	int get_filter_size() const;
-	int get_stride() const;
+	size_t get_filter_size() const;
+	size_t get_stride() const;
 	e_pooling_type_t get_pooling_fn() const;
 
 	void set_all_parameters(float value) override;
