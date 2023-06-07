@@ -73,5 +73,5 @@ public:
 	void enable_gpu_mode();
 
 	bool equal_format(const neural_network& other);
-	bool operator==(const neural_network& other);
+	bool equal_parameter(const neural_network& other);
 };

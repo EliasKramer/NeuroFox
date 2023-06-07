@@ -51,5 +51,5 @@ public:
 	void disable_gpu() override;
 
 	bool equal_format(const layer& other) override;
-	bool operator==(const layer& other) override;
+	bool equal_parameter(const layer& other) override;
 };

@@ -42,3 +42,8 @@ bool vector3::are_equal(const vector3 & v1, const vector3 & v2)
 		v1.y == v2.y &&
 		v1.z == v2.z;
 }
+
+bool vector3::operator==(const vector3& other) const
+{
+	return are_equal(*this, other);
+}

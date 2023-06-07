@@ -277,24 +277,34 @@ void convolutional_layer::disable_gpu()
 
 bool convolutional_layer::equal_format(const layer& other)
 {
-	if (layer::type == e_layer_type_t::convolution)
+	if (layer::equal_format(other))
 	{
-		const convolutional_layer& other_conv_layer = dynamic_cast<const convolutional_layer&>(other);
-		
+		const convolutional_layer& other_conv = dynamic_cast<const convolutional_layer&>(other);
+	
 		return
-			layer::equal_format(other) &&
-			kernel_count == other_conv_layer.kernel_count &&
-			kernel_size == other_conv_layer.kernel_size &&
-			stride == other_conv_layer.stride;
+			//TODO convert kernelsize into kernel format
+			kernel_size == other_conv.kernel_size &&
+			stride == other_conv.stride &&
+			kernel_count == other_conv.kernel_count;
 	}
-	else 
-	{
-		throw std::invalid_argument("you cannot call equal format if it is not the same type");
-		return false;
-	}
+	return false;
 }
 
-bool convolutional_layer::operator==(const layer& other)
+bool convolutional_layer::equal_parameter(const layer& other)
 {
-	throw std::exception("not implmented");
+	if (layer::equal_format(other))
+	{
+		const convolutional_layer& other_conv = dynamic_cast<const convolutional_layer&>(other);
+
+		if (kernel_weights.size() == other_conv.kernel_weights.size())
+		{
+			for (int i = 0; i < kernel_weights.size(); i++)
+			{
+				if(!matrix::are_equal(kernel_weights[i], other_conv.kernel_weights[i]))
+					return false;
+			}
+			return matrix::are_equal(kernel_biases, other_conv.kernel_biases);
+		}
+	}
+	return false;
 }

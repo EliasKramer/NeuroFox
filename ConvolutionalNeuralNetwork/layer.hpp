@@ -74,5 +74,5 @@ public:
 	virtual void disable_gpu();
 
 	virtual bool equal_format(const layer& other);
-	virtual bool operator==(const layer& other);
+	virtual bool equal_parameter(const layer& other) = 0;
 };

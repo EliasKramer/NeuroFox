@@ -301,10 +301,32 @@ void neural_network::enable_gpu_mode()
 
 bool neural_network::equal_format(const neural_network& other)
 {
-	return false;
+	if (layers.size() != other.layers.size())
+	{
+		return false;
+	}
+	for (int i = 0; i < layers.size(); i++)
+	{
+		if (!layers[i]->equal_format(*other.layers[i]))
+		{
+			return false;
+		}
+	}
+	return true;
 }
 
-bool neural_network::operator==(const neural_network& other)
+bool neural_network::equal_parameter(const neural_network& other)
 {
-	return false;
+	if (layers.size() != other.layers.size())
+	{
+		return false;
+	}
+	for (int i = 0; i < layers.size(); i++)
+	{
+		if (!layers[i]->equal_parameter(*other.layers[i]))
+		{
+			return false;
+		}
+	}
+	return true;
 }

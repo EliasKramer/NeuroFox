@@ -195,17 +195,19 @@ void pooling_layer::disable_gpu()
 
 bool pooling_layer::equal_format(const layer& other)
 {
-	return layer::equal_format(other);
+	if (layer::equal_format(other))
+	{
+		const pooling_layer& other_cast = dynamic_cast<const pooling_layer&>(other);
+
+		return filter_size == other_cast.filter_size &&
+			stride == other_cast.stride &&
+			pooling_fn == other_cast.pooling_fn;
+	}
+
+	return false;
 }
 
-bool pooling_layer::operator==(const layer& other)
+bool pooling_layer::equal_parameter(const layer& other)
 {
-	if(typeid(*this) != typeid(other))
-		return false;
-
-
-	return *this == other && d
-		filter_size == other.filter_size &&
-		stride == other.get_stride() &&
-		pooling_fn == other.get_pooling_fn();
+	return equal_format(other);
 }

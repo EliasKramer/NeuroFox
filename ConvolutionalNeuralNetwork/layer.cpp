@@ -111,17 +111,11 @@ void layer::disable_gpu()
 bool layer::equal_format(const layer& other)
 {
 	return
+		input_format == other.input_format &&
 		type == other.type &&
 		matrix::equal_format(activations, other.activations) &&
 		matrix::equal_format(error, other.error) &&
 		matrix::equal_format(input_format, other.input_format);
-}
-
-bool layer::operator==(const layer& other)
-{
-	return matrix::are_equal(activations, other.activations) &&
-		matrix::are_equal(error, other.error) &&
-		matrix::are_equal(input_format, other.input_format);
 }
 
 void layer::sync_device_and_host()

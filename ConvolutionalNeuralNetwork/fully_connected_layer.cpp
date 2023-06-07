@@ -238,10 +238,28 @@ void fully_connected_layer::disable_gpu()
 
 bool fully_connected_layer::equal_format(const layer& other)
 {
+	if (layer::equal_format(other))
+	{
+		const fully_connected_layer& other_casted = dynamic_cast<const fully_connected_layer&>(other);
+		//we could check for the deltas as well, but they should always be the same format
+		//weights should have the same format as weight deltas
+		//biases should have the same format as bias deltas
+		return
+			matrix::equal_format(weights, other_casted.weights) &&
+			matrix::equal_format(biases, other_casted.biases);
+	}
 	return false;
 }
 
-bool fully_connected_layer::operator==(const layer& other)
+bool fully_connected_layer::equal_parameter(const layer& other)
 {
+	if (equal_format(other))
+	{
+		const fully_connected_layer& other_casted = dynamic_cast<const fully_connected_layer&>(other);
+		return
+			matrix::are_equal(weights, other_casted.weights) &&
+			matrix::are_equal(biases, other_casted.biases);
+	}
+
 	return false;
 }
