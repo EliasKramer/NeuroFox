@@ -45,7 +45,7 @@ public:
 	void set_input_format(vector3 input_format) override;
 
 	//set all weights and biases to that value
-	void set_all_parameter(float value) override;
+	void set_all_parameters(float value) override;
 	//a random value to the current weights and biases between -value and value
 	void apply_noise(float range) override;
 	//add a random value between range and -range to one weight or bias 

@@ -55,7 +55,7 @@ public:
 	void add_pooling_layer(int kernel_size, int stride, e_pooling_type_t pooling_type);
 
 	//set all weights and biases to that value
-	void set_all_parameter(float value);
+	void set_all_parameters(float value);
 	//a random value to the current weights and biases between -value and value
 	void apply_noise(float range);
 	//add a random value between range and -range to one weight or bias 

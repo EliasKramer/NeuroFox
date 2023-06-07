@@ -54,7 +54,7 @@ public:
 	virtual void set_error_for_last_layer_cpu(const matrix& expected);
 
 	//set all weights and biases to that value
-	virtual void set_all_parameter(float value) = 0;
+	virtual void set_all_parameters(float value) = 0;
 	//a random value to the current weights and biases between -value and value
 	virtual void apply_noise(float range) = 0;
 	//add a random value between range and -range to one weight or bias 

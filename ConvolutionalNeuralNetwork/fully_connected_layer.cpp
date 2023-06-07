@@ -92,7 +92,7 @@ matrix& fully_connected_layer::get_biases_ref()
 	return biases;
 }
 
-void fully_connected_layer::set_all_parameter(float value)
+void fully_connected_layer::set_all_parameters(float value)
 {
 	biases.set_all(value);
 	weights.set_all(value);

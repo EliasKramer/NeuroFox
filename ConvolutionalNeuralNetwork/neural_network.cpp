@@ -163,12 +163,12 @@ void neural_network::add_pooling_layer(int kernel_size, int stride, e_pooling_ty
 	//TODO
 }
 
-void neural_network::set_all_parameter(float value)
+void neural_network::set_all_parameters(float value)
 {
 	//for parameter layers
 	for (auto& l : parameter_layer_indices)
 	{
-		layers[l]->set_all_parameter(value);
+		layers[l]->set_all_parameters(value);
 	}
 }
 

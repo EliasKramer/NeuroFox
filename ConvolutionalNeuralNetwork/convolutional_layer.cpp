@@ -130,7 +130,7 @@ void convolutional_layer::set_input_format(vector3 input_format)
 			kernel_count));
 }
 
-void convolutional_layer::set_all_parameter(float value)
+void convolutional_layer::set_all_parameters(float value)
 {
 	for (matrix& weights : kernel_weights)
 	{
@@ -283,6 +283,7 @@ bool convolutional_layer::equal_format(const layer& other)
 	
 		return
 			//TODO convert kernelsize into kernel format
+			activation_fn == other_conv.activation_fn &&
 			kernel_size == other_conv.kernel_size &&
 			stride == other_conv.stride &&
 			kernel_count == other_conv.kernel_count;

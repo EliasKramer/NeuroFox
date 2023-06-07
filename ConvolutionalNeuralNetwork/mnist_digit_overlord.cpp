@@ -200,7 +200,7 @@ mnist_digit_overlord::mnist_digit_overlord()
 	//nn.add_fully_connected_layer(16, e_activation_t::sigmoid_fn);
 	//nn.add_fully_connected_layer(16, e_activation_t::sigmoid_fn);
 	nn.add_fully_connected_layer(vector3(1, 10, 1), e_activation_t::sigmoid_fn);
-	nn.set_all_parameter(0);
+	nn.set_all_parameters(0);
 
 	nn.apply_noise(0.1f);
 	//enable_gpu();
