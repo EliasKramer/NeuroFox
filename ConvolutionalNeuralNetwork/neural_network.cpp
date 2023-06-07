@@ -298,3 +298,13 @@ void neural_network::enable_gpu_mode()
 
 	sync_device_and_host();
 }
+
+bool neural_network::equal_format(const neural_network& other)
+{
+	return false;
+}
+
+bool neural_network::operator==(const neural_network& other)
+{
+	return false;
+}

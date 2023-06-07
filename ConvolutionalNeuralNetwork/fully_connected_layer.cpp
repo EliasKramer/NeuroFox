@@ -235,3 +235,13 @@ void fully_connected_layer::enable_gpu_mode()
 void fully_connected_layer::disable_gpu()
 {
 }
+
+bool fully_connected_layer::equal_format(const layer& other)
+{
+	return false;
+}
+
+bool fully_connected_layer::operator==(const layer& other)
+{
+	return false;
+}

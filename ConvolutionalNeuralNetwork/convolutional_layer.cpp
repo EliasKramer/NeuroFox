@@ -274,3 +274,27 @@ void convolutional_layer::disable_gpu()
 	//gpu_kernel_weights.clear();
 	//gpu_kernel_biases = nullptr;
 }
+
+bool convolutional_layer::equal_format(const layer& other)
+{
+	if (layer::type == e_layer_type_t::convolution)
+	{
+		const convolutional_layer& other_conv_layer = dynamic_cast<const convolutional_layer&>(other);
+		
+		return
+			layer::equal_format(other) &&
+			kernel_count == other_conv_layer.kernel_count &&
+			kernel_size == other_conv_layer.kernel_size &&
+			stride == other_conv_layer.stride;
+	}
+	else 
+	{
+		throw std::invalid_argument("you cannot call equal format if it is not the same type");
+		return false;
+	}
+}
+
+bool convolutional_layer::operator==(const layer& other)
+{
+	throw std::exception("not implmented");
+}

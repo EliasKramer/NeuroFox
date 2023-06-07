@@ -72,4 +72,7 @@ public:
 
 	virtual void enable_gpu_mode();
 	virtual void disable_gpu();
+
+	virtual bool equal_format(const layer& other);
+	virtual bool operator==(const layer& other);
 };

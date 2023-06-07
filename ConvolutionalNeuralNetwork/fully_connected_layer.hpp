@@ -63,4 +63,7 @@ public:
 
 	void enable_gpu_mode() override;
 	void disable_gpu() override;
+
+	bool equal_format(const layer& other) override;
+	bool operator==(const layer& other) override;
 };

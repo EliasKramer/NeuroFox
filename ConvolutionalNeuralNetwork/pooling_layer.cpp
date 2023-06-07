@@ -192,3 +192,20 @@ void pooling_layer::disable_gpu()
 	gpu_enabled = false;
 	throw std::runtime_error("pooling layer has no implementation of disable gpu");
 }
+
+bool pooling_layer::equal_format(const layer& other)
+{
+	return layer::equal_format(other);
+}
+
+bool pooling_layer::operator==(const layer& other)
+{
+	if(typeid(*this) != typeid(other))
+		return false;
+
+
+	return *this == other && d
+		filter_size == other.filter_size &&
+		stride == other.get_stride() &&
+		pooling_fn == other.get_pooling_fn();
+}
