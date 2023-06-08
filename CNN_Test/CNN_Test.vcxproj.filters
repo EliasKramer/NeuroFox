@@ -96,6 +96,9 @@
     <ClCompile Include="..\ConvolutionalNeuralNetwork\vector3.cpp">
       <Filter>Source Files\nn</Filter>
     </ClCompile>
+    <ClCompile Include="nn_test.cpp">
+      <Filter>Source Files\test</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ConvolutionalNeuralNetwork\convolutional_layer.hpp">

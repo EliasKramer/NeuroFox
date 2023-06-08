@@ -180,6 +180,7 @@
     <ClCompile Include="math_test.cpp" />
     <ClCompile Include="matrix_test.cpp" />
     <ClCompile Include="model_test.cpp" />
+    <ClCompile Include="nn_test.cpp" />
     <ClCompile Include="pooling_layer_test.cpp" />
     <ClCompile Include="gpu_test.cpp" />
     <ClCompile Include="test_util.cpp" />

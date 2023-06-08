@@ -90,5 +90,38 @@ namespace CNNTest
 			Assert::AreEqual(start.equal_parameter(not_same), false);
 			Assert::AreEqual(start.equal_parameter(same), true);
 		}
+		TEST_METHOD(layer_clone_test)
+		{
+			fully_connected_layer start(5, e_activation_t::relu_fn);
+			start.set_input_format(vector3(1, 1, 1));
+			start.apply_noise(1.0f);
+			
+			std::unique_ptr<layer> same = start.clone();
+
+			std::unique_ptr<layer> not_same = start.clone();
+			not_same->mutate(1.0f);
+
+			Assert::AreEqual(start.equal_parameter(*not_same), false);
+			Assert::AreEqual(start.equal_parameter(*same), true);
+
+			Assert::AreEqual(start.equal_format(*not_same), true);
+			Assert::AreEqual(start.equal_format(*same), true);
+		}
+		TEST_METHOD(layer_copy_constructor_test)
+		{
+			convolutional_layer start(3, 2, 2, e_activation_t::sigmoid_fn);
+			start.set_input_format(vector3(4, 4, 1));
+
+			convolutional_layer same(start);
+
+			convolutional_layer not_same(start);
+			not_same.mutate(1.0f);
+
+			Assert::AreEqual(start.equal_parameter(not_same), false);
+			Assert::AreEqual(start.equal_parameter(same), true);
+
+			Assert::AreEqual(start.equal_format(not_same), true);
+			Assert::AreEqual(start.equal_format(same), true);
+		}
 	};
 }

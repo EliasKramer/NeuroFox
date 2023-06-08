@@ -245,6 +245,7 @@ bool fully_connected_layer::equal_format(const layer& other)
 		//weights should have the same format as weight deltas
 		//biases should have the same format as bias deltas
 		return
+			activation_fn == other_casted.activation_fn &&
 			matrix::equal_format(weights, other_casted.weights) &&
 			matrix::equal_format(biases, other_casted.biases);
 	}
