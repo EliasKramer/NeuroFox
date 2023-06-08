@@ -74,5 +74,5 @@ public:
 
 	bool equal_format(const neural_network& other);
 	bool equal_parameter(const neural_network& other);
-	void set_parameter(const neural_network& other);
+	void set_parameters(const neural_network& other);
 };

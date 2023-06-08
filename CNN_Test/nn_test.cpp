@@ -92,5 +92,24 @@ namespace CNNTest
 			Assert::AreEqual(false, nn.equal_parameter(copy));
 			Assert::AreEqual(true, nn.equal_format(copy));
 		}
+		TEST_METHOD(nn_set_parameter_test)
+		{
+			neural_network nn;
+			nn.set_input_format(vector3(28, 28, 1));
+			nn.add_fully_connected_layer(15, e_activation_t::relu_fn);
+			nn.add_fully_connected_layer(10, e_activation_t::sigmoid_fn);
+			nn.set_all_parameters(1.0f);
+
+			neural_network copy(nn);
+			copy.mutate(5);
+			
+			Assert::AreEqual(false, nn.equal_parameter(copy));
+			Assert::AreEqual(true, nn.equal_format(copy));
+
+			copy.set_parameters(nn);
+
+			Assert::AreEqual(true, nn.equal_parameter(copy));
+			Assert::AreEqual(true, nn.equal_format(copy));
+		}
 	};
 }

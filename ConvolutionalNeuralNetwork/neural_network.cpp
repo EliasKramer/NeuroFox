@@ -331,7 +331,7 @@ bool neural_network::equal_parameter(const neural_network& other)
 	return true;
 }
 
-void neural_network::set_parameter(const neural_network& other)
+void neural_network::set_parameters(const neural_network& other)
 {
 	if (!equal_format(other))
 	{
@@ -339,6 +339,6 @@ void neural_network::set_parameter(const neural_network& other)
 	}
 	for (auto& l : parameter_layer_indices)
 	{
-		layers[l]->set_parameter(*other.layers[l]);
+		layers[l]->set_parameters(*other.layers[l]);
 	}
 }

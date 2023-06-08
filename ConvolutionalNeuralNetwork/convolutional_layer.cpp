@@ -272,7 +272,7 @@ bool convolutional_layer::equal_parameter(const layer& other)
 	return false;
 }
 
-void convolutional_layer::set_parameter(const layer& other)
+void convolutional_layer::set_parameters(const layer& other)
 {
 	if (layer::equal_format(other))
 	{

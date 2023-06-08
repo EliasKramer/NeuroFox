@@ -70,7 +70,7 @@ namespace CNNTest
 			same.set_input_format(vector3(1, 1, 1));
 			convolutional_layer not_same(1, 1, 1, e_activation_t::relu_fn);
 			not_same.set_input_format(vector3(1, 1, 1));
-			
+
 			Assert::AreEqual(start.equal_format(not_same), false);
 			Assert::AreEqual(start.equal_format(same), true);
 		}
@@ -86,7 +86,7 @@ namespace CNNTest
 			not_same.set_input_format(vector3(1, 1, 1));
 			not_same.set_all_parameters(1.0f);
 			not_same.mutate(1.0f);
-			
+
 			Assert::AreEqual(start.equal_parameter(not_same), false);
 			Assert::AreEqual(start.equal_parameter(same), true);
 		}
@@ -95,7 +95,7 @@ namespace CNNTest
 			fully_connected_layer start(5, e_activation_t::relu_fn);
 			start.set_input_format(vector3(1, 1, 1));
 			start.apply_noise(1.0f);
-			
+
 			std::unique_ptr<layer> same = start.clone();
 
 			std::unique_ptr<layer> not_same = start.clone();
@@ -122,6 +122,27 @@ namespace CNNTest
 
 			Assert::AreEqual(start.equal_format(not_same), true);
 			Assert::AreEqual(start.equal_format(same), true);
+		}
+		TEST_METHOD(layer_set_parameter_test)
+		{
+			fully_connected_layer start(5, e_activation_t::relu_fn);
+			start.set_input_format(vector3(1, 1, 1));
+			start.set_all_parameters(1.0f);
+
+			fully_connected_layer other(5, e_activation_t::relu_fn);
+			other.set_input_format(vector3(1, 1, 1));
+			other.set_all_parameters(1.0f);
+
+			other.mutate(1.0f);
+			other.mutate(1.0f);
+			other.mutate(1.0f);
+			other.mutate(1.0f);
+
+			Assert::AreEqual(start.equal_parameter(other), false);
+
+			other.set_parameters(start);
+
+			Assert::AreEqual(start.equal_parameter(other), true);
 		}
 	};
 }

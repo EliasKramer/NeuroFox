@@ -265,7 +265,7 @@ bool fully_connected_layer::equal_parameter(const layer& other)
 	return false;
 }
 
-void fully_connected_layer::set_parameter(const layer& other)
+void fully_connected_layer::set_parameters(const layer& other)
 {
 	if (equal_format(other))
 	{
