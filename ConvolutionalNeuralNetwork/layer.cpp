@@ -134,16 +134,3 @@ void layer::back_propagation(const matrix& input, matrix* passing_error)
 	valid_input_check(input);
 	valid_passing_error_check_cpu(passing_error);
 }
-
-/*
-void layer::forward_propagation_gpu(const gpu_matrix& input)
-{
-	valid_input_check_gpu(input);
-}
-
-void layer::back_propagation_gpu(const gpu_matrix& input, gpu_matrix* passing_error)
-{
-	valid_input_check_gpu(input);
-	valid_passing_error_check_gpu(passing_error);
-}
-*/

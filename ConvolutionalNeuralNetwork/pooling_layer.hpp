@@ -52,4 +52,5 @@ public:
 
 	bool equal_format(const layer& other) override;
 	bool equal_parameter(const layer& other) override;
+	void set_parameter(const layer& other) override;
 };

@@ -264,3 +264,17 @@ bool fully_connected_layer::equal_parameter(const layer& other)
 
 	return false;
 }
+
+void fully_connected_layer::set_parameter(const layer& other)
+{
+	if (equal_format(other))
+	{
+		const fully_connected_layer& other_casted = dynamic_cast<const fully_connected_layer&>(other);
+		weights.set_data_from_src(other_casted.weights);
+		biases.set_data_from_src(other_casted.biases);
+	}
+	else
+	{
+		throw std::invalid_argument("other does not have the same format");
+	}
+}

@@ -73,4 +73,5 @@ public:
 
 	virtual bool equal_format(const layer& other);
 	virtual bool equal_parameter(const layer& other) = 0;
+	virtual void set_parameter(const layer& other) = 0;
 };

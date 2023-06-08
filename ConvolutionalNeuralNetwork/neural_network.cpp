@@ -330,3 +330,15 @@ bool neural_network::equal_parameter(const neural_network& other)
 	}
 	return true;
 }
+
+void neural_network::set_parameter(const neural_network& other)
+{
+	if (!equal_format(other))
+	{
+		throw std::runtime_error("Cannot set parameter. Format of the networks is not equal.");
+	}
+	for (auto& l : parameter_layer_indices)
+	{
+		layers[l]->set_parameter(*other.layers[l]);
+	}
+}

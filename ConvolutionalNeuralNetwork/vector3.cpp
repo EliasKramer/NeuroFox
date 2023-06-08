@@ -47,3 +47,8 @@ bool vector3::operator==(const vector3& other) const
 {
 	return are_equal(*this, other);
 }
+
+bool vector3::operator!=(const vector3& other) const
+{
+	return !are_equal(*this, other);
+}

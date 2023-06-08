@@ -206,3 +206,8 @@ bool pooling_layer::equal_parameter(const layer& other)
 {
 	return equal_format(other);
 }
+
+void pooling_layer::set_parameter(const layer& other)
+{
+	throw std::invalid_argument("pooling layer does not have any parameters");
+}

@@ -144,6 +144,9 @@ void matrix::set_own_host_data_from(const std::vector<float> src)
 	allocate_host_mem();
 
 	std::copy(src.data(), src.data() + item_count(), this->host_data);
+	
+	//not tested 
+	set_host_as_last_updated();
 }
 
 void matrix::set_own_host_data_from(const matrix& src)
@@ -163,7 +166,10 @@ void matrix::set_own_host_data_from(const matrix& src)
 	allocate_host_mem();
 
 	std::copy(src.host_data, src.host_data + item_count(), this->host_data);
-
+	
+	//not tested 
+	set_host_as_last_updated();
+	
 	//TODO gpu
 	/*
 	if (src.is_device_mem_allocated())
@@ -325,6 +331,21 @@ matrix& matrix::operator=(const matrix& other)
 		}
 	}
 	return *this;
+}
+
+void matrix::set_data_from_src(const matrix& src)
+{
+	if_not_initialized_throw();
+	src.if_not_owning_throw();
+	
+	if (format != src.format)
+	{
+		throw std::invalid_argument("src format is not the same as this format");
+	}
+
+	set_own_host_data_from(src);
+	
+	sync_device_and_host();
 }
 
 void matrix::set_all(float value)

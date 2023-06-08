@@ -60,16 +60,8 @@ public:
 	void sync_device_and_host();
 
 	void enable_gpu_mode();
-	/*
-	//deletes the old data and allocates new memory
-	void initialize_format(vector3 new_format);
-	//deletes the old data and allocates new memory
-	//does not copy values
-	void initialize_format(const matrix& source);
-	*/
-
-	//void set_ptr_as_source(float* given_ptr);
-
+	
+	void set_data_from_src(const matrix& src);
 	void set_all(float value);
 	void apply_noise(float range);
 	void mutate(float range);
@@ -84,10 +76,6 @@ public:
 	void set_at_flat(size_t idx, float value);
 	void add_at_flat(size_t idx, float value);
 
-	/*
-	float* get_data();
-	const float* get_data_readonly() const;
-	*/
 	float* get_device_ptr();
 	const float* get_device_ptr_readonly() const;
 	float* get_device_ptr_layer(size_t depth_idx);

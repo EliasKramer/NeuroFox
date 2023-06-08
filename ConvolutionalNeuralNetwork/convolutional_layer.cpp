@@ -25,7 +25,7 @@ convolutional_layer::convolutional_layer(
 
 convolutional_layer::convolutional_layer(
 	const convolutional_layer& other
-) : 
+) :
 	layer(other),
 	kernel_size(other.kernel_size),
 	stride(other.stride),
@@ -36,7 +36,7 @@ convolutional_layer::convolutional_layer(
 {
 	for (const auto& kernel : other.kernel_weights)
 		kernel_weights.push_back(matrix(kernel));
-	for(const auto& kernel : other.kernel_weights_deltas)
+	for (const auto& kernel : other.kernel_weights_deltas)
 		kernel_weights_deltas.push_back(matrix(kernel, false)); // do noty copy the deltas
 }
 
@@ -242,7 +242,7 @@ bool convolutional_layer::equal_format(const layer& other)
 	if (layer::equal_format(other))
 	{
 		const convolutional_layer& other_conv = dynamic_cast<const convolutional_layer&>(other);
-	
+
 		return
 			//TODO convert kernelsize into kernel format
 			activation_fn == other_conv.activation_fn &&
@@ -263,11 +263,36 @@ bool convolutional_layer::equal_parameter(const layer& other)
 		{
 			for (int i = 0; i < kernel_weights.size(); i++)
 			{
-				if(!matrix::are_equal(kernel_weights[i], other_conv.kernel_weights[i]))
+				if (!matrix::are_equal(kernel_weights[i], other_conv.kernel_weights[i]))
 					return false;
 			}
 			return matrix::are_equal(kernel_biases, other_conv.kernel_biases);
 		}
 	}
 	return false;
+}
+
+void convolutional_layer::set_parameter(const layer& other)
+{
+	if (layer::equal_format(other))
+	{
+		const convolutional_layer& other_conv = dynamic_cast<const convolutional_layer&>(other);
+
+		if (kernel_weights.size() == other_conv.kernel_weights.size())
+		{
+			for (int i = 0; i < kernel_weights.size(); i++)
+			{
+				kernel_weights[i].set_data_from_src(other_conv.kernel_weights[i]);
+			}
+			kernel_biases.set_data_from_src(other_conv.kernel_biases);
+		}
+		else
+		{
+			throw std::invalid_argument("kernel weight count does not match");
+		}
+	}
+	else
+	{
+		throw std::invalid_argument("layer format does not match");
+	}
 }
