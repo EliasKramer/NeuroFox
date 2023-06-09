@@ -20,6 +20,8 @@ private:
 	size_t idx_of_max(const matrix& m) const;
 
 	void enable_gpu();
+
+	void save_to_file();
 public:
 	mnist_digit_overlord();
 

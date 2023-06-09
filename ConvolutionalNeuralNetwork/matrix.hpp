@@ -58,13 +58,14 @@ public:
 	~matrix();
 
 	void sync_device_and_host();
-
 	void enable_gpu_mode();
 	
 	void set_data_from_src(const matrix& src);
 	void set_all(float value);
 	void apply_noise(float range);
 	void mutate(float range);
+
+	void write_to_ofstream(std::ofstream& file) const;
 
 	vector3 get_format() const;
 	size_t get_width() const;

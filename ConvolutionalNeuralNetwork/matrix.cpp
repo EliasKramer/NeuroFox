@@ -1,4 +1,5 @@
 #include "matrix.hpp"
+#include <fstream>
 #include <numeric>
 
 void matrix::set_host_as_last_updated()
@@ -383,6 +384,13 @@ void matrix::mutate(float range)
 		random_float_incl(-range, range));
 
 	set_host_as_last_updated();
+}
+
+void matrix::write_to_ofstream(std::ofstream& file) const
+{
+	if_not_initialized_throw();
+	format.write_to_ofstream(file);
+	file.write((char*)host_data, sizeof(float) * item_count());
 }
 
 vector3 matrix::get_format() const

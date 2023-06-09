@@ -296,3 +296,17 @@ void convolutional_layer::set_parameters(const layer& other)
 		throw std::invalid_argument("layer format does not match");
 	}
 }
+
+void convolutional_layer::write_to_ofstream(std::ofstream& file) const
+{
+	layer::write_to_ofstream(file);
+	file.write((char*)&activation_fn, sizeof(activation_fn));
+	file.write((char*)&kernel_size, sizeof(kernel_size));
+	file.write((char*)&stride, sizeof(stride));
+	file.write((char*)&kernel_count, sizeof(kernel_count));
+	for (const matrix& weights : kernel_weights)
+	{
+		weights.write_to_ofstream(file);
+	}
+	kernel_biases.write_to_ofstream(file);
+}

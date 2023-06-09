@@ -75,4 +75,7 @@ public:
 	bool equal_format(const neural_network& other);
 	bool equal_parameter(const neural_network& other);
 	void set_parameters(const neural_network& other);
+
+	//this is not const, because we need to sync the device and host memory before saving
+	void save_to_file(const std::string& file_path);
 };

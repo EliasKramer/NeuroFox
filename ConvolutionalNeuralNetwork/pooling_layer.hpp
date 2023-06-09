@@ -53,4 +53,6 @@ public:
 	bool equal_format(const layer& other) override;
 	bool equal_parameter(const layer& other) override;
 	void set_parameters(const layer& other) override;
+	
+	void write_to_ofstream(std::ofstream& file) const override;
 };

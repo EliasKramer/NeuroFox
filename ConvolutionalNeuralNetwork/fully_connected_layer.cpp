@@ -278,3 +278,11 @@ void fully_connected_layer::set_parameters(const layer& other)
 		throw std::invalid_argument("other does not have the same format");
 	}
 }
+
+void fully_connected_layer::write_to_ofstream(std::ofstream& file) const
+{
+	layer::write_to_ofstream(file);
+	file.write((char*)&activation_fn, sizeof(activation_fn));
+	weights.write_to_ofstream(file);
+	biases.write_to_ofstream(file);
+}

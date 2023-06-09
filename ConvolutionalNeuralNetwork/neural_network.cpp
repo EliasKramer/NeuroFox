@@ -1,5 +1,6 @@
 #include "neural_network.hpp"
 #include "util.hpp"
+#include <fstream>
 
 layer* neural_network::get_last_layer()
 {
@@ -11,7 +12,7 @@ layer* neural_network::get_last_layer()
 neural_network::neural_network()
 {}
 
-neural_network::neural_network(const neural_network & source)
+neural_network::neural_network(const neural_network& source)
 {
 	//if same return
 	if (this == &source)
@@ -341,4 +342,31 @@ void neural_network::set_parameters(const neural_network& other)
 	{
 		layers[l]->set_parameters(*other.layers[l]);
 	}
+}
+
+void neural_network::save_to_file(const std::string& file_path)
+{
+	const float magic_number = (float)0xfacade;
+	std::ofstream out(file_path, std::ios::out | std::ios::binary);
+	try
+	{
+		out.write((char*)&magic_number, sizeof(float));
+		input_format.write_to_ofstream(out);
+
+		size_t layer_count = layers.size();
+		out.write((char*)&layer_count, sizeof(size_t));
+
+		sync_device_and_host();
+
+		for (auto& l : layers)
+		{
+			l->write_to_ofstream(out);
+		}
+	}
+	catch (const std::exception& e)
+	{
+		out.close();
+		throw e;
+	}
+	out.close();
 }

@@ -2,6 +2,7 @@
 #include "matrix.hpp"
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
+#include <fstream>
 
 typedef enum _layer_type {
 	convolution,
@@ -74,4 +75,6 @@ public:
 	virtual bool equal_format(const layer& other);
 	virtual bool equal_parameter(const layer& other) = 0;
 	virtual void set_parameters(const layer& other) = 0;
+
+	virtual void write_to_ofstream(std::ofstream& file) const;
 };

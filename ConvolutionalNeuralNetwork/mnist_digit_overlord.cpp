@@ -174,6 +174,22 @@ void mnist_digit_overlord::enable_gpu()
 		<< "ms" << std::endl;
 }
 
+void mnist_digit_overlord::save_to_file()
+{
+	std::string path = "..\\data\\digit_recognition\\models\\digit_model.parameter";
+
+	std::cout << "saving to file " << path << std::endl;
+	auto start = std::chrono::high_resolution_clock::now();
+
+	nn.save_to_file(path);
+
+	auto end = std::chrono::high_resolution_clock::now();
+	std::cout
+		<< "saved to file, took "
+		<< std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()
+		<< "us" << std::endl;
+}
+
 mnist_digit_overlord::mnist_digit_overlord()
 {
 	std::string base_path = "..\\data\\digit_recognition";
@@ -198,7 +214,7 @@ mnist_digit_overlord::mnist_digit_overlord()
 	nn.set_input_format(vector3(28, 28, 1));
 	//nn.add_convolutional_layer(2, 3, 1, e_activation_t::sigmoid_fn);
 	//nn.add_fully_connected_layer(16, e_activation_t::sigmoid_fn);
-	//nn.add_fully_connected_layer(16, e_activation_t::sigmoid_fn);
+	nn.add_fully_connected_layer(16, e_activation_t::sigmoid_fn);
 	nn.add_fully_connected_layer(vector3(1, 10, 1), e_activation_t::sigmoid_fn);
 	nn.set_all_parameters(0);
 
@@ -255,8 +271,8 @@ void mnist_digit_overlord::train(
 	size_t batch_size,
 	float learning_rate)
 {
-	std::cout 
-		<< "start training... " 
+	std::cout
+		<< "start training... "
 		<< "(epochs:" << epochs
 		<< ", batch_size:" << batch_size
 		<< ", learning_rate:" << learning_rate

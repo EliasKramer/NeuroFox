@@ -1,5 +1,5 @@
 #include "vector3.hpp"
-
+#include <fstream>
 vector3::vector3()
 :x(0), y(0), z(0)
 {}
@@ -33,6 +33,13 @@ size_t vector3::get_index(const vector3& format) const
 size_t vector3::item_count() const
 {
 	return x * y * z;
+}
+
+void vector3::write_to_ofstream(std::ofstream& file) const
+{
+	file.write((char*)&x, sizeof(x));
+	file.write((char*)&y, sizeof(y));
+	file.write((char*)&z, sizeof(z));
 }
 
 bool vector3::are_equal(const vector3 & v1, const vector3 & v2)

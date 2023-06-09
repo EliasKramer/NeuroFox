@@ -211,3 +211,11 @@ void pooling_layer::set_parameters(const layer& other)
 {
 	throw std::invalid_argument("pooling layer does not have any parameters");
 }
+
+void pooling_layer::write_to_ofstream(std::ofstream& file) const
+{
+	layer::write_to_ofstream(file);
+	file.write((char*)&filter_size, sizeof(filter_size));
+	file.write((char*)&stride, sizeof(stride));
+	file.write((char*)&pooling_fn, sizeof(pooling_fn));
+}

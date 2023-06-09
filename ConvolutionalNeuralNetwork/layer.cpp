@@ -118,6 +118,13 @@ bool layer::equal_format(const layer& other)
 		matrix::equal_format(input_format, other.input_format);
 }
 
+void layer::write_to_ofstream(std::ofstream& file) const
+{
+	file.write((char*)&type, sizeof(e_layer_type_t));
+	input_format.write_to_ofstream(file);
+	activations.get_format().write_to_ofstream(file);
+}
+
 void layer::sync_device_and_host()
 {
 	activations.sync_device_and_host();
