@@ -19,7 +19,7 @@ namespace CNNTest
 			pooling_layer p(2, 2, e_pooling_type_t::max_pooling);
 
 			Assert::AreEqual((int)fc.get_layer_type(), (int)e_layer_type_t::fully_connected);
-			Assert::AreEqual((int)c.get_layer_type(), (int)e_layer_type_t::convolution);
+			Assert::AreEqual((int)c.get_layer_type(), (int)e_layer_type_t::convolutional);
 			Assert::AreEqual((int)p.get_layer_type(), (int)e_layer_type_t::pooling);
 		}
 		TEST_METHOD(layer_equal_format_input_test)

@@ -34,6 +34,10 @@ public:
 		e_activation_t activation_function
 	);
 
+	fully_connected_layer(
+		std::ifstream& file
+	);
+
 	fully_connected_layer(const fully_connected_layer& other);
 
 	std::unique_ptr<layer> clone() const override;

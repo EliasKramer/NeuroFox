@@ -16,6 +16,13 @@ vector3::vector3(size_t x)
 	:x(x), y(0), z(0)
 {}
 
+vector3::vector3(std::ifstream& file)
+{
+	file.read((char*)&x, sizeof(x));
+	file.read((char*)&y, sizeof(y));
+	file.read((char*)&z, sizeof(z));
+}
+
 bool vector3::is_in_bounds(const vector3& format) const
 {
 	return x < format.x && y < format.y && z < format.z;

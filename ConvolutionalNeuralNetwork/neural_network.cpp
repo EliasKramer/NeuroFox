@@ -2,6 +2,8 @@
 #include "util.hpp"
 #include <fstream>
 
+const float FILE_MAGIC_NUMBER = (float)0xfacade;
+
 layer* neural_network::get_last_layer()
 {
 	//the last layer is the layer that was added last or nullptr 
@@ -11,15 +13,63 @@ layer* neural_network::get_last_layer()
 
 neural_network::neural_network()
 {}
+neural_network::neural_network(const std::string& file)
+{
+	std::ifstream input(file, std::ios::binary | std::ios::in);
+	try
+	{
+		if (!input.is_open())
+			throw std::runtime_error("Could not open file " + file);
+
+		//read the magic number
+		float magic_number;
+		input.read((char*)&magic_number, sizeof(float));
+
+		if (magic_number != FILE_MAGIC_NUMBER)
+			throw std::runtime_error("file is invalid");
+
+		input_format = vector3(input);
+
+		size_t layer_count;
+		input.read((char*)&layer_count, sizeof(size_t));
+
+		for (size_t i = 0; i < layer_count; i++)
+		{
+			e_layer_type_t layer_type;
+			input.read((char*)&layer_type, sizeof(e_layer_type_t));
+			switch (layer_type)
+			{
+			case e_layer_type_t::convolutional:
+				parameter_layer_indices.push_back(layers.size());
+				layers.push_back(std::move(std::make_unique<convolutional_layer>(input)));
+				break;
+			case e_layer_type_t::fully_connected:
+				parameter_layer_indices.push_back(layers.size());
+				layers.push_back(std::move(std::make_unique<fully_connected_layer>(input)));
+				break;
+			case e_layer_type_t::pooling:
+				layers.push_back(std::move(std::make_unique<pooling_layer>(input)));
+				break;
+
+			default:
+				throw std::runtime_error("Unknown layer type");
+			}
+		}
+
+		gpu_enabled = false;
+	}
+	catch (const std::exception& e)
+	{
+		input.close();
+		throw e;
+	}
+	input.close();
+}
 
 neural_network::neural_network(const neural_network& source)
 {
-	//if same return
-	if (this == &source)
-		return;
-
 	//copy all layers
-	for (auto& curr : source.layers)
+	for (const auto& curr : source.layers)
 	{
 		layers.push_back(std::move(curr->clone()));
 	}
@@ -32,6 +82,28 @@ neural_network::neural_network(const neural_network& source)
 
 	//copy the gpu_enabled flag
 	gpu_enabled = source.gpu_enabled;
+}
+neural_network& neural_network::operator=(const neural_network& source)
+{
+	if (this != &source)
+	{
+		layers = std::vector<std::unique_ptr<layer>>();
+		for (const auto& curr : source.layers)
+		{
+			layers.push_back(std::move(curr->clone()));
+		}
+
+		//copy the input format
+		input_format = source.input_format;
+
+		//copy the parameter layer indices
+		parameter_layer_indices = source.parameter_layer_indices;
+
+		//copy the gpu_enabled flag
+		gpu_enabled = source.gpu_enabled;
+
+	}
+	return *this;
 }
 
 size_t neural_network::get_param_count() const
@@ -346,11 +418,14 @@ void neural_network::set_parameters(const neural_network& other)
 
 void neural_network::save_to_file(const std::string& file_path)
 {
-	const float magic_number = (float)0xfacade;
 	std::ofstream out(file_path, std::ios::out | std::ios::binary);
 	try
 	{
-		out.write((char*)&magic_number, sizeof(float));
+		if (!out.is_open())
+			throw std::runtime_error("Cannot open file " + file_path);
+
+		out.write((char*)&FILE_MAGIC_NUMBER, sizeof(float));
+
 		input_format.write_to_ofstream(out);
 
 		size_t layer_count = layers.size();

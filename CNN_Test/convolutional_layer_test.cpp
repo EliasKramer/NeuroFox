@@ -11,7 +11,7 @@ namespace CNNTest
 		TEST_METHOD(constructor_test)
 		{
 			convolutional_layer layer(3, 2, 1, e_activation_t::relu_fn);
-			Assert::AreEqual((int)e_layer_type_t::convolution, (int)layer.get_layer_type());
+			Assert::AreEqual((int)e_layer_type_t::convolutional, (int)layer.get_layer_type());
 			Assert::AreEqual((size_t)3, layer.get_kernel_count());
 			Assert::AreEqual((size_t)2, layer.get_kernel_size());
 			Assert::AreEqual((size_t)1, layer.get_stride());

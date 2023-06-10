@@ -282,6 +282,25 @@ matrix::matrix(const matrix& source)
 	:matrix(source, true)
 {}
 
+matrix::matrix(std::ifstream & file)
+	:matrix()
+{
+	if (!file.is_open())
+	{
+		throw std::runtime_error("cannot read from file, file is not open");
+	}
+	format = vector3(file);
+	if (format_is_valid())
+	{
+		allocate_host_mem();
+		file.read((char*)host_data, sizeof(float) * item_count());
+	}
+	else
+	{
+		throw std::runtime_error("invalid format");
+	}
+}
+
 
 matrix::~matrix()
 {

@@ -6,7 +6,7 @@ convolutional_layer::convolutional_layer(
 	size_t stride,
 	e_activation_t activation_function
 )
-	:layer(e_layer_type_t::convolution),
+	:layer(e_layer_type_t::convolutional),
 	stride(stride),
 	kernel_size(kernel_size),
 	activation_fn(activation_function),
@@ -21,6 +21,28 @@ convolutional_layer::convolutional_layer(
 
 	if (stride > kernel_size)
 		throw std::invalid_argument("stride must be smaller or equal than the kernel_size");
+}
+
+convolutional_layer::convolutional_layer(std::ifstream& file)
+	:layer(file, e_layer_type_t::convolutional)
+{
+	if (!file.is_open())
+	{
+		throw std::runtime_error("file is not open");
+	}
+
+	file.read((char*)&activation_fn, sizeof(activation_fn));
+	file.read((char*)&kernel_size, sizeof(kernel_size));
+	file.read((char*)&stride, sizeof(stride));
+	file.read((char*)&kernel_count, sizeof(kernel_count));
+
+	for (size_t i = 0; i < kernel_count; i++)
+	{
+		kernel_weights.push_back(matrix(file));
+		kernel_weights_deltas.push_back(kernel_weights[0].get_format());
+	}
+	kernel_biases = matrix(file);
+	kernel_bias_deltas = matrix(kernel_biases.get_format());
 }
 
 convolutional_layer::convolutional_layer(

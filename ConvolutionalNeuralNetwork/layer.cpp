@@ -20,6 +20,20 @@ void layer::valid_passing_error_check_cpu(const matrix* passing_error) const
 	valid_input_check(*passing_error);
 }
 
+layer::layer(std::ifstream& file, e_layer_type_t given_type)
+{
+	if (!file.is_open())
+	{
+		throw std::runtime_error("file is not open");
+	}
+	type = given_type;
+	input_format = vector3(file);
+	vector3 activation_format(file);
+
+	activations = matrix(activation_format);
+	error = matrix(activation_format);
+}
+
 layer::layer(e_layer_type_t given_layer_type)
 	: type(given_layer_type)
 {}

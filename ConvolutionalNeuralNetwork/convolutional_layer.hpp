@@ -25,6 +25,8 @@ public:
 		e_activation_t activation_function
 	);
 
+	convolutional_layer(std::ifstream& file);
+
 	convolutional_layer(const convolutional_layer& other);
 
 	std::unique_ptr<layer> clone() const override;

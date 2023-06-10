@@ -5,7 +5,7 @@
 #include <fstream>
 
 typedef enum _layer_type {
-	convolution,
+	convolutional,
 	pooling,
 	fully_connected,
 	NO_TYPE
@@ -25,6 +25,8 @@ protected:
 	matrix error;
 
 	vector3 input_format;
+
+	layer(std::ifstream& file, e_layer_type_t given_type);
 
 public:
 	layer(e_layer_type_t given_layer_type);

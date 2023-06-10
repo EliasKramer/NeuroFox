@@ -39,6 +39,16 @@ fully_connected_layer::fully_connected_layer(
 	bias_deltas(activation_format)
 {}
 
+fully_connected_layer::fully_connected_layer(std::ifstream & file)
+	:layer(file, e_layer_type_t::fully_connected)
+{
+	file.read((char*)&activation_fn, sizeof(activation_fn));
+	weights = matrix(file);
+	biases = matrix(file);
+	weight_deltas = matrix(weights.get_format());
+	bias_deltas = matrix(biases.get_format());
+}
+
 fully_connected_layer::fully_connected_layer(
 	const fully_connected_layer & other
 ) : 

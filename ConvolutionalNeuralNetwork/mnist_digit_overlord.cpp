@@ -174,22 +174,6 @@ void mnist_digit_overlord::enable_gpu()
 		<< "ms" << std::endl;
 }
 
-void mnist_digit_overlord::save_to_file()
-{
-	std::string path = "..\\data\\digit_recognition\\models\\digit_model.parameter";
-
-	std::cout << "saving to file " << path << std::endl;
-	auto start = std::chrono::high_resolution_clock::now();
-
-	nn.save_to_file(path);
-
-	auto end = std::chrono::high_resolution_clock::now();
-	std::cout
-		<< "saved to file, took "
-		<< std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()
-		<< "us" << std::endl;
-}
-
 mnist_digit_overlord::mnist_digit_overlord()
 {
 	std::string base_path = "..\\data\\digit_recognition";
@@ -220,6 +204,51 @@ mnist_digit_overlord::mnist_digit_overlord()
 
 	nn.apply_noise(0.1f);
 	//enable_gpu();
+}
+
+void mnist_digit_overlord::debug_function()
+{
+	neural_network before = nn;
+	save_to_file();
+	load_from_file();
+	neural_network after = nn;
+
+	bool same_format = before.equal_format(after);
+	bool same_parameters = before.equal_parameter(after);
+
+	std::cout << "same format: " << same_format << std::endl;
+	std::cout << "same parameters: " << same_parameters << std::endl;
+}
+
+void mnist_digit_overlord::save_to_file()
+{
+	std::string path = "..\\data\\digit_recognition\\models\\digit_model.parameter";
+
+	std::cout << "saving to file " << path << std::endl;
+	auto start = std::chrono::high_resolution_clock::now();
+
+	nn.save_to_file(path);
+
+	auto end = std::chrono::high_resolution_clock::now();
+	std::cout
+		<< "saved to file, took "
+		<< std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()
+		<< "us" << std::endl;
+}
+
+void mnist_digit_overlord::load_from_file()
+{
+	std::string path = "..\\data\\digit_recognition\\models\\digit_model.parameter";
+	std::cout << "loading from file " << path << std::endl;
+	auto start = std::chrono::high_resolution_clock::now();
+
+	nn = neural_network(path);
+
+	auto end = std::chrono::high_resolution_clock::now();
+	std::cout
+		<< "loaded from file, took "
+		<< std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()
+		<< "us" << std::endl;
 }
 
 void mnist_digit_overlord::print_nn_size() const

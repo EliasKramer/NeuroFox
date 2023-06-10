@@ -31,7 +31,10 @@ private:
 public:
 
 	neural_network();
+	neural_network(const std::string& file);
 	neural_network(const neural_network& source);
+
+	neural_network& operator=(const neural_network& source);
 
 	//returns the number of parameters (weights and biases) of the nn
 	size_t get_param_count() const;

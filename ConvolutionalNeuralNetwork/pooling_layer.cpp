@@ -16,6 +16,18 @@ pooling_layer::pooling_layer(
 		throw std::invalid_argument("stride must be greater than 0");
 }
 
+pooling_layer::pooling_layer(std::ifstream& file)
+	:layer(file, e_layer_type_t::pooling)
+{
+	if (!file.is_open())
+	{
+		throw std::runtime_error("file is not open");
+	}
+	file.read((char*)&filter_size, sizeof(filter_size));
+	file.read((char*)&stride, sizeof(stride));
+	file.read((char*)&pooling_fn, sizeof(pooling_fn));
+}
+
 std::unique_ptr<layer> pooling_layer::clone() const
 {
 	return std::make_unique<pooling_layer>(*this);

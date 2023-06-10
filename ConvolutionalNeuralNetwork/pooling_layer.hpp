@@ -23,6 +23,9 @@ public:
 		size_t stride,
 		e_pooling_type_t pooling_fn
 	);
+
+	pooling_layer(std::ifstream& file);
+
 	pooling_layer(const pooling_layer& other);
 
 	//clone

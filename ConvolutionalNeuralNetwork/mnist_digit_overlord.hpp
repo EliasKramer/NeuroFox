@@ -21,9 +21,13 @@ private:
 
 	void enable_gpu();
 
-	void save_to_file();
 public:
 	mnist_digit_overlord();
+
+	void debug_function();
+
+	void save_to_file();
+	void load_from_file();
 
 	void print_nn_size() const;
 
