@@ -73,3 +73,44 @@ std::string byte_size_to_str(size_t byte_size)
 
 	return result == "" ? "0 B " : result;
 }
+
+bool convolution_format_valid(
+	size_t input_size,
+	size_t filter_size,
+	size_t stride)
+{
+	if (input_size <= 0 || filter_size <= 0 || stride <= 0 ||
+		input_size < filter_size || filter_size < stride)
+	{
+		return false;
+	}
+
+	const float output_size = (input_size - filter_size) / (float)stride + 1;
+
+	return is_whole_number(output_size);
+}
+
+bool convolution_format_valid(
+	vector3 input_size, 
+	vector3 filter_size, 
+	size_t stride, 
+	vector3 output_size)
+{
+	return
+		convolution_output_size(input_size.x, filter_size.x, stride) == output_size.x &&
+		convolution_output_size(input_size.y, filter_size.y, stride) == output_size.y &&
+		input_size.z == filter_size.z;
+}
+
+size_t convolution_output_size(
+	size_t input_size, 
+	size_t filter_size, 
+	size_t stride)
+{
+	if (!convolution_format_valid(input_size, filter_size, stride))
+	{
+		throw std::invalid_argument("convolution format is invalid");
+	}
+
+	return (input_size - filter_size) / stride + 1;
+}

@@ -145,7 +145,7 @@ void matrix::set_own_host_data_from(const std::vector<float> src)
 	allocate_host_mem();
 
 	std::copy(src.data(), src.data() + item_count(), this->host_data);
-	
+
 	//not tested 
 	set_host_as_last_updated();
 }
@@ -167,10 +167,10 @@ void matrix::set_own_host_data_from(const matrix& src)
 	allocate_host_mem();
 
 	std::copy(src.host_data, src.host_data + item_count(), this->host_data);
-	
+
 	//not tested 
 	set_host_as_last_updated();
-	
+
 	//TODO gpu
 	/*
 	if (src.is_device_mem_allocated())
@@ -282,7 +282,7 @@ matrix::matrix(const matrix& source)
 	:matrix(source, true)
 {}
 
-matrix::matrix(std::ifstream & file)
+matrix::matrix(std::ifstream& file)
 	:matrix()
 {
 	if (!file.is_open())
@@ -357,14 +357,14 @@ void matrix::set_data_from_src(const matrix& src)
 {
 	if_not_initialized_throw();
 	src.if_not_owning_throw();
-	
+
 	if (format != src.format)
 	{
 		throw std::invalid_argument("src format is not the same as this format");
 	}
 
 	set_own_host_data_from(src);
-	
+
 	sync_device_and_host();
 }
 
@@ -842,6 +842,102 @@ void matrix::subtract(const matrix& a, const matrix& b, matrix& result)
 	result.set_host_as_last_updated();
 }
 
+void matrix::pooling(
+	const matrix& input,
+	matrix& output,
+	size_t stride,
+	size_t kernel_size,
+	e_pooling_type_t pooling_type)
+{
+	input.if_not_initialized_throw();
+	output.if_not_initialized_throw();
+	output.if_not_owning_throw();
+
+	if (input.get_depth() != output.get_depth() ||
+		convolution_output_size(input.get_width(), kernel_size, stride) != output.get_width())
+	{
+		throw std::invalid_argument("pooling could not be performed. input and output matrices are in the wrong format");
+	}
+
+	if (input.gpu_enabled &&
+		output.gpu_enabled)
+	{
+		//TODO
+		//gpu_pooling(input, output, stride, kernel_size, pooling_type);
+		output.set_device_as_last_updated();
+		return;
+	}
+
+	//iterate over each depth
+	for (size_t d = 0; d < output.get_depth(); d++)
+	{
+		//iterate over each row of the output
+		for (size_t y = 0; y < output.get_height(); y++)
+		{
+			//calculate the start and end index of the filter on the y axis
+			const size_t start_idx_y = y * stride;
+			const size_t end_idx_y = start_idx_y + kernel_size;
+
+			for (size_t x = 0; x < output.get_width(); x++)
+			{
+				//calculate the start and end index of the filter on the x axis
+				const size_t start_idx_x = x * stride;
+				const size_t end_idx_x = start_idx_x + kernel_size;
+
+				//calculating the max, min, and average values
+				//this could be improved by only calculating one of these values
+				float max = FLT_MIN;
+				float min = FLT_MAX;
+				float sum = 0;
+
+				//iterate over the filter
+				for (size_t i = start_idx_y; i <= end_idx_y; i++)
+				{
+					if (i >= input.get_height())
+						break;
+
+					for (size_t j = start_idx_x; j <= end_idx_x; j++)
+					{
+						if (j >= input.get_width())
+							break;
+
+						//get the value of the input at the current index
+						const float curr_val = input.get_at_host(vector3(j, i, d));
+
+						//if the current value is greater than the max value
+						//set the max value to the current value
+						if (curr_val > max)
+						{
+							max = curr_val;
+						}
+						if (curr_val < min)
+						{
+							min = curr_val;
+						}
+						sum += curr_val;
+					}
+				}
+
+				switch (pooling_type)
+				{
+				case max_pooling:
+					output.set_at(vector3(x, y, d), max);
+					break;
+				case min_pooling:
+					output.set_at(vector3(x, y, d), min);
+					break;
+				case average_pooling:
+					output.set_at(vector3(x, y, d), sum / (kernel_size * kernel_size));
+					break;
+				default:
+					throw std::runtime_error("Invalid pooling type");
+					break;
+				}
+			}
+		}
+	}
+}
+
 bool matrix::are_equal(const matrix& a, const matrix& b)
 {
 	return are_equal(a, b, FLOAT_TOLERANCE);
@@ -892,17 +988,12 @@ void matrix::cross_correlation(
 		use_gpu = use_gpu && curr_kernel.gpu_enabled;
 	}
 
-	//this only works with a stride of one
-	const size_t input_size = input.get_width();
-	const size_t kernel_size = kernels[0].get_width();
-	const size_t output_size = output.get_width();
-	const float expected_output_size = ((input_size - kernel_size) / (float)stride) + 1;
-
-	if ((float)output_size != expected_output_size)
-	{
-		throw std::invalid_argument("cross correlation could not be performed. output matrix is not the correct size");
-	}
-	if (input.get_depth() != kernels[0].get_depth())
+	if (kernels.size() == 0 &&
+		!convolution_format_valid(
+			input.get_format(),
+			kernels[0].get_format(),
+			stride,
+			output.get_format()))
 	{
 		throw std::invalid_argument("cross correlation could not be performed. input matrices are in the wrong format");
 	}
@@ -925,6 +1016,8 @@ void matrix::cross_correlation(
 		output.set_device_as_last_updated();
 		return;
 	}
+
+	size_t kernel_size = kernels[0].get_width();
 
 	//iterate over each
 	for (int z = 0; z < output.get_depth(); z++)

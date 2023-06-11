@@ -47,15 +47,15 @@ public:
 	const matrix& get_output_readonly() const;
 	matrix& get_output();
 
-	void add_fully_connected_layer(int num_neurons, e_activation_t activation_fn);
+	void add_fully_connected_layer(size_t num_neurons, e_activation_t activation_fn);
 	void add_fully_connected_layer(vector3 neuron_format, e_activation_t activation_fn);
 	
 	void add_convolutional_layer(
-		int number_of_kernels, 
-		int kernel_size, 
-		int stride, 
+		size_t number_of_kernels, 
+		size_t kernel_size,
+		size_t stride,
 		e_activation_t activation_fn);
-	void add_pooling_layer(int kernel_size, int stride, e_pooling_type_t pooling_type);
+	void add_pooling_layer(size_t kernel_size, size_t stride, e_pooling_type_t pooling_type);
 
 	//set all weights and biases to that value
 	void set_all_parameters(float value);

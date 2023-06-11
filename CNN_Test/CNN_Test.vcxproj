@@ -194,6 +194,7 @@
     <ClInclude Include="..\ConvolutionalNeuralNetwork\convolutional_layer.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\data_space.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\device_memory.cuh" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\enum_space.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\fully_connected_layer.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\gpu_matrix.h" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\layer.hpp" />

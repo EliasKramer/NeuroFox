@@ -28,6 +28,7 @@
   <ItemGroup>
     <ClInclude Include="convolutional_layer.hpp" />
     <ClInclude Include="data_space.hpp" />
+    <ClInclude Include="enum_space.hpp" />
     <ClInclude Include="fully_connected_layer.hpp" />
     <ClInclude Include="gpu_math.cuh" />
     <ClInclude Include="layer.hpp" />

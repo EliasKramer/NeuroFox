@@ -14,6 +14,8 @@ pooling_layer::pooling_layer(
 		throw std::invalid_argument("filter size must be greater than 0");
 	if (stride == 0)
 		throw std::invalid_argument("stride must be greater than 0");
+	if (stride > filter_size)
+		throw std::invalid_argument("stride must be smaller or equal than the filter size");
 }
 
 pooling_layer::pooling_layer(std::ifstream& file)
@@ -47,25 +49,22 @@ pooling_layer::pooling_layer(const pooling_layer& other)
 
 void pooling_layer::set_input_format(vector3 input_format)
 {
+	//does check if input_format has more than 0 on every dimension
 	layer::set_input_format(input_format);
-
-	float output_width = ((float)input_format.x - (float)filter_size) / (float)stride + 1;
-	float output_height = ((float)input_format.y - (float)filter_size) / (float)stride + 1;
-	size_t output_depth = input_format.z;
-
-	//TODO create test case for this scenario
-	if (!is_whole_number(output_width) ||
-		!is_whole_number(output_height))
+	
+	if (input_format.x != input_format.y)
 	{
-		throw std::invalid_argument("input format is not compatible with the kernel size and stride");
-		return;
+		throw std::invalid_argument("pooling layer only supports square input");
 	}
+
+	const size_t output_width = convolution_output_size(input_format.x, filter_size, stride);
+	const size_t output_height = convolution_output_size(input_format.y, filter_size, stride);
 
 	activations = matrix(
 		vector3(
-			(size_t)output_width,
-			(size_t)output_height,
-					output_depth));
+			output_width,
+			output_height,
+			input_format.z));
 }
 
 size_t pooling_layer::get_filter_size() const
@@ -106,75 +105,7 @@ void pooling_layer::sync_device_and_host()
 void pooling_layer::forward_propagation(const matrix& input)
 {
 	layer::forward_propagation(input);
-
-	//iterate over each depth
-	for (size_t d = 0; d < activations.get_depth(); d++)
-	{
-		//iterate over each row of the output
-		for (size_t y = 0; y < activations.get_height(); y++)
-		{
-			//calculate the start and end index of the filter on the y axis
-			const size_t start_idx_y = y * stride;
-			const size_t end_idx_y = start_idx_y + filter_size;
-
-			for (size_t x = 0; x < activations.get_width(); x++)
-			{
-				//calculate the start and end index of the filter on the x axis
-				const size_t start_idx_x = x * stride;
-				const size_t end_idx_x = start_idx_x + filter_size;
-
-				//calculating the max, min, and average values
-				//this could be improved by only calculating one of these values
-				float max = FLT_MIN;
-				float min = FLT_MAX;
-				float sum = 0;
-
-				//iterate over the filter
-				for (size_t i = start_idx_y; i <= end_idx_y; i++)
-				{
-					if (i >= input.get_height())
-						break;
-
-					for (size_t j = start_idx_x; j <= end_idx_x; j++)
-					{
-						if (j >= input.get_width())
-							break;
-
-						//get the value of the input at the current index
-						const float curr_val = input.get_at_host(vector3(j, i, d));
-
-						//if the current value is greater than the max value
-						//set the max value to the current value
-						if (curr_val > max)
-						{
-							max = curr_val;
-						}
-						if (curr_val < min)
-						{
-							min = curr_val;
-						}
-						sum += curr_val;
-					}
-				}
-
-				switch (pooling_fn)
-				{
-				case max_pooling:
-					activations.set_at(vector3(x, y, d), max);
-					break;
-				case min_pooling:
-					activations.set_at(vector3(x, y, d), min);
-					break;
-				case average_pooling:
-					activations.set_at(vector3(x, y, d), sum / (filter_size * filter_size));
-					break;
-				default:
-					throw std::runtime_error("Invalid pooling type");
-					break;
-				}
-			}
-		}
-	}
+	matrix::pooling(input, activations, filter_size, stride, pooling_fn);
 }
 
 void pooling_layer::back_propagation(const matrix& input, matrix* passing_error)

@@ -196,14 +196,15 @@ mnist_digit_overlord::mnist_digit_overlord()
 		std::endl;
 
 	nn.set_input_format(vector3(28, 28, 1));
-	//nn.add_convolutional_layer(2, 3, 1, e_activation_t::sigmoid_fn);
+	nn.add_pooling_layer(2, 2, e_pooling_type_t::average_pooling);
+	nn.add_convolutional_layer(2, 3, 1, e_activation_t::sigmoid_fn);
 	//nn.add_fully_connected_layer(16, e_activation_t::sigmoid_fn);
 	nn.add_fully_connected_layer(16, e_activation_t::sigmoid_fn);
 	nn.add_fully_connected_layer(vector3(1, 10, 1), e_activation_t::sigmoid_fn);
 	nn.set_all_parameters(0);
 
 	nn.apply_noise(0.1f);
-	//enable_gpu();
+	enable_gpu();
 }
 
 void mnist_digit_overlord::debug_function()

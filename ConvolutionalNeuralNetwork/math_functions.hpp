@@ -1,9 +1,5 @@
 #pragma once
-
-enum _activation {
-	sigmoid_fn,
-	relu_fn
-} typedef e_activation_t;
+#include "enum_space.hpp"
 
 float sigmoid(float x);
 float relu(float x);

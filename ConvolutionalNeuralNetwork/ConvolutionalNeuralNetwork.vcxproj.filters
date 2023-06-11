@@ -122,6 +122,9 @@
     <ClInclude Include="gpu_math.cuh">
       <Filter>header\gpu</Filter>
     </ClInclude>
+    <ClInclude Include="enum_space.hpp">
+      <Filter>header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="gpu_math.cu">

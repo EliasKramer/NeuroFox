@@ -3,6 +3,7 @@
 #include <ctime>
 #include <random>
 #include <string>
+#include "vector3.hpp"
 
 constexpr float FLOAT_TOLERANCE = 0.000001f;
 
@@ -38,3 +39,18 @@ int swap_endian(int value);
 bool is_little_endian();
 
 std::string byte_size_to_str(size_t byte_size);
+
+bool convolution_format_valid(
+	size_t input_size, 
+	size_t filter_size, 
+	size_t stride);
+bool convolution_format_valid(
+	vector3 input_size,
+	vector3 filter_size,
+	size_t stride,
+	vector3 output_size);
+
+size_t convolution_output_size(
+	size_t input_size,
+	size_t filter_size,
+	size_t stride);

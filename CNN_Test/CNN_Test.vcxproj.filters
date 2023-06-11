@@ -146,6 +146,9 @@
     <ClInclude Include="..\ConvolutionalNeuralNetwork\vector3.hpp">
       <Filter>Header Files\nn</Filter>
     </ClInclude>
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\enum_space.hpp">
+      <Filter>Header Files\nn</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\ConvolutionalNeuralNetwork\gpu_math.cu">

@@ -200,7 +200,7 @@ void neural_network::sync_device_and_host()
 	}
 }
 
-void neural_network::add_fully_connected_layer(int num_neurons, e_activation_t activation_fn)
+void neural_network::add_fully_connected_layer(size_t num_neurons, e_activation_t activation_fn)
 {
 	std::unique_ptr<fully_connected_layer> new_layer =
 		std::make_unique<fully_connected_layer>(num_neurons, activation_fn);
@@ -216,9 +216,9 @@ void neural_network::add_fully_connected_layer(vector3 neuron_format, e_activati
 }
 
 void neural_network::add_convolutional_layer(
-	int number_of_kernels,
-	int kernel_size,
-	int stride,
+	size_t number_of_kernels,
+	size_t kernel_size,
+	size_t stride,
 	e_activation_t activation_fn)
 {
 	std::unique_ptr<convolutional_layer> new_layer =
@@ -231,7 +231,7 @@ void neural_network::add_convolutional_layer(
 	add_layer(std::move(new_layer));
 }
 
-void neural_network::add_pooling_layer(int kernel_size, int stride, e_pooling_type_t pooling_type)
+void neural_network::add_pooling_layer(size_t kernel_size, size_t stride, e_pooling_type_t pooling_type)
 {
 	//TODO
 }
@@ -319,7 +319,7 @@ void neural_network::back_propagation(const matrix& given_data, const matrix& gi
 
 	//calculating the cost derivative
 	//calculate_cost_derivative(training_data->get_label_p());
-	get_last_layer()->set_error_for_last_layer_cpu(given_label);
+	get_last_layer()->set_error_for_last_layer(given_label);
 
 	//we start from the last layer
 	for (int i = layers.size() - 1; i >= 0; i--)

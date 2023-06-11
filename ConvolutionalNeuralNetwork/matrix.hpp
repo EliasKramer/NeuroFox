@@ -7,6 +7,7 @@
 #include "vector3.hpp"
 #include "gpu_math.cuh"
 #include <cuda_runtime.h>
+#include "enum_space.hpp"
 
 class matrix {
 private:
@@ -109,10 +110,18 @@ public:
 	static void add_flat(const matrix& a, const matrix& b, matrix& result);
 
 	static void subtract(const matrix& a, const matrix& b, matrix& result);
+	
+	static void pooling(
+		const matrix& input, 
+		matrix& output, 
+		size_t stride, 
+		size_t kernel_size,
+		e_pooling_type_t pooling_type);
 
 	static bool are_equal(const matrix& a, const matrix& b);
 	static bool are_equal(const matrix& a, const matrix& b, float tolerance);
 	static bool equal_format(const matrix& a, const matrix& b);
+
 
 	static void cross_correlation(
 		const matrix& input,

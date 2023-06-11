@@ -68,6 +68,10 @@ size_t layer::get_param_byte_size() const
 
 void layer::set_input_format(vector3 given_input_format)
 {
+	if (given_input_format.item_count() == 0)
+	{
+		throw std::invalid_argument("input format must be set");
+	}
 	this->input_format = given_input_format;
 }
 
@@ -96,7 +100,7 @@ matrix* layer::get_error_p()
 	return &error;
 }
 
-void layer::set_error_for_last_layer_cpu(const matrix& expected)
+void layer::set_error_for_last_layer(const matrix& expected)
 {
 	if (!matrix::equal_format(activations, expected))
 	{

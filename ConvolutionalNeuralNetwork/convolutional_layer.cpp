@@ -67,7 +67,6 @@ std::unique_ptr<layer> convolutional_layer::clone() const
 	return std::make_unique<convolutional_layer>(*this);
 }
 
-
 size_t convolutional_layer::get_parameter_count() const
 {
 	size_t result = 0;
@@ -119,19 +118,12 @@ void convolutional_layer::set_input_format(vector3 input_format)
 {
 	layer::set_input_format(input_format);
 
-	const int input_depth = input_format.z;
+	const size_t input_depth = input_format.z;
 
-	const float output_width =
-		(input_format.x - kernel_size) / (float)stride + 1;
+	const size_t output_width = convolution_output_size(input_format.x, kernel_size, stride);
+	const size_t output_height = convolution_output_size(input_format.y, kernel_size, stride);
 
-	const float output_height =
-		(input_format.y - kernel_size) / (float)stride + 1;
-
-	if (!is_whole_number(output_width) ||
-		!is_whole_number(output_height))
-		throw std::invalid_argument("input format is not compatible with the kernel size and stride");
-
-	activations = matrix(vector3((int)output_width, (int)output_height, kernel_count));
+	activations = matrix(vector3(output_width, output_height, kernel_count));
 	error = matrix(activations.get_format());
 
 	for (int i = 0; i < kernel_count; i++)
@@ -142,13 +134,13 @@ void convolutional_layer::set_input_format(vector3 input_format)
 	}
 	kernel_biases = matrix(
 		vector3(
-			(size_t)output_width,
-			(size_t)output_height,
+			output_width,
+			output_height,
 			kernel_count));
 	kernel_bias_deltas = matrix(
 		vector3(
-			(size_t)output_width,
-			(size_t)output_height,
+			output_width,
+			output_height,
 			kernel_count));
 }
 

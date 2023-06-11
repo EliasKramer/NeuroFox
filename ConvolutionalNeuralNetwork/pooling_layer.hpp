@@ -2,13 +2,6 @@
 #include "matrix.hpp"
 #include "layer.hpp"
 
-enum _pooling_type
-{
-	max_pooling,
-	min_pooling,
-	average_pooling
-} typedef e_pooling_type_t;
-
 class pooling_layer : public layer {
 private:
 	size_t filter_size;

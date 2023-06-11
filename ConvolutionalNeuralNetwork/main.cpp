@@ -20,6 +20,5 @@ int main()
 	std::cout << "end testing after file loading" << std::endl;
 	std::cout << t_result.to_string() << std::endl;
 	
-
 	return 0;
 }
