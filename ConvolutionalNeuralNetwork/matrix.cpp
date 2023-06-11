@@ -862,8 +862,7 @@ void matrix::pooling(
 	if (input.gpu_enabled &&
 		output.gpu_enabled)
 	{
-		//TODO
-		//gpu_pooling(input, output, stride, kernel_size, pooling_type);
+		gpu_pooling(input, output, stride, kernel_size, pooling_type);
 		output.set_device_as_last_updated();
 		return;
 	}
@@ -936,6 +935,7 @@ void matrix::pooling(
 			}
 		}
 	}
+	output.set_host_as_last_updated();
 }
 
 bool matrix::are_equal(const matrix& a, const matrix& b)

@@ -65,6 +65,12 @@ void pooling_layer::set_input_format(vector3 input_format)
 			output_width,
 			output_height,
 			input_format.z));
+
+	error = matrix(
+		vector3(
+			output_width,
+			output_height,
+			input_format.z));
 }
 
 size_t pooling_layer::get_filter_size() const
@@ -121,14 +127,14 @@ void pooling_layer::apply_deltas(size_t training_data_count, float learning_rate
 
 void pooling_layer::enable_gpu_mode()
 {
+	layer::enable_gpu_mode();
 	gpu_enabled = true;
-	throw std::runtime_error("pooling layer has no implementation of enable gpu");
 }
 
 void pooling_layer::disable_gpu()
 {
+	layer::disable_gpu();
 	gpu_enabled = false;
-	throw std::runtime_error("pooling layer has no implementation of disable gpu");
 }
 
 bool pooling_layer::equal_format(const layer& other)

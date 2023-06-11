@@ -187,6 +187,13 @@ void gpu_valid_cross_correlation(
 	size_t stride,
 	size_t output_width);
 
+void gpu_pooling(
+	const matrix& input,
+	matrix& output,
+	size_t stride,
+	size_t kernel_size,
+	e_pooling_type_t pooling_type);
+
 /*
 	activation functions
 	performs a function that has one input and one output

@@ -80,5 +80,29 @@ namespace CNNTest
 				Assert::AreEqual(1.0f, pooling.get_activations_readonly().get_at_flat_host(i));
 			}
 		}
+		TEST_METHOD(feed_forward_test_min_pooling_gpu)
+		{
+			matrix input(vector3(6, 6, 2));
+			input.enable_gpu_mode();
+			input.set_all(1);
+			input.set_at(vector3(0, 0, 0), 0);
+			input.sync_device_and_host();
+
+			pooling_layer pooling(2, 2, min_pooling);
+			pooling.set_input_format(input.get_format());
+			pooling.enable_gpu_mode();
+
+			pooling.forward_propagation(input);
+			pooling.sync_device_and_host();
+			Assert::AreEqual((size_t)3, pooling.get_activations_readonly().get_height());
+			Assert::AreEqual((size_t)3, pooling.get_activations_readonly().get_width());
+			Assert::AreEqual((size_t)2, pooling.get_activations_readonly().get_depth());
+
+			Assert::AreEqual(0.0f, pooling.get_activations_readonly().get_at_flat_host(0));
+			for (int i = 1; i < pooling.get_activations_readonly().item_count(); i++)
+			{
+				Assert::AreEqual(1.0f, pooling.get_activations_readonly().get_at_flat_host(i));
+			}
+		}
 	};
 }
