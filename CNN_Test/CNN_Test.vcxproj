@@ -160,18 +160,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\ConvolutionalNeuralNetwork\convolutional_layer.cpp" />
-    <ClCompile Include="..\ConvolutionalNeuralNetwork\data_space.cpp" />
-    <ClCompile Include="..\ConvolutionalNeuralNetwork\fully_connected_layer.cpp" />
-    <ClCompile Include="..\ConvolutionalNeuralNetwork\layer.cpp" />
-    <ClCompile Include="..\ConvolutionalNeuralNetwork\math_functions.cpp" />
-    <ClCompile Include="..\ConvolutionalNeuralNetwork\matrix.cpp" />
-    <ClCompile Include="..\ConvolutionalNeuralNetwork\mnist_digit_overlord.cpp" />
-    <ClCompile Include="..\ConvolutionalNeuralNetwork\neural_network.cpp" />
-    <ClCompile Include="..\ConvolutionalNeuralNetwork\pooling_layer.cpp" />
-    <ClCompile Include="..\ConvolutionalNeuralNetwork\test_result.cpp" />
-    <ClCompile Include="..\ConvolutionalNeuralNetwork\util.cpp" />
-    <ClCompile Include="..\ConvolutionalNeuralNetwork\vector3.cpp" />
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\code\convolutional_layer.cpp" />
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\code\data_space.cpp" />
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\code\fully_connected_layer.cpp" />
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\code\layer.cpp" />
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\code\math_functions.cpp" />
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\code\matrix.cpp" />
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\code\neural_network.cpp" />
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\code\pooling_layer.cpp" />
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\code\test_result.cpp" />
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\code\util.cpp" />
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\code\vector3.cpp" />
     <ClCompile Include="CNN_Test.cpp" />
     <ClCompile Include="convolutional_layer_test.cpp" />
     <ClCompile Include="data_space_test.cpp" />
@@ -191,25 +190,23 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\ConvolutionalNeuralNetwork\convolutional_layer.hpp" />
-    <ClInclude Include="..\ConvolutionalNeuralNetwork\data_space.hpp" />
-    <ClInclude Include="..\ConvolutionalNeuralNetwork\device_memory.cuh" />
-    <ClInclude Include="..\ConvolutionalNeuralNetwork\enum_space.hpp" />
-    <ClInclude Include="..\ConvolutionalNeuralNetwork\fully_connected_layer.hpp" />
-    <ClInclude Include="..\ConvolutionalNeuralNetwork\gpu_matrix.h" />
-    <ClInclude Include="..\ConvolutionalNeuralNetwork\layer.hpp" />
-    <ClInclude Include="..\ConvolutionalNeuralNetwork\math_functions.hpp" />
-    <ClInclude Include="..\ConvolutionalNeuralNetwork\matrix.hpp" />
-    <ClInclude Include="..\ConvolutionalNeuralNetwork\mnist_digit_overlord.hpp" />
-    <ClInclude Include="..\ConvolutionalNeuralNetwork\neural_network.hpp" />
-    <ClInclude Include="..\ConvolutionalNeuralNetwork\pooling_layer.hpp" />
-    <ClInclude Include="..\ConvolutionalNeuralNetwork\test_result.hpp" />
-    <ClInclude Include="..\ConvolutionalNeuralNetwork\util.hpp" />
-    <ClInclude Include="..\ConvolutionalNeuralNetwork\vector3.hpp" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\code\convolutional_layer.hpp" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\code\data_space.hpp" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\code\enum_space.hpp" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\code\fully_connected_layer.hpp" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\code\gpu_math.cuh" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\code\layer.hpp" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\code\math_functions.hpp" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\code\matrix.hpp" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\code\neural_network.hpp" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\code\pooling_layer.hpp" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\code\test_result.hpp" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\code\util.hpp" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\code\vector3.hpp" />
     <ClInclude Include="test_util.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="..\ConvolutionalNeuralNetwork\gpu_math.cu" />
+    <CudaCompile Include="..\ConvolutionalNeuralNetwork\code\gpu_math.cu" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

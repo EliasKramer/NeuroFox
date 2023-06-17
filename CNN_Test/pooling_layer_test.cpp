@@ -1,5 +1,5 @@
 #include "CppUnitTest.h"
-#include "../ConvolutionalNeuralNetwork/pooling_layer.hpp"
+#include "../ConvolutionalNeuralNetwork/code/pooling_layer.hpp"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace CNNTest

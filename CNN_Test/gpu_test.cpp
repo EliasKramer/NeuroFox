@@ -1,6 +1,6 @@
 #include "CppUnitTest.h"
-#include "../ConvolutionalNeuralNetwork/gpu_math.cuh"
-#include "../ConvolutionalNeuralNetwork/util.hpp"
+#include "../ConvolutionalNeuralNetwork/code/gpu_math.cuh"
+#include "../ConvolutionalNeuralNetwork/code/util.hpp"
 #include "test_util.hpp"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;

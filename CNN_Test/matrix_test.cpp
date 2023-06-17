@@ -1,5 +1,5 @@
 #include "CppUnitTest.h"
-#include "../ConvolutionalNeuralNetwork/matrix.hpp"
+#include "../ConvolutionalNeuralNetwork/code/matrix.hpp"
 #include "test_util.hpp"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 

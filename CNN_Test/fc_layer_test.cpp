@@ -1,5 +1,5 @@
 #include "CppUnitTest.h"
-#include "../ConvolutionalNeuralNetwork/fully_connected_layer.hpp"
+#include "../ConvolutionalNeuralNetwork/code/fully_connected_layer.hpp"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace CNNTest

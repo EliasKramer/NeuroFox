@@ -176,7 +176,7 @@ void mnist_digit_overlord::enable_gpu()
 
 mnist_digit_overlord::mnist_digit_overlord()
 {
-	std::string base_path = "..\\data\\digit_recognition";
+	std::string base_path = "..\\models\\mnist_digit_images\\data\\digit_recognition";
 	std::cout << "loading training data" << std::endl;
 	auto start = std::chrono::high_resolution_clock::now();
 	load_data(
@@ -223,7 +223,7 @@ void mnist_digit_overlord::debug_function()
 
 void mnist_digit_overlord::save_to_file()
 {
-	std::string path = "..\\data\\digit_recognition\\models\\digit_model.parameter";
+	std::string path = "..\\models\\mnist_digit_images\\saved\\digit_model.parameter";
 
 	std::cout << "saving to file " << path << std::endl;
 	auto start = std::chrono::high_resolution_clock::now();
@@ -239,7 +239,7 @@ void mnist_digit_overlord::save_to_file()
 
 void mnist_digit_overlord::load_from_file()
 {
-	std::string path = "..\\data\\digit_recognition\\models\\digit_model.parameter";
+	std::string path = "..\\models\\mnist_digit_images\\saved\\digit_model.parameter";
 	std::cout << "loading from file " << path << std::endl;
 	auto start = std::chrono::high_resolution_clock::now();
 

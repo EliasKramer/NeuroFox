@@ -1,5 +1,5 @@
 #include <iostream>
-#include "mnist_digit_overlord.hpp"
+#include "../models/mnist_digit_images/mnist_digit_overlord.hpp"
 
 int main()
 {

@@ -1,5 +1,5 @@
 #include "CppUnitTest.h"
-#include "../ConvolutionalNeuralNetwork/math_functions.hpp"
+#include "../ConvolutionalNeuralNetwork/code/math_functions.hpp"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace CNNTest

@@ -1,6 +1,6 @@
 #pragma once
-#include "data_space.hpp"
-#include "neural_network.hpp"
+#include "../../ConvolutionalNeuralNetwork/code/data_space.hpp"
+#include "../../ConvolutionalNeuralNetwork/code/neural_network.hpp"
 class mnist_digit_overlord
 {
 private:

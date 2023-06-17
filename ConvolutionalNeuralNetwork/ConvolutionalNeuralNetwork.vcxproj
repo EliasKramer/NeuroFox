@@ -11,38 +11,38 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="convolutional_layer.cpp" />
-    <ClCompile Include="data_space.cpp" />
-    <ClCompile Include="fully_connected_layer.cpp" />
-    <ClCompile Include="layer.cpp" />
+    <ClInclude Include="..\models\mnist_digit_images\mnist_digit_overlord.hpp" />
+    <ClInclude Include="code\convolutional_layer.hpp" />
+    <ClInclude Include="code\data_space.hpp" />
+    <ClInclude Include="code\enum_space.hpp" />
+    <ClInclude Include="code\fully_connected_layer.hpp" />
+    <ClInclude Include="code\gpu_math.cuh" />
+    <ClInclude Include="code\layer.hpp" />
+    <ClInclude Include="code\math_functions.hpp" />
+    <ClInclude Include="code\matrix.hpp" />
+    <ClInclude Include="code\neural_network.hpp" />
+    <ClInclude Include="code\pooling_layer.hpp" />
+    <ClInclude Include="code\test_result.hpp" />
+    <ClInclude Include="code\util.hpp" />
+    <ClInclude Include="code\vector3.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\models\mnist_digit_images\mnist_digit_overlord.cpp" />
+    <ClCompile Include="code\convolutional_layer.cpp" />
+    <ClCompile Include="code\data_space.cpp" />
+    <ClCompile Include="code\fully_connected_layer.cpp" />
+    <ClCompile Include="code\layer.cpp" />
+    <ClCompile Include="code\math_functions.cpp" />
+    <ClCompile Include="code\matrix.cpp" />
+    <ClCompile Include="code\neural_network.cpp" />
+    <ClCompile Include="code\pooling_layer.cpp" />
+    <ClCompile Include="code\test_result.cpp" />
+    <ClCompile Include="code\util.cpp" />
+    <ClCompile Include="code\vector3.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="math_functions.cpp" />
-    <ClCompile Include="matrix.cpp" />
-    <ClCompile Include="neural_network.cpp" />
-    <ClCompile Include="mnist_digit_overlord.cpp" />
-    <ClCompile Include="pooling_layer.cpp" />
-    <ClCompile Include="test_result.cpp" />
-    <ClCompile Include="util.cpp" />
-    <ClCompile Include="vector3.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="convolutional_layer.hpp" />
-    <ClInclude Include="data_space.hpp" />
-    <ClInclude Include="enum_space.hpp" />
-    <ClInclude Include="fully_connected_layer.hpp" />
-    <ClInclude Include="gpu_math.cuh" />
-    <ClInclude Include="layer.hpp" />
-    <ClInclude Include="math_functions.hpp" />
-    <ClInclude Include="matrix.hpp" />
-    <ClInclude Include="neural_network.hpp" />
-    <ClInclude Include="mnist_digit_overlord.hpp" />
-    <ClInclude Include="pooling_layer.hpp" />
-    <ClInclude Include="test_result.hpp" />
-    <ClInclude Include="util.hpp" />
-    <ClInclude Include="vector3.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <CudaCompile Include="gpu_math.cu" />
+    <CudaCompile Include="code\gpu_math.cu" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D8C885F6-007A-45AF-A38F-B60CE38A9F9D}</ProjectGuid>

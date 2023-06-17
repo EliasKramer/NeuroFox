@@ -1,8 +1,8 @@
 #include "CppUnitTest.h"
-#include "../ConvolutionalNeuralNetwork/layer.hpp"
-#include "../ConvolutionalNeuralNetwork/fully_connected_layer.hpp"
-#include "../ConvolutionalNeuralNetwork/convolutional_layer.hpp"
-#include "../ConvolutionalNeuralNetwork/pooling_layer.hpp"
+#include "../ConvolutionalNeuralNetwork/code/layer.hpp"
+#include "../ConvolutionalNeuralNetwork/code/fully_connected_layer.hpp"
+#include "../ConvolutionalNeuralNetwork/code/convolutional_layer.hpp"
+#include "../ConvolutionalNeuralNetwork/code/pooling_layer.hpp"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 

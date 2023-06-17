@@ -1,134 +1,131 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="header">
-      <UniqueIdentifier>{a63eecde-0db4-4729-8f87-2ea050c10684}</UniqueIdentifier>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{a8efcf25-b9fd-41bb-b2cb-e2d4a207688c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source">
-      <UniqueIdentifier>{e5a3cbbe-c27b-4fb2-be02-b2ed34656d9f}</UniqueIdentifier>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{b5fdb239-3efb-467c-9bf1-a96a0f305276}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\main">
-      <UniqueIdentifier>{24b2a962-c13f-497d-90e6-539f67ffc49d}</UniqueIdentifier>
+    <Filter Include="Header Files\layer">
+      <UniqueIdentifier>{d2643ce9-a95e-4212-a4f5-8a81417d6611}</UniqueIdentifier>
     </Filter>
-    <Filter Include="header\layer">
-      <UniqueIdentifier>{33ad602b-68e6-4bc1-80e0-d86ee4ce9aa9}</UniqueIdentifier>
+    <Filter Include="Source Files\layer">
+      <UniqueIdentifier>{5ba9efc1-a72c-4775-8845-3e23456b2ee0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\layer">
-      <UniqueIdentifier>{9aba3599-d721-45cc-8853-a31eb9c906f2}</UniqueIdentifier>
+    <Filter Include="Source Files\matrix">
+      <UniqueIdentifier>{b11a22d7-ed90-4dbc-a71a-976a5aec6928}</UniqueIdentifier>
     </Filter>
-    <Filter Include="header\training">
-      <UniqueIdentifier>{92c55fbc-6f90-47d4-bb0f-5d41ffb8cb0e}</UniqueIdentifier>
+    <Filter Include="Header Files\matrix">
+      <UniqueIdentifier>{ab606a8c-1a86-4e19-be93-e8191d2bb6a0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\training">
-      <UniqueIdentifier>{969ceefe-1c70-4fd6-88fb-41e2b0bae323}</UniqueIdentifier>
+    <Filter Include="Header Files\util">
+      <UniqueIdentifier>{b1ceb066-e72c-45bf-a09f-a9f5fa203127}</UniqueIdentifier>
     </Filter>
-    <Filter Include="header\testing">
-      <UniqueIdentifier>{0f7eb64a-22c6-48ca-80fc-69ae81bc4595}</UniqueIdentifier>
+    <Filter Include="Source Files\util">
+      <UniqueIdentifier>{9de471a0-1578-4826-9db7-622d878aff7b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\testing">
-      <UniqueIdentifier>{be512c61-7789-413f-bd35-a745055b82c1}</UniqueIdentifier>
+    <Filter Include="Header Files\nnet">
+      <UniqueIdentifier>{fa55945a-71be-49f6-8c50-1bd1394715b1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\gpu">
-      <UniqueIdentifier>{563228e2-f328-47fe-b959-3be8bba7e3b6}</UniqueIdentifier>
+    <Filter Include="Source Files\nnet">
+      <UniqueIdentifier>{f2cc82d1-3d73-4467-84b6-1918feabf59a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="header\overlords">
-      <UniqueIdentifier>{f0e2f925-5cd2-4beb-a727-73deec6f661a}</UniqueIdentifier>
+    <Filter Include="Header Files\model">
+      <UniqueIdentifier>{ce562647-439e-476c-9016-7bbde1d49f9e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\overlords">
-      <UniqueIdentifier>{d98f4350-b963-461b-b0f3-03cf949941eb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="header\gpu">
-      <UniqueIdentifier>{a7b20c13-801b-463e-9ce4-7b38a3457e68}</UniqueIdentifier>
+    <Filter Include="Source Files\model">
+      <UniqueIdentifier>{162cd134-3bc9-488d-ba94-22fba6747c30}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="neural_network.cpp">
-      <Filter>source</Filter>
+    <ClInclude Include="code\layer.hpp">
+      <Filter>Header Files\layer</Filter>
+    </ClInclude>
+    <ClInclude Include="code\fully_connected_layer.hpp">
+      <Filter>Header Files\layer</Filter>
+    </ClInclude>
+    <ClInclude Include="code\convolutional_layer.hpp">
+      <Filter>Header Files\layer</Filter>
+    </ClInclude>
+    <ClInclude Include="code\pooling_layer.hpp">
+      <Filter>Header Files\layer</Filter>
+    </ClInclude>
+    <ClInclude Include="code\matrix.hpp">
+      <Filter>Header Files\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="code\gpu_math.cuh">
+      <Filter>Header Files\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="code\vector3.hpp">
+      <Filter>Header Files\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="code\util.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="code\test_result.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="code\math_functions.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="code\enum_space.hpp">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="code\data_space.hpp">
+      <Filter>Header Files\nnet</Filter>
+    </ClInclude>
+    <ClInclude Include="code\neural_network.hpp">
+      <Filter>Header Files\nnet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\models\mnist_digit_images\mnist_digit_overlord.hpp">
+      <Filter>Header Files\model</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="code\layer.cpp">
+      <Filter>Source Files\layer</Filter>
+    </ClCompile>
+    <ClCompile Include="code\pooling_layer.cpp">
+      <Filter>Source Files\layer</Filter>
+    </ClCompile>
+    <ClCompile Include="code\fully_connected_layer.cpp">
+      <Filter>Source Files\layer</Filter>
+    </ClCompile>
+    <ClCompile Include="code\convolutional_layer.cpp">
+      <Filter>Source Files\layer</Filter>
+    </ClCompile>
+    <ClCompile Include="code\matrix.cpp">
+      <Filter>Source Files\matrix</Filter>
+    </ClCompile>
+    <ClCompile Include="code\vector3.cpp">
+      <Filter>Source Files\matrix</Filter>
+    </ClCompile>
+    <ClCompile Include="code\math_functions.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\test_result.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\neural_network.cpp">
+      <Filter>Source Files\nnet</Filter>
+    </ClCompile>
+    <ClCompile Include="code\data_space.cpp">
+      <Filter>Source Files\nnet</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>source\main</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="matrix.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="pooling_layer.cpp">
-      <Filter>source\layer</Filter>
-    </ClCompile>
-    <ClCompile Include="fully_connected_layer.cpp">
-      <Filter>source\layer</Filter>
-    </ClCompile>
-    <ClCompile Include="convolutional_layer.cpp">
-      <Filter>source\layer</Filter>
-    </ClCompile>
-    <ClCompile Include="math_functions.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="layer.cpp">
-      <Filter>source\layer</Filter>
-    </ClCompile>
-    <ClCompile Include="util.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="test_result.cpp">
-      <Filter>source\testing</Filter>
-    </ClCompile>
-    <ClCompile Include="data_space.cpp">
-      <Filter>source\training</Filter>
-    </ClCompile>
-    <ClCompile Include="mnist_digit_overlord.cpp">
-      <Filter>source\overlords</Filter>
-    </ClCompile>
-    <ClCompile Include="vector3.cpp">
-      <Filter>source</Filter>
+    <ClCompile Include="..\models\mnist_digit_images\mnist_digit_overlord.cpp">
+      <Filter>Source Files\model</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="neural_network.hpp">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="matrix.hpp">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="math_functions.hpp">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="fully_connected_layer.hpp">
-      <Filter>header\layer</Filter>
-    </ClInclude>
-    <ClInclude Include="util.hpp">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="test_result.hpp">
-      <Filter>header\testing</Filter>
-    </ClInclude>
-    <ClInclude Include="pooling_layer.hpp">
-      <Filter>header\layer</Filter>
-    </ClInclude>
-    <ClInclude Include="convolutional_layer.hpp">
-      <Filter>header\layer</Filter>
-    </ClInclude>
-    <ClInclude Include="mnist_digit_overlord.hpp">
-      <Filter>header\overlords</Filter>
-    </ClInclude>
-    <ClInclude Include="data_space.hpp">
-      <Filter>header\training</Filter>
-    </ClInclude>
-    <ClInclude Include="vector3.hpp">
-      <Filter>header</Filter>
-    </ClInclude>
-    <ClInclude Include="layer.hpp">
-      <Filter>header\layer</Filter>
-    </ClInclude>
-    <ClInclude Include="gpu_math.cuh">
-      <Filter>header\gpu</Filter>
-    </ClInclude>
-    <ClInclude Include="enum_space.hpp">
-      <Filter>header</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <CudaCompile Include="gpu_math.cu">
-      <Filter>source\gpu</Filter>
+    <CudaCompile Include="code\gpu_math.cu">
+      <Filter>Source Files\matrix</Filter>
     </CudaCompile>
   </ItemGroup>
 </Project>
