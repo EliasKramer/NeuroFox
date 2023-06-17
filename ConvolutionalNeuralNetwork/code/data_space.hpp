@@ -63,6 +63,9 @@ public:
 	void iterator_reset();
 	bool iterator_has_next() const;
 
+	void set_iterator_idx(size_t idx);
+	size_t get_iterator_idx() const;
+
 	//TODO
 	//load in file
 	//save in file

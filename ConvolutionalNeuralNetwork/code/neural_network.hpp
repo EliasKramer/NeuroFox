@@ -74,6 +74,7 @@ public:
 	void apply_deltas(size_t training_data_count, float learning_rate);
 
 	void enable_gpu_mode();
+	bool is_in_gpu_mode();
 
 	bool equal_format(const neural_network& other);
 	bool equal_parameter(const neural_network& other);

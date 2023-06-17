@@ -68,6 +68,7 @@ neural_network::neural_network(const std::string& file)
 
 neural_network::neural_network(const neural_network& source)
 {
+	layers = std::vector<std::unique_ptr<layer>>();
 	//copy all layers
 	for (const auto& curr : source.layers)
 	{
@@ -262,9 +263,15 @@ void neural_network::mutate(float range)
 		throw std::runtime_error("Cannot mutate. No parameter layers have been added yet.");
 	}
 	int layer_idx = parameter_layer_indices[random_idx((int)parameter_layer_indices.size())];
+	
+	if (is_in_gpu_mode())
+	{
+		layers[layer_idx]->sync_device_and_host();
+	}
+	
 	layers[layer_idx]->mutate(range);
-
-	if (gpu_enabled)
+	
+	if (is_in_gpu_mode())
 	{
 		layers[layer_idx]->sync_device_and_host();
 	}
@@ -299,6 +306,10 @@ test_result neural_network::test(const std::vector<std::unique_ptr<nn_data>>& te
 
 void neural_network::forward_propagation(const matrix& input)
 {
+	if (input.is_in_gpu_mode() != is_in_gpu_mode())
+	{
+		throw std::runtime_error("Input data is not in the same mode as the neural network.");
+	}
 	matrix* last_layer = nullptr;
 	//std::vector<std::unique_ptr<layer>>::iterator::value_type
 	for (auto& l : layers)
@@ -370,6 +381,11 @@ void neural_network::enable_gpu_mode()
 	gpu_enabled = true;
 
 	sync_device_and_host();
+}
+
+bool neural_network::is_in_gpu_mode()
+{
+	return gpu_enabled;
 }
 
 bool neural_network::equal_format(const neural_network& other)

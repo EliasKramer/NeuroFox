@@ -171,16 +171,43 @@ void matrix::set_own_host_data_from(const matrix& src)
 	//not tested 
 	set_host_as_last_updated();
 
-	//TODO gpu
-	/*
-	if (src.is_device_mem_allocated())
+}
+
+void matrix::copy_host_data_from(const matrix& src)
+{
+	if_not_initialized_throw();
+	src.if_not_owning_throw();
+
+	if (!matrix::equal_format(*this, src))
 	{
-		if (!is_device_mem_allocated())
-		{
-			allocate_device_mem();
-		}
-		copy_device_to_host();
-	}*/
+		throw std::runtime_error("cannot copy data from one matrix to another if they are not in the same format");
+	}
+
+	std::copy(src.host_data, src.host_data + item_count(), this->host_data);
+	set_host_as_last_updated();
+}
+
+void matrix::copy_device_data_from(const matrix& src)
+{
+	if_not_initialized_throw();
+	src.if_not_owning_throw();
+	if_gpu_not_allocated_throw();
+	src.if_gpu_not_allocated_throw();
+	//we have to own our data - the source does not have to
+	if_not_owning_throw();
+
+	if (!matrix::equal_format(*this, src))
+	{
+		throw std::runtime_error("cannot copy data from one matrix to another if they are not in the same format");
+	}
+
+	cudaMemcpy(
+		device_data,
+		src.device_data,
+		item_count() * sizeof(float),
+		cudaMemcpyDeviceToDevice);
+	if_cuda_error_throw();
+	set_device_as_last_updated();
 }
 
 void matrix::delete_data_if_owning()
@@ -353,6 +380,13 @@ matrix& matrix::operator=(const matrix& other)
 	return *this;
 }
 
+bool matrix::operator==(const matrix& other) const
+{
+	return matrix::are_equal(*this, other);
+}
+
+
+//impl with gpu TODO
 void matrix::set_data_from_src(const matrix& src)
 {
 	if_not_initialized_throw();
@@ -363,9 +397,19 @@ void matrix::set_data_from_src(const matrix& src)
 		throw std::invalid_argument("src format is not the same as this format");
 	}
 
-	set_own_host_data_from(src);
+	if (src.gpu_enabled != gpu_enabled)
+	{
+		throw std::invalid_argument("src gpu_enabled is not the same as this gpu_enabled");
+	}
 
-	sync_device_and_host();
+	if (gpu_enabled)
+	{
+		copy_device_data_from(src);
+	}
+	else
+	{
+		copy_host_data_from(src);
+	}
 }
 
 void matrix::set_all(float value)
@@ -389,9 +433,13 @@ void matrix::apply_noise(float range)
 
 	for (int i = 0; i < item_count(); i++)
 	{
-		host_data[i] += random_float_incl(-range, range);
+		host_data[i] += random_float_excl(-range, range);
 	}
-	set_host_as_last_updated();
+
+	if (gpu_enabled)
+	{
+		copy_host_to_device();
+	}
 }
 
 void matrix::mutate(float range)
@@ -400,7 +448,7 @@ void matrix::mutate(float range)
 
 	add_at_flat(
 		random_idx((int)item_count()),
-		random_float_incl(-range, range));
+		random_float_excl(-range, range));
 
 	set_host_as_last_updated();
 }
@@ -495,6 +543,10 @@ void matrix::enable_gpu_mode()
 			copy_host_to_device();
 		}
 	}
+}
+bool matrix::is_in_gpu_mode() const
+{
+	return gpu_enabled;
 }
 /*
 float* matrix::get_data()

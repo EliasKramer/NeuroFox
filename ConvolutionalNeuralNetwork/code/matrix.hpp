@@ -39,6 +39,10 @@ private:
 	void allocate_host_mem();
 	void set_own_host_data_from(const std::vector<float> src);
 	void set_own_host_data_from(const matrix& src);
+	
+	void copy_host_data_from(const matrix& src);
+	void copy_device_data_from(const matrix& src);
+
 	void delete_data_if_owning();
 
 	//given_ptr must be either host or device pointer
@@ -57,10 +61,13 @@ public:
 
 	matrix& operator=(const matrix& other);
 
+	bool operator==(const matrix& other) const;
+
 	~matrix();
 
 	void sync_device_and_host();
 	void enable_gpu_mode();
+	bool is_in_gpu_mode() const;
 	
 	void set_data_from_src(const matrix& src);
 	void set_all(float value);

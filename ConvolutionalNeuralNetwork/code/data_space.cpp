@@ -139,6 +139,21 @@ bool data_space::iterator_has_next() const
 	return iterator_idx + 1 < item_count;
 }
 
+void data_space::set_iterator_idx(size_t idx)
+{
+	if_not_initialized_throw();
+	if (idx >= item_count)
+	{
+		throw std::exception("iterator index out of range");
+	}
+	iterator_idx = idx;
+}
+
+size_t data_space::get_iterator_idx() const
+{
+	return iterator_idx;
+}
+
 void data_space::copy_to_gpu()
 {
 	if_not_initialized_throw();

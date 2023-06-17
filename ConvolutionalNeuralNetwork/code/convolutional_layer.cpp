@@ -175,7 +175,7 @@ void convolutional_layer::mutate(float range)
 
 		//mutate the weight
 		kernel_weights[random_idx(kernel_weights.size())]
-			.add_at_flat(random_weight_idx, random_float_incl(-range, range));
+			.add_at_flat(random_weight_idx, random_float_excl(-range, range));
 	}
 	else
 	{

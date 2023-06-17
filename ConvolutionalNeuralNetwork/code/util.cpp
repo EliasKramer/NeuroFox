@@ -2,19 +2,19 @@
 
 int random_idx(int size)
 {
-    // Seed the random number generator with the current time
-    std::srand((int)std::time(nullptr));
-
-    // Generate a random number between 0 and size-1
-    return std::rand() % size;
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+	static std::uniform_int_distribution
+		<int> dis(0, size);
+	return dis(gen) % size;
 }
 
 bool biased_coin_toss(float true_bias, float false_bias)
 {
-    if(true_bias <= 0 || false_bias <= 0)
+	if (true_bias <= 0 || false_bias <= 0)
 		throw std::invalid_argument("true_bias and false_bias must be greater than 0");
 
-    // Seed the random number generator with the current time
+	// Seed the random number generator with the current time
 	std::srand((int)std::time(nullptr));
 	// Generate a random number between 0 and 1
 	float random_number = (float)std::rand() / (float)RAND_MAX;
@@ -22,17 +22,19 @@ bool biased_coin_toss(float true_bias, float false_bias)
 	return random_number < true_bias / (true_bias + false_bias);
 }
 
-float random_float_incl(float min, float max)
+float random_float_excl(float min, float max)
 {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<float> dis(min, std::nextafter(max, std::numeric_limits<float>::max()));
-    return dis(gen);
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+	static std::uniform_real_distribution<float> dis(
+		min,
+		max);
+	return dis(gen);
 }
 
 bool is_whole_number(float number)
 {
-    return number == (int)number;
+	return number == (int)number;
 }
 
 int swap_endian(int value) {
@@ -91,9 +93,9 @@ bool convolution_format_valid(
 }
 
 bool convolution_format_valid(
-	vector3 input_size, 
-	vector3 filter_size, 
-	size_t stride, 
+	vector3 input_size,
+	vector3 filter_size,
+	size_t stride,
 	vector3 output_size)
 {
 	return
@@ -103,8 +105,8 @@ bool convolution_format_valid(
 }
 
 size_t convolution_output_size(
-	size_t input_size, 
-	size_t filter_size, 
+	size_t input_size,
+	size_t filter_size,
 	size_t stride)
 {
 	if (!convolution_format_valid(input_size, filter_size, stride))
