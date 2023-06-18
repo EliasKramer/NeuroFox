@@ -5,7 +5,7 @@ int main()
 {
 	mnist_digit_overlord overlord;
 	
-	overlord.train(10000, 50, 0.1);
+	overlord.train(1000, 50, 0.1);
 	
 	std::cout << "start testing" << std::endl;
 	test_result t_result = overlord.test();

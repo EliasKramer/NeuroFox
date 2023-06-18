@@ -497,7 +497,7 @@ __global__ void gpu_fc_backprop_kernel(
 		//printf("%d error_value: %f, unac_acti: %f, acti_deriv: %f, bias_change: %f\n",neuron_idx, error_value, unactivated_activation, activation_derivative, bias_change);
 
 		//iterate input layer
-		for (int input_idx = 0; input_idx < activation_count; input_idx++)
+		for (int input_idx = 0; input_idx < input_count; input_idx++)
 		{
 			float input_value = input[input_idx];
 
@@ -505,8 +505,9 @@ __global__ void gpu_fc_backprop_kernel(
 
 			float weight = weights[weight_idx]; // could be moved in if statement
 
+			float weight_delta_before = weight_deltas[weight_idx];
 			weight_deltas[weight_idx] += (error_value * activation_derivative * input_value);
-			//printf("%f weight change %f weight %d weight idx\n", weight_deltas[weight_idx], weight, weight_idx);
+			//printf("%f += %f * %f * %f = %f\n", weight_delta_before, error_value, activation_derivative, input_value, weight_deltas[weight_idx]);
 
 			if (passing_error != nullptr)
 			{

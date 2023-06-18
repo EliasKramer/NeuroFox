@@ -319,8 +319,7 @@ void neural_network::back_propagation(const matrix& given_data, const matrix& gi
 			layers[i - 1].get()->get_error_p();
 		//layers[i].get()->sync_device_and_host();
 		layers[i].get()->back_propagation(input, passing_error);
-		//[i].get()->sync_device_and_host();
-
+		//layers[i].get()->sync_device_and_host();
 	}
 }
 

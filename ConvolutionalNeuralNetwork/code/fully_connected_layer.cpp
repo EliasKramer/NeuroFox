@@ -145,7 +145,7 @@ void fully_connected_layer::back_propagation(const matrix& input, matrix* passin
 
 void fully_connected_layer::apply_deltas(size_t training_data_count, float learning_rate)
 {
-	/*/
+	/*
 	for (int i = 0; i < biases.item_count(); i++)
 	{
 		float current_bias = biases.get_at_flat_host(i);
@@ -161,13 +161,19 @@ void fully_connected_layer::apply_deltas(size_t training_data_count, float learn
 		weights.set_at_flat(i, current_weight - (avg_weight_delta * learning_rate));
 		weight_deltas.set_at_flat(i, 0.0f);
 	}*/
-	//biases.sync_device_and_host();
-	//bias_deltas.sync_device_and_host();
+	biases.sync_device_and_host();
+	bias_deltas.sync_device_and_host();
+	weight_deltas.sync_device_and_host();
+	weights.sync_device_and_host();
 	biases.apply_deltas(bias_deltas, training_data_count, learning_rate);
 	//bias_deltas.sync_device_and_host();
 	//biases.sync_device_and_host();
 	//weights.sync_device_and_host();
+	//weight_deltas.sync_device_and_host();
+	//weights.sync_device_and_host();
 	weights.apply_deltas(weight_deltas, training_data_count, learning_rate);
+	//weight_deltas.sync_device_and_host();
+	//weights.sync_device_and_host();
 	//weights.sync_device_and_host();
 }
 
