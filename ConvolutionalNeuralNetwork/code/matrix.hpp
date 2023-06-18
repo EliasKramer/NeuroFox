@@ -125,6 +125,17 @@ public:
 		size_t kernel_size,
 		e_pooling_type_t pooling_type);
 
+	static void fully_connected_backprop(
+		const matrix& activations,
+		const matrix& weights,
+		const matrix& input,
+		const matrix& error,
+		matrix* passing_error,
+		matrix& weight_deltas,
+		matrix& bias_deltas,
+		e_activation_t activation_fn
+	);
+
 	static bool are_equal(const matrix& a, const matrix& b);
 	static bool are_equal(const matrix& a, const matrix& b, float tolerance);
 	static bool equal_format(const matrix& a, const matrix& b);
@@ -137,6 +148,8 @@ public:
 		size_t stride);
 	//static void valid_convolution(const matrix& input, const matrix& kernel, matrix& output);
 	//static void full_cross_correlation(const matrix& input, const matrix& kernel, matrix& output, int stride);
+	
+	void apply_deltas(matrix& delta, size_t training_data_count, float learning_rate);
 
 	void scalar_multiplication(float a);
 	void apply_activation_function(e_activation_t activation_fn);
@@ -180,7 +193,7 @@ void gpu_subtract(
 	matrix& gpu_memory_result);
 
 void gpu_scalar_mult(
-	const matrix gpu_memory_a,
+	const matrix& gpu_memory_a,
 	float scalar,
 	matrix& gpu_memory_result);
 
@@ -211,17 +224,25 @@ void gpu_pooling(
 	size_t kernel_size,
 	e_pooling_type_t pooling_type);
 
+void gpu_fc_backprop(
+	const matrix& activations,
+	const matrix& weights,
+	const matrix& input,
+	const matrix& error,
+	matrix* passing_error,
+	matrix& weight_deltas,
+	matrix& bias_deltas,
+	e_activation_t activation_fn);
+
+void gpu_apply_deltas(
+	matrix& a,
+	matrix& delta,
+	size_t training_data_count,
+	float learning_rate);
+
 /*
 	activation functions
 	performs a function that has one input and one output
 	for example relu where x = max(0, x)
 */
-using gpu_activation_fn = void(*)(matrix&);
-void gpu_sigmoid(matrix& gpu_memory);
-void gpu_relu(matrix& gpu_memory);
-
-//this has to have the same indexing as the ACTIVATION function pointer array
-const gpu_activation_fn GPU_ACTIVATION[] = {
-	gpu_sigmoid,
-	gpu_relu
-};
+void gpu_activation_fn(matrix& gpu_memory, e_activation_t activation_idx);

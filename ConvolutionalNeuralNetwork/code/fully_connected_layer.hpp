@@ -15,13 +15,6 @@ private:
 	matrix bias_deltas;
 
 	e_activation_t activation_fn;
-
-	float get_weight_at(int input_layer_idx, int current_activation_idx) const;
-	void set_weight_at(int input_layer_idx, int current_activation_idx, float value);
-
-	float get_weight_delta_at(int input_layer_idx, int current_activation_idx) const;
-	void set_weight_delta_at(int input_layer_idx, int current_activation_idx, float value);
-
 public:
 
 	fully_connected_layer(

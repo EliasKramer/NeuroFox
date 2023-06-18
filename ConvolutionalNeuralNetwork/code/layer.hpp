@@ -45,7 +45,7 @@ public:
 	matrix* get_error_p();
 
 	//TODO - make this separate
-	virtual void set_error_for_last_layer(const matrix& expected);
+	void set_error_for_last_layer(const matrix& expected);
 
 	//set all weights and biases to that value
 	virtual void set_all_parameters(float value) = 0;

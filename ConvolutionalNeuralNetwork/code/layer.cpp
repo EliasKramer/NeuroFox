@@ -107,6 +107,7 @@ void layer::set_error_for_last_layer(const matrix& expected)
 		throw std::runtime_error("setting error for the last layer could not be done. wrong expected matrix format");
 	}
 	//this calculates the const derivative
+	error.set_all(0);
 	matrix::subtract(activations, expected, error);
 	error.scalar_multiplication(2);
 }

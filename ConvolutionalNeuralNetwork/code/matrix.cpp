@@ -886,6 +886,7 @@ void matrix::subtract(const matrix& a, const matrix& b, matrix& result)
 			result
 		);
 		result.set_device_as_last_updated();
+
 		return;
 	}
 
@@ -990,6 +991,85 @@ void matrix::pooling(
 		}
 	}
 	output.set_host_as_last_updated();
+}
+
+void matrix::fully_connected_backprop(
+	const matrix& activations,
+	const matrix& weights,
+	const matrix& input,
+	const matrix& error,
+	matrix* passing_error,
+	matrix& weight_deltas,
+	matrix& bias_deltas,
+	e_activation_t activation_fn)
+{
+	if (!matrix::equal_format(activations, error))
+	{
+		throw std::invalid_argument("activations and error_right have different format");
+	}
+
+	if (activations.is_in_gpu_mode() &&
+		weights.is_in_gpu_mode() &&
+		input.is_in_gpu_mode() &&
+		error.is_in_gpu_mode() &&
+		weight_deltas.is_in_gpu_mode() &&
+		bias_deltas.is_in_gpu_mode())
+	{
+		gpu_fc_backprop(
+			activations,
+			weights,
+			input,
+			error,
+			passing_error,
+			weight_deltas,
+			bias_deltas,
+			activation_fn
+		);
+
+		weight_deltas.set_device_as_last_updated();
+		bias_deltas.set_device_as_last_updated();
+		if (passing_error != nullptr)
+			passing_error->set_device_as_last_updated();
+		return;
+	}
+
+	for (int neuron_idx = 0; neuron_idx < activations.item_count(); neuron_idx++)
+	{
+		float error_value = error.get_at_flat_host(neuron_idx);
+
+		float unactivated_activation = INVERSE[activation_fn](activations.get_at_flat_host(neuron_idx));
+		float activation_derivative = DERIVATIVE[activation_fn](unactivated_activation);
+
+		//bias change
+		float bias_change = error_value * activation_derivative;
+		bias_deltas.add_at_flat(neuron_idx, bias_change);
+
+		//iterate input layer
+		for (int input_idx = 0; input_idx < input.item_count(); input_idx++)
+		{
+			float input_value = input.get_at_flat_host(input_idx);
+
+			//this weight connects the current input node to the current neuron
+			float weight = weights.get_at_host(vector3(input_idx, neuron_idx));
+
+			weight_deltas.add_at_host(
+				vector3(input_idx, neuron_idx), 
+				error_value * activation_derivative * input_value);
+
+			//passing error is null when this is the first layer
+			if (passing_error != nullptr)
+			{
+				passing_error->set_at_flat(input_idx, error_value * activation_derivative * weight);
+			}
+		}
+	}
+
+	weight_deltas.set_host_as_last_updated();
+	bias_deltas.set_host_as_last_updated();
+	if (passing_error != nullptr)
+	{
+		passing_error->set_host_as_last_updated();
+	}
 }
 
 bool matrix::are_equal(const matrix& a, const matrix& b)
@@ -1121,6 +1201,40 @@ void matrix::cross_correlation(
 	output.set_host_as_last_updated();
 }
 
+void matrix::apply_deltas(
+	matrix& delta,
+	size_t training_data_count,
+	float learning_rate)
+{
+	if_not_initialized_throw();
+	if_not_owning_throw();
+	if (delta.get_width() != get_width() ||
+		delta.get_height() != get_height() ||
+		delta.get_depth() != get_depth())
+	{
+		throw std::invalid_argument("delta matrix is not the same size as the current matrix");
+	}
+	if (gpu_enabled)
+	{
+		gpu_apply_deltas(
+			*this,
+			delta,
+			training_data_count,
+			learning_rate
+		);
+		set_device_as_last_updated();
+		delta.set_device_as_last_updated();
+		return;
+	}
+	for (int i = 0; i < item_count(); i++)
+	{
+		host_data[i] -= ((delta.host_data[i] / (float)training_data_count) * learning_rate);
+		delta.host_data[i] = 0;
+	}
+	set_host_as_last_updated();
+	delta.set_host_as_last_updated();
+}
+
 void matrix::scalar_multiplication(float a)
 {
 	if_not_initialized_throw();
@@ -1134,9 +1248,9 @@ void matrix::scalar_multiplication(float a)
 			*this
 		);
 		set_device_as_last_updated();
+		//sync_device_and_host();
 		return;
 	}
-
 
 	for (int i = 0; i < item_count(); i++)
 	{
@@ -1152,8 +1266,7 @@ void matrix::apply_activation_function(e_activation_t activation_fn)
 
 	if (gpu_enabled)
 	{
-		//NOT TESTED
-		GPU_ACTIVATION[activation_fn](*this);
+		gpu_activation_fn(*this, activation_fn);
 		set_device_as_last_updated();
 		return;
 	}

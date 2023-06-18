@@ -235,6 +235,7 @@ void neural_network::add_convolutional_layer(
 void neural_network::add_pooling_layer(size_t kernel_size, size_t stride, e_pooling_type_t pooling_type)
 {
 	//TODO
+	throw std::exception("not implemented");
 }
 
 void neural_network::set_all_parameters(float value)
@@ -276,33 +277,6 @@ void neural_network::mutate(float range)
 		layers[layer_idx]->sync_device_and_host();
 	}
 }
-/*
-test_result neural_network::test(const std::vector<std::unique_ptr<nn_data>>& test_data)
-{
-	test_result result;
-	result.data_count = test_data.size();
-	int correct_predictions = 0;
-	float cost_sum = 0.0f;
-	auto start = std::chrono::high_resolution_clock::now();
-
-	for (auto& curr_data : test_data)
-	{
-		forward_propagation_cpu(curr_data.get()->get_data());
-		if (get_interpreter<interpreter>()->same_result(*get_output(), curr_data.get()->get_label()))
-		{
-			correct_predictions++;
-		}
-		cost_sum += calculate_cost(curr_data.get()->get_label());
-	}
-
-	auto end = std::chrono::high_resolution_clock::now();
-
-	result.time_in_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-	result.accuracy = (float)correct_predictions / (float)result.data_count;
-	result.avg_cost = cost_sum / (float)result.data_count;
-
-	return result;
-}*/
 
 void neural_network::forward_propagation(const matrix& input)
 {
@@ -331,7 +305,6 @@ void neural_network::back_propagation(const matrix& given_data, const matrix& gi
 	//calculating the cost derivative
 	//calculate_cost_derivative(training_data->get_label_p());
 	get_last_layer()->set_error_for_last_layer(given_label);
-
 	//we start from the last layer
 	for (int i = layers.size() - 1; i >= 0; i--)
 	{
@@ -344,8 +317,10 @@ void neural_network::back_propagation(const matrix& given_data, const matrix& gi
 			i == 0 ?
 			nullptr :
 			layers[i - 1].get()->get_error_p();
-
+		//layers[i].get()->sync_device_and_host();
 		layers[i].get()->back_propagation(input, passing_error);
+		//[i].get()->sync_device_and_host();
+
 	}
 }
 

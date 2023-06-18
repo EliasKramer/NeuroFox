@@ -313,5 +313,65 @@ namespace CNNTest
 
 			Assert::IsTrue(matrix::are_equal(expected, result));
 		}
+		TEST_METHOD(activation_sigmoid)
+		{
+			matrix m = matrix(vector3(2, 3, 5));
+			m.set_all(1);
+			m.set_at_flat(0, 0);
+
+			m.apply_activation_function(e_activation_t::sigmoid_fn);
+
+			matrix expected(vector3(2, 3, 5));
+			expected.set_all(sigmoid(1));
+			expected.set_at_flat(0, sigmoid(0));
+
+			Assert::IsTrue(matrix::are_equal(expected, m));
+		}
+		TEST_METHOD(activation_relu)
+		{
+			matrix m = matrix(vector3(2, 3, 5));
+			m.set_all(-1);
+			m.set_at_flat(0, 5);
+
+			m.apply_activation_function(e_activation_t::relu_fn);
+
+			matrix expected(vector3(2, 3, 5));
+			expected.set_all(relu(-1));
+			expected.set_at_flat(0, relu(5));
+
+			Assert::IsTrue(matrix::are_equal(expected, m));
+		}
+		TEST_METHOD(activation_sigmoid_gpu_test)
+		{
+			matrix m = matrix(vector3(2, 3, 5));
+			m.set_all(1);
+			m.set_at_flat(0, 0);
+			m.enable_gpu_mode();
+
+			m.apply_activation_function(e_activation_t::sigmoid_fn);
+			m.sync_device_and_host();
+
+			matrix expected(vector3(2, 3, 5));
+			expected.set_all(sigmoid(1));
+			expected.set_at_flat(0, sigmoid(0));
+
+			Assert::IsTrue(matrix::are_equal(expected, m));
+		}
+		TEST_METHOD(activation_relu_gpu_test)
+		{
+			matrix m = matrix(vector3(2, 3, 5));
+			m.set_all(-1);
+			m.set_at_flat(0, 5);
+			m.enable_gpu_mode();
+
+			m.apply_activation_function(e_activation_t::relu_fn);
+			m.sync_device_and_host();
+
+			matrix expected(vector3(2, 3, 5));
+			expected.set_all(relu(-1));
+			expected.set_at_flat(0, relu(5));
+
+			Assert::IsTrue(matrix::are_equal(expected, m));
+		}
 	};
 }

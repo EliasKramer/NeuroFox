@@ -65,6 +65,92 @@ __device__ int get_x(int idx, int height, int width)
 	return idx - get_z(idx, height, width) * width * height - get_y(idx, height, width) * width;
 }
 
+__device__ float gpu_single_sigmoid(float x)
+{
+	return 1 / (1 + exp(-x));
+}
+
+__device__ float gpu_single_relu(float x)
+{
+	return x > 0 ? x : 0;
+}
+
+//not clean, but it has to do for now
+__device__ float gpu_single_activation(float x, int function_idx)
+{
+	if (function_idx == 0)
+	{
+		return gpu_single_sigmoid(x);
+	}
+	else if (function_idx == 1)
+	{
+		return gpu_single_relu(x);
+	}
+	else
+	{
+		printf("single_activation not implemented");
+		return 0;
+	}
+}
+
+__device__ float gpu_single_sigmoid_derivative(float x)
+{
+	float sigmoid = gpu_single_sigmoid(x);
+	return sigmoid * (1 - sigmoid);
+}
+
+__device__ float gpu_single_relu_derivative(float x)
+{
+	return x > 0 ? 1 : 0;
+}
+
+//not clean, but it has to do for now
+__device__ float gpu_single_derivative(float x, int function_idx)
+{
+	if (function_idx == 0)
+	{
+		return gpu_single_sigmoid_derivative(x);
+	}
+	else if (function_idx == 1)
+	{
+		return gpu_single_relu_derivative(x);
+	}
+	else
+	{
+		printf("single_derivative not implemented");
+		return 0;
+	}
+}
+
+__device__ float gpu_single_sigmoid_inverse(float x)
+{
+	return log(x / (1 - x));
+}
+
+__device__ float gpu_single_relu_inverse(float x)
+{
+	printf("gpu_single_relu_inverse not implemented");
+	return x;
+}
+
+//not clean, but it has to do for now
+__device__ float gpu_single_inverse(float x, int function_idx)
+{
+	if (function_idx == 0)
+	{
+		return gpu_single_sigmoid_inverse(x);
+	}
+	else if (function_idx == 1)
+	{
+		return gpu_single_relu_inverse(x);
+	}
+	else
+	{
+		printf("single_inverse not implemented");
+		return 0;
+	}
+}
+
 __global__ void gpu_dot_product_kernel(
 	const float* weights,
 	const float* input,
@@ -199,7 +285,7 @@ __global__ void gpu_scalar_mult_kernel(const float* a, float scalar, float* resu
 }
 
 void gpu_scalar_mult(
-	const matrix gpu_memory_a,
+	const matrix& gpu_memory_a,
 	float scalar,
 	matrix& gpu_memory_result)
 {
@@ -383,54 +469,137 @@ void gpu_pooling(
 	check_for_error_and_synchronize();
 }
 
-__global__ void gpu_sigmoid_kernel(float* data, int size)
+__global__ void gpu_fc_backprop_kernel(
+	const float* activations,
+	const float* weights,
+	const float* input,
+	const float* error,
+	float* passing_error,
+	float* weight_deltas,
+	float* bias_deltas,
+	e_activation_t activation_fn,
+	const unsigned int activation_count,
+	const unsigned int input_count
+)
 {
-	unsigned int index = blockIdx.x * blockDim.x + threadIdx.x;
-	if (index < size)
+	unsigned int neuron_idx = blockIdx.x * blockDim.x + threadIdx.x;
+	if (neuron_idx < activation_count)
 	{
-		data[index] = 1 / (1 + exp(-data[index]));
+		float error_value = error[neuron_idx];
+
+		float unactivated_activation = gpu_single_inverse(activations[neuron_idx], activation_fn);
+		float activation_derivative = gpu_single_derivative(unactivated_activation, activation_fn);
+
+		//bias change
+		float bias_change = error_value * activation_derivative;
+		bias_deltas[neuron_idx] += bias_change;
+
+		//printf("%d error_value: %f, unac_acti: %f, acti_deriv: %f, bias_change: %f\n",neuron_idx, error_value, unactivated_activation, activation_derivative, bias_change);
+
+		//iterate input layer
+		for (int input_idx = 0; input_idx < activation_count; input_idx++)
+		{
+			float input_value = input[input_idx];
+
+			int weight_idx = get_idx(input_idx, neuron_idx, 0, input_count, activation_count);
+
+			float weight = weights[weight_idx]; // could be moved in if statement
+
+			weight_deltas[weight_idx] += (error_value * activation_derivative * input_value);
+			//printf("%f weight change %f weight %d weight idx\n", weight_deltas[weight_idx], weight, weight_idx);
+
+			if (passing_error != nullptr)
+			{
+				passing_error[input_idx] = (error_value * activation_derivative * weight);
+			}
+		}
 	}
 }
 
-void gpu_sigmoid(matrix& gpu_memory)
+void gpu_fc_backprop(
+	const matrix& activations,
+	const matrix& weights,
+	const matrix& input,
+	const matrix& error,
+	matrix* passing_error,
+	matrix& weight_deltas,
+	matrix& bias_deltas,
+	e_activation_t activation_fn)
 {
-	if (gpu_memory.item_count() == 0)
-	{
-		throw std::invalid_argument("gpu_sigmoid failed. size must be greater than 0");
-	}
+	unsigned int size = activations.item_count();
 
-	set_device();
-
-	unsigned int size = gpu_memory.item_count();
-	gpu_sigmoid_kernel << < get_block_count(size), THREADS_PER_BLOCK >> > (
-		gpu_memory.get_device_ptr(),
-		size);
+	gpu_fc_backprop_kernel << <get_block_count(size), THREADS_PER_BLOCK >> > (
+		activations.get_device_ptr_readonly(),
+		weights.get_device_ptr_readonly(),
+		input.get_device_ptr_readonly(),
+		error.get_device_ptr_readonly(),
+		passing_error == nullptr ? nullptr : passing_error->get_device_ptr(),
+		weight_deltas.get_device_ptr(),
+		bias_deltas.get_device_ptr(),
+		activation_fn,
+		size,
+		input.item_count());
 
 	check_for_error_and_synchronize();
 }
 
-__global__ void gpu_relu_kernel(float* data, int size)
+__global__ void gpu_apply_deltas_kernel(
+	float* a,
+	float* delta,
+	int training_data_count,
+	float learning_rate,
+	unsigned int size
+)
 {
 	unsigned int index = blockIdx.x * blockDim.x + threadIdx.x;
 	if (index < size)
 	{
-		data[index] = data[index] > 0 ? data[index] : 0;
+		a[index] -= ((delta[index] / (float)training_data_count) * learning_rate);
+		delta[index] = 0;
 	}
 }
 
-void gpu_relu(matrix& gpu_memory)
+void gpu_apply_deltas(
+	matrix& a,
+	matrix& delta,
+	size_t training_data_count,
+	float learning_rate)
+{
+	unsigned int size = a.item_count();
+	gpu_apply_deltas_kernel << < get_block_count(size), THREADS_PER_BLOCK >> > (
+		a.get_device_ptr(),
+		delta.get_device_ptr(),
+		training_data_count,
+		learning_rate,
+		a.item_count()
+		);
+	check_for_error_and_synchronize();
+}
+
+__global__ void gpu_activation_kernel(float* data, unsigned int size, int activation_idx)
+{
+	unsigned int index = blockIdx.x * blockDim.x + threadIdx.x;
+	if (index < size)
+	{
+		data[index] = gpu_single_activation(data[index], activation_idx);
+	}
+}
+
+void gpu_activation_fn(
+	matrix& gpu_memory,
+	e_activation_t activation_idx)
 {
 	if (gpu_memory.item_count() == 0)
 	{
-		throw std::invalid_argument("gpu_relu failed. size must be greater than 0");
+		throw std::invalid_argument("apply activations only on valid matrices");
 	}
 
-	set_device();
-
 	unsigned int size = gpu_memory.item_count();
-	gpu_relu_kernel << < get_block_count(size), THREADS_PER_BLOCK >> > (
+
+	gpu_activation_kernel << < get_block_count(size), THREADS_PER_BLOCK >> > (
 		gpu_memory.get_device_ptr(),
-		size);
+		size,
+		(int)activation_idx);
 
 	check_for_error_and_synchronize();
 }

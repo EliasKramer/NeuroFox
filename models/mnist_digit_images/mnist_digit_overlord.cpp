@@ -196,8 +196,8 @@ mnist_digit_overlord::mnist_digit_overlord()
 		std::endl;
 
 	nn.set_input_format(vector3(28, 28, 1));
-	nn.add_pooling_layer(2, 2, e_pooling_type_t::average_pooling);
-	nn.add_convolutional_layer(2, 3, 1, e_activation_t::sigmoid_fn);
+	//nn.add_pooling_layer(2, 2, e_pooling_type_t::average_pooling);
+	//nn.add_convolutional_layer(2, 3, 1, e_activation_t::sigmoid_fn);
 	//nn.add_fully_connected_layer(16, e_activation_t::sigmoid_fn);
 	nn.add_fully_connected_layer(16, e_activation_t::sigmoid_fn);
 	nn.add_fully_connected_layer(vector3(1, 10, 1), e_activation_t::sigmoid_fn);
@@ -313,6 +313,7 @@ void mnist_digit_overlord::train(
 
 	for (size_t curr_epoch = 0; curr_epoch < epochs; curr_epoch++)
 	{
+		//TODO this is not a proper batch implementation.
 		for (size_t i = 0; i < batch_size; i++)
 		{
 			const matrix& input = ds_training.get_current_data();
