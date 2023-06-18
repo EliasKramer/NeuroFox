@@ -39,7 +39,7 @@ private:
 	void allocate_host_mem();
 	void set_own_host_data_from(const std::vector<float> src);
 	void set_own_host_data_from(const matrix& src);
-	
+
 	void copy_host_data_from(const matrix& src);
 	void copy_device_data_from(const matrix& src);
 
@@ -68,7 +68,7 @@ public:
 	void sync_device_and_host();
 	void enable_gpu_mode();
 	bool is_in_gpu_mode() const;
-	
+
 	void set_data_from_src(const matrix& src);
 	void set_all(float value);
 	void apply_noise(float range);
@@ -117,11 +117,11 @@ public:
 	static void add_flat(const matrix& a, const matrix& b, matrix& result);
 
 	static void subtract(const matrix& a, const matrix& b, matrix& result);
-	
+
 	static void pooling(
-		const matrix& input, 
-		matrix& output, 
-		size_t stride, 
+		const matrix& input,
+		matrix& output,
+		size_t stride,
 		size_t kernel_size,
 		e_pooling_type_t pooling_type);
 
@@ -134,7 +134,7 @@ public:
 		const matrix& input,
 		const std::vector<matrix>& kernels,
 		matrix& output,
-		int stride);
+		size_t stride);
 	//static void valid_convolution(const matrix& input, const matrix& kernel, matrix& output);
 	//static void full_cross_correlation(const matrix& input, const matrix& kernel, matrix& output, int stride);
 
@@ -172,6 +172,16 @@ void gpu_dot_product(
 void gpu_add(
 	const matrix& gpu_memory_a,
 	const matrix& gpu_memory_b,
+	matrix& gpu_memory_result);
+
+void gpu_subtract(
+	const matrix& gpu_memory_a,
+	const matrix& gpu_memory_b,
+	matrix& gpu_memory_result);
+
+void gpu_scalar_mult(
+	const matrix gpu_memory_a,
+	float scalar,
 	matrix& gpu_memory_result);
 
 /// <summary>

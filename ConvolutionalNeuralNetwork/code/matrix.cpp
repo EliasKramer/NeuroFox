@@ -871,8 +871,7 @@ void matrix::subtract(const matrix& a, const matrix& b, matrix& result)
 	result.if_not_owning_throw();
 
 	if (!equal_format(a, b) ||
-		!equal_format(b, result) ||
-		!equal_format(result, a))
+		!equal_format(b, result))
 	{
 		throw std::invalid_argument("subtraction could not be performed. input matrices are in the wrong format");
 	}
@@ -881,8 +880,11 @@ void matrix::subtract(const matrix& a, const matrix& b, matrix& result)
 		b.gpu_enabled &&
 		result.gpu_enabled)
 	{
-		//gpu_subtract(a, b, result);
-		throw std::exception("gpu subtract not implemented");
+		gpu_subtract(
+			a,
+			b,
+			result
+		);
 		result.set_device_as_last_updated();
 		return;
 	}
@@ -1024,7 +1026,7 @@ void matrix::cross_correlation(
 	const matrix& input,
 	const std::vector<matrix>& kernels,
 	matrix& output,
-	int stride)
+	size_t stride)
 {
 	input.if_not_initialized_throw();
 	output.if_not_initialized_throw();
@@ -1072,11 +1074,11 @@ void matrix::cross_correlation(
 	size_t kernel_size = kernels[0].get_width();
 
 	//iterate over each
-	for (int z = 0; z < output.get_depth(); z++)
+	for (size_t z = 0; z < output.get_depth(); z++)
 	{
-		for (int y = 0; y < output.get_height(); y++)
+		for (size_t y = 0; y < output.get_height(); y++)
 		{
-			for (int x = 0; x < output.get_width(); x++)
+			for (size_t x = 0; x < output.get_width(); x++)
 			{
 				//iterate over the kernel and input.
 				//the overlaying values are multiplied and added to the output
@@ -1090,11 +1092,11 @@ void matrix::cross_correlation(
 				//40 is the sum
 
 				float sum = 0;
-				for (int curr_depth = 0; curr_depth < kernels[0].get_depth(); curr_depth++)
+				for (size_t curr_depth = 0; curr_depth < kernels[0].get_depth(); curr_depth++)
 				{
-					for (int i = 0; i < kernel_size; i++)
+					for (size_t i = 0; i < kernel_size; i++)
 					{
-						for (int j = 0; j < kernel_size; j++)
+						for (size_t j = 0; j < kernel_size; j++)
 						{
 							sum +=
 								input.get_at_host(
@@ -1126,8 +1128,11 @@ void matrix::scalar_multiplication(float a)
 
 	if (gpu_enabled)
 	{
-		//TODO
-		throw std::exception("not implemented");
+		gpu_scalar_mult(
+			*this,
+			a,
+			*this
+		);
 		set_device_as_last_updated();
 		return;
 	}

@@ -240,5 +240,78 @@ namespace CNNTest
 			m.set_at(vector3(0, 0, 1), 3);
 			Assert::AreNotEqual(3.0f, m2.get_at_host(vector3(0, 0, 1)));
 		}
+		TEST_METHOD(subtract)
+		{
+			matrix m = matrix(vector3(2, 3, 5));
+			m.set_all(5);
+			matrix m2 = matrix(vector3(2, 3, 5));
+			m2.set_all(2);
+			
+			matrix result(vector3(2, 3, 5));
+
+			matrix::subtract(m, m2, result);
+
+			matrix expected(vector3(2, 3, 5));
+			expected.set_all(3);
+
+			Assert::IsTrue(matrix::are_equal(expected, result));
+		}
+		TEST_METHOD(subtract_negative_result)
+		{
+			matrix m = matrix(vector3(2, 3, 5));
+			m.set_all(2);
+			matrix m2 = matrix(vector3(2, 3, 5));
+			m2.set_all(5);
+			
+			matrix result(vector3(2, 3, 5));
+
+			matrix::subtract(m, m2, result);
+
+			matrix expected(vector3(2, 3, 5));
+			expected.set_all(-3);
+
+			Assert::IsTrue(matrix::are_equal(expected, result));
+		}
+		TEST_METHOD(subtract_gpu)
+		{
+			matrix m = matrix(vector3(2, 3, 5));
+			m.set_all(5);
+			m.enable_gpu_mode();
+			matrix m2 = matrix(vector3(2, 3, 5));
+			m2.set_all(2);
+			m2.enable_gpu_mode();
+
+			matrix result(vector3(2, 3, 5));
+			result.enable_gpu_mode();
+
+			matrix::subtract(m, m2, result);
+			result.sync_device_and_host();
+
+			matrix expected(vector3(2, 3, 5));
+			expected.set_all(3);
+
+
+			Assert::IsTrue(matrix::are_equal(expected, result));
+		}
+		TEST_METHOD(subtract_negative_result_gpu)
+		{
+			matrix m = matrix(vector3(2, 3, 5));
+			m.set_all(2);
+			m.enable_gpu_mode();
+			matrix m2 = matrix(vector3(2, 3, 5));
+			m2.set_all(5);
+			m2.enable_gpu_mode();
+
+			matrix result(vector3(2, 3, 5));
+			result.enable_gpu_mode();
+
+			matrix::subtract(m, m2, result);
+			result.sync_device_and_host();
+
+			matrix expected(vector3(2, 3, 5));
+			expected.set_all(-3);
+
+			Assert::IsTrue(matrix::are_equal(expected, result));
+		}
 	};
 }

@@ -163,6 +163,57 @@ void gpu_add(
 	check_for_error_and_synchronize();
 }
 
+__global__ void gpu_subtract_matrices_kernel(const float* a, const float* b, float* result, unsigned int size)
+{
+	unsigned int index = blockIdx.x * blockDim.x + threadIdx.x;
+	if (index < size)
+	{
+		result[index] = a[index] - b[index];
+	}
+}
+
+void gpu_subtract(
+	const matrix& gpu_memory_a,
+	const matrix& gpu_memory_b,
+	matrix& gpu_memory_result)
+{
+	unsigned int size = gpu_memory_a.item_count();
+
+	gpu_subtract_matrices_kernel << < get_block_count(size), THREADS_PER_BLOCK >> > (
+		gpu_memory_a.get_device_ptr_readonly(),
+		gpu_memory_b.get_device_ptr_readonly(),
+		gpu_memory_result.get_device_ptr(),
+		size);
+
+	check_for_error_and_synchronize();
+}
+
+
+__global__ void gpu_scalar_mult_kernel(const float* a, float scalar, float* result, unsigned int size)
+{
+	unsigned int index = blockIdx.x * blockDim.x + threadIdx.x;
+	if (index < size)
+	{
+		result[index] = a[index] * scalar;
+	}
+}
+
+void gpu_scalar_mult(
+	const matrix gpu_memory_a,
+	float scalar,
+	matrix& gpu_memory_result)
+{
+	unsigned int size = gpu_memory_a.item_count();
+
+	gpu_scalar_mult_kernel << < get_block_count(size), THREADS_PER_BLOCK >> > (
+		gpu_memory_a.get_device_ptr_readonly(),
+		scalar,
+		gpu_memory_result.get_device_ptr(),
+		size);
+
+	check_for_error_and_synchronize();
+}
+
 __global__ void gpu_valid_cross_correlation_kernel(
 	const float* input,
 	const float* weights,
@@ -285,7 +336,7 @@ __global__ void pooling_kernel(
 		}
 
 		float result = 0;
-		/*	
+		/*
 		copied from the enum - TODO find a way to use the enum directly
 		max_pooling = 0,
 		min_pooling = 1,
