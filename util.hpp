@@ -4,6 +4,7 @@
 #include <random>
 #include <string>
 #include "vector3.hpp"
+#include <iostream>
 
 constexpr float FLOAT_TOLERANCE = 0.000001f;
 

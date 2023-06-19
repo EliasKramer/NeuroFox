@@ -26,10 +26,18 @@ float random_float_excl(float min, float max)
 {
 	static std::random_device rd;
 	static std::mt19937 gen(rd());
-	static std::uniform_real_distribution<float> dis(
+	std::uniform_real_distribution<float> dis(
 		min,
 		max);
-	return dis(gen);
+
+	float ret_val = dis(gen);
+
+	if (ret_val < min || ret_val >= max)
+	{
+		throw std::runtime_error("random_float_excl returned a value outside of the range");
+	}
+
+	return ret_val;
 }
 
 bool is_whole_number(float number)
