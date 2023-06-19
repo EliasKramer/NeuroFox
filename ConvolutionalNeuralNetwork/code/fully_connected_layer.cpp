@@ -130,6 +130,7 @@ void fully_connected_layer::forward_propagation(const matrix& input)
 void fully_connected_layer::back_propagation(const matrix& input, matrix* passing_error)
 {
 	layer::back_propagation(input, passing_error);
+	//sync_device_and_host();
 
 	matrix::fully_connected_backprop(
 		activations,
@@ -141,6 +142,7 @@ void fully_connected_layer::back_propagation(const matrix& input, matrix* passin
 		bias_deltas,
 		activation_fn
 	);
+	//sync_device_and_host();
 }
 
 void fully_connected_layer::apply_deltas(size_t training_data_count, float learning_rate)
