@@ -4,7 +4,7 @@ int random_idx(int size)
 {
 	static std::random_device rd;
 	static std::mt19937 gen(rd());
-	static std::uniform_int_distribution
+	std::uniform_int_distribution
 		<int> dis(0, size);
 	return dis(gen) % size;
 }
