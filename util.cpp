@@ -34,6 +34,7 @@ float random_float_excl(float min, float max)
 
 	if (ret_val < min || ret_val >= max)
 	{
+		//why does this get called TODO FIX
 		throw std::runtime_error("random_float_excl returned a value outside of the range");
 	}
 
@@ -123,4 +124,24 @@ size_t convolution_output_size(
 	}
 
 	return (input_size - filter_size) / stride + 1;
+}
+
+std::string ms_to_str(size_t ms)
+{
+	//TODO make this work
+	size_t seconds = ms / 1000;
+	size_t minutes = seconds / 60;
+	size_t hours = minutes / 60;
+
+	std::string result = "";
+	if (hours > 0)
+		result += std::to_string(hours) + "h ";
+	if (minutes > 0)
+		result += std::to_string(minutes) + "m ";
+	if (seconds > 0)
+		result += std::to_string(seconds) + "s ";
+	if (ms > 0)
+		result += std::to_string(ms) + "ms ";
+
+	return result == "" ? "0ms" : result;
 }
