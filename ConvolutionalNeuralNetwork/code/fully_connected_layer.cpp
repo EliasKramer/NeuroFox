@@ -130,7 +130,6 @@ void fully_connected_layer::forward_propagation(const matrix& input)
 void fully_connected_layer::back_propagation(const matrix& input, matrix* passing_error)
 {
 	layer::back_propagation(input, passing_error);
-	//sync_device_and_host();
 
 	matrix::fully_connected_backprop(
 		activations,
@@ -142,41 +141,12 @@ void fully_connected_layer::back_propagation(const matrix& input, matrix* passin
 		bias_deltas,
 		activation_fn
 	);
-	//sync_device_and_host();
 }
 
 void fully_connected_layer::apply_deltas(size_t training_data_count, float learning_rate)
 {
-	/*
-	for (int i = 0; i < biases.item_count(); i++)
-	{
-		float current_bias = biases.get_at_flat_host(i);
-		float avg_bias_delta = bias_deltas.get_at_flat_host(i) / training_data_count;
-		biases.set_at_flat(i, current_bias - (avg_bias_delta * learning_rate));
-		bias_deltas.set_at_flat(i, 0.0f);
-	}
-
-	for (int i = 0; i < weights.item_count(); i++)
-	{
-		float current_weight = weights.get_at_flat_host(i);
-		float avg_weight_delta = weight_deltas.get_at_flat_host(i) / training_data_count;
-		weights.set_at_flat(i, current_weight - (avg_weight_delta * learning_rate));
-		weight_deltas.set_at_flat(i, 0.0f);
-	}*/
-	biases.sync_device_and_host();
-	bias_deltas.sync_device_and_host();
-	weight_deltas.sync_device_and_host();
-	weights.sync_device_and_host();
 	biases.apply_deltas(bias_deltas, training_data_count, learning_rate);
-	//bias_deltas.sync_device_and_host();
-	//biases.sync_device_and_host();
-	//weights.sync_device_and_host();
-	//weight_deltas.sync_device_and_host();
-	//weights.sync_device_and_host();
 	weights.apply_deltas(weight_deltas, training_data_count, learning_rate);
-	//weight_deltas.sync_device_and_host();
-	//weights.sync_device_and_host();
-	//weights.sync_device_and_host();
 }
 
 void fully_connected_layer::enable_gpu_mode()

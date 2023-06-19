@@ -311,18 +311,7 @@ void mnist_digit_overlord::train(
 
 	auto start = std::chrono::high_resolution_clock::now();
 
-	for (size_t curr_epoch = 0; curr_epoch < epochs; curr_epoch++)
-	{
-		//TODO this is not a proper batch implementation.
-		for (size_t i = 0; i < batch_size; i++)
-		{
-			const matrix& input = ds_training.get_current_data();
-			const matrix& label = ds_training.get_current_label();
-			nn.back_propagation(input, label);
-			ds_training.iterator_next();
-		}
-		nn.apply_deltas(batch_size, learning_rate);
-	}
+	nn.learn_on_ds(ds_training, epochs, batch_size, learning_rate);
 
 	auto end = std::chrono::high_resolution_clock::now();
 

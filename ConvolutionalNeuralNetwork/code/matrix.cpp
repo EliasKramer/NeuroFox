@@ -1030,9 +1030,6 @@ void matrix::fully_connected_backprop(
 		bias_deltas.set_device_as_last_updated();
 		if (passing_error != nullptr)
 			passing_error->set_device_as_last_updated();
-
-		//weight_deltas.sync_device_and_host();
-		//bias_deltas.sync_device_and_host();
 		return;
 	}
 

@@ -9,6 +9,7 @@
 
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
+#include "data_space.hpp"
 
 class neural_network {
 private:
@@ -68,6 +69,12 @@ public:
 	void forward_propagation(const matrix& input);
 	
 	void back_propagation(const matrix& given_data, const matrix& given_label);
+
+	void learn_on_ds(
+		data_space& ds, 
+		size_t epochs, 
+		size_t batch_size, 
+		float learning_rate);
 
 	//we need the training_data_count for 
 	//calculating the average of the deltas

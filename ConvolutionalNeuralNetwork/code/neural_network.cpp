@@ -264,14 +264,14 @@ void neural_network::mutate(float range)
 		throw std::runtime_error("Cannot mutate. No parameter layers have been added yet.");
 	}
 	int layer_idx = parameter_layer_indices[random_idx((int)parameter_layer_indices.size())];
-	
+
 	if (is_in_gpu_mode())
 	{
 		layers[layer_idx]->sync_device_and_host();
 	}
-	
+
 	layers[layer_idx]->mutate(range);
-	
+
 	if (is_in_gpu_mode())
 	{
 		layers[layer_idx]->sync_device_and_host();
@@ -303,8 +303,8 @@ void neural_network::back_propagation(const matrix& given_data, const matrix& gi
 	forward_propagation(given_data);
 
 	//calculating the cost derivative
-	//calculate_cost_derivative(training_data->get_label_p());
 	get_last_layer()->set_error_for_last_layer(given_label);
+
 	//we start from the last layer
 	for (int i = layers.size() - 1; i >= 0; i--)
 	{
@@ -317,9 +317,59 @@ void neural_network::back_propagation(const matrix& given_data, const matrix& gi
 			i == 0 ?
 			nullptr :
 			layers[i - 1].get()->get_error_p();
-		//layers[i].get()->sync_device_and_host();
+
 		layers[i].get()->back_propagation(input, passing_error);
-		//layers[i].get()->sync_device_and_host();
+	}
+}
+
+void neural_network::learn_on_ds(
+	data_space& ds,
+	size_t epochs,
+	size_t batch_size,
+	float learning_rate)
+{
+	if (ds.get_current_data().is_in_gpu_mode() != is_in_gpu_mode())
+	{
+		throw std::runtime_error("Data space is not in the same mode as the neural network.");
+	}
+	if (vector3::are_equal(ds.get_current_data().get_format(), input_format) == false ||
+		vector3::are_equal(ds.get_current_label().get_format(), get_output_readonly().get_format()) == false)
+	{
+		throw std::runtime_error("Data space is not in the same format as the neural network.");
+	}
+	if (ds.get_item_count() == 0)
+	{
+		throw std::runtime_error("Data space is empty.");
+	}
+
+	for (size_t curr_epoch = 0; curr_epoch < epochs; curr_epoch++)
+	{
+		size_t batch_item = 0;
+		ds.iterator_reset();
+		bool first = true;
+		while (ds.iterator_has_next())
+		{
+			//we do this check in order to get every item. 
+			//if we did not do that, we would skip the first item
+			if (first)
+			{
+				first = false;
+			}
+			else {
+				ds.iterator_next();
+			}
+
+			batch_item++;
+			const matrix& input = ds.get_current_data();
+			const matrix& label = ds.get_current_label();
+			back_propagation(input, label);
+
+			if (batch_item >= batch_size)
+			{
+				apply_deltas(batch_size, learning_rate);
+				batch_item = 0;
+			}
+		}
 	}
 }
 
