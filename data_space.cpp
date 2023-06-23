@@ -37,6 +37,7 @@ void data_space::allocate_data_table()
 			(size_t)(data_item_count() + label_item_count()),
 			item_count,
 			(size_t)1));
+	data_table.set_all(0);
 }
 
 data_space::data_space()
