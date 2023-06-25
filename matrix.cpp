@@ -772,46 +772,6 @@ float matrix::get_at_host(vector3 pos) const
 	return host_data[pos.get_index(format)];
 }
 
-void matrix::dot_product(const matrix& a, const matrix& b, matrix& result)
-{
-	a.if_not_initialized_throw();
-	b.if_not_initialized_throw();
-	result.if_not_initialized_throw();
-
-	if (a.get_width() != b.get_height() || a.get_depth() != b.get_depth())
-	{
-		throw std::invalid_argument("dot product could not be performed. input matrices are in the wrong format");
-	}
-	if (result.get_width() != b.get_width() || result.get_height() != a.get_height() || result.get_depth() != a.get_depth())
-	{
-		throw std::invalid_argument("dot product could not be performed. result matrix is not the correct size");
-	}
-
-	if (a.gpu_enabled || b.gpu_enabled || result.gpu_enabled)
-	{
-		throw std::exception("no proper dot product implemented on the gpu. use dot_product_flat");
-		result.set_device_as_last_updated();
-		return;
-	}
-
-	for (int z = 0; z < result.get_depth(); z++)
-	{
-		for (int y = 0; y < result.get_height(); y++)
-		{
-			for (int x = 0; x < result.get_width(); x++)
-			{
-				float sum = 0;
-				for (int i = 0; i < a.get_width(); i++)
-				{
-					sum += a.get_at_host(vector3(i, y, z)) * b.get_at_host(vector3(x, i, z));
-				}
-				result.set_at_host(vector3(x, y, z), sum);
-			}
-		}
-	}
-	result.set_host_as_last_updated();
-}
-
 void matrix::dot_product_flat(const matrix& a, const matrix& flat, matrix& result_flat)
 {
 	a.if_not_initialized_throw();
@@ -820,8 +780,8 @@ void matrix::dot_product_flat(const matrix& a, const matrix& flat, matrix& resul
 
 	if (a.get_width() != flat.item_count() ||
 		a.get_height() != result_flat.item_count() ||
-		a.get_depth() != 1 ||
-		result_flat.get_depth() != 1)
+		a.get_depth() != 1 )//||
+		//result_flat.get_depth() != 1)
 	{
 		throw std::invalid_argument("dot product could not be performed. input matrices are in the wrong format");
 	}

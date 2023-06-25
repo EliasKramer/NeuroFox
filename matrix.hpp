@@ -112,8 +112,6 @@ public:
 	//getter
 	float get_at_host(vector3 pos) const;
 
-	//TODO - implement for gpu
-	static void dot_product(const matrix& a, const matrix& b, matrix& result);
 	static void dot_product_flat(const matrix& a, const matrix& flat, matrix& result_flat);
 
 	static void add(const matrix& a, const matrix& b, matrix& result);
