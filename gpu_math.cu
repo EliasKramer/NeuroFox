@@ -75,6 +75,11 @@ __device__ float gpu_single_relu(float x)
 	return x > 0 ? x : 0;
 }
 
+__device__ float gpu_single_leaky_relu(float x)
+{
+	return x > 0 ? x : LEAKY_RELU_FACTOR * x;
+}
+
 //not clean, but it has to do for now
 __device__ float gpu_single_activation(float x, int function_idx)
 {
@@ -85,6 +90,10 @@ __device__ float gpu_single_activation(float x, int function_idx)
 	else if (function_idx == 1)
 	{
 		return gpu_single_relu(x);
+	}
+	else if (function_idx == 2)
+	{
+		return gpu_single_leaky_relu(x);
 	}
 	else
 	{
@@ -104,6 +113,11 @@ __device__ float gpu_single_relu_derivative(float x)
 	return x > 0 ? 1 : 0;
 }
 
+__device__ float gpu_single_leaky_relu_derivative(float x)
+{
+	return x > 0 ? 1 : LEAKY_RELU_FACTOR;
+}
+
 //not clean, but it has to do for now
 __device__ float gpu_single_derivative(float x, int function_idx)
 {
@@ -114,6 +128,10 @@ __device__ float gpu_single_derivative(float x, int function_idx)
 	else if (function_idx == 1)
 	{
 		return gpu_single_relu_derivative(x);
+	}
+	else if (function_idx == 2)
+	{
+		return gpu_single_leaky_relu_derivative(x);
 	}
 	else
 	{
@@ -133,6 +151,11 @@ __device__ float gpu_single_relu_inverse(float x)
 	return x;
 }
 
+__device__ float gpu_single_leaky_relu_inverse(float x)
+{
+	return x > 0 ? x : x / LEAKY_RELU_FACTOR;
+}
+
 //not clean, but it has to do for now
 __device__ float gpu_single_inverse(float x, int function_idx)
 {
@@ -143,6 +166,10 @@ __device__ float gpu_single_inverse(float x, int function_idx)
 	else if (function_idx == 1)
 	{
 		return gpu_single_relu_inverse(x);
+	}
+	else if (function_idx == 2)
+	{
+		return gpu_single_leaky_relu_inverse(x);
 	}
 	else
 	{
@@ -177,6 +204,7 @@ void gpu_dot_product(
 	const matrix& gpu_input,
 	matrix& gpu_activations)
 {
+	/*
 	if (gpu_weights.get_device_ptr_readonly() == nullptr ||
 		gpu_input.get_device_ptr_readonly() == nullptr ||
 		gpu_activations.get_device_ptr() == nullptr)
@@ -194,6 +222,18 @@ void gpu_dot_product(
 	{
 		throw std::invalid_argument("gpu_dot_product failed. false format");
 	}
+	*/
+
+	assert_throw((gpu_weights.get_device_ptr_readonly() != nullptr));
+	assert_throw((gpu_input.get_device_ptr_readonly() != nullptr));
+	assert_throw((gpu_activations.get_device_ptr() != nullptr));
+
+	assert_throw(gpu_weights.item_count() != 0);
+	assert_throw(gpu_input.item_count() != 0);
+	assert_throw(gpu_activations.item_count() != 0);
+
+	assert_throw(gpu_activations.item_count() * gpu_input.item_count() == gpu_weights.item_count());
+
 
 	unsigned int size = gpu_activations.item_count();
 	unsigned int block_count = get_block_count(size);
@@ -221,22 +261,29 @@ void gpu_add(
 	const matrix& gpu_memory_b,
 	matrix& gpu_memory_result)
 {
-	if (gpu_memory_a.get_device_ptr_readonly() == nullptr ||
+	/*if (gpu_memory_a.get_device_ptr_readonly() == nullptr ||
 		gpu_memory_b.get_device_ptr_readonly() == nullptr ||
 		gpu_memory_result.get_device_ptr() == nullptr)
 	{
 		throw std::invalid_argument("argument is nullptr");
 	}
-
+	
 	if (gpu_memory_a.item_count() == 0 ||
 		gpu_memory_a.item_count() != gpu_memory_b.item_count() ||
 		gpu_memory_a.item_count() != gpu_memory_result.item_count())
 	{
 		throw std::invalid_argument("gpu_add_matrices failed. size must be greater than 0");
-	}
+	}*/
+	assert_throw((gpu_memory_a.get_device_ptr_readonly() != nullptr));
+	assert_throw((gpu_memory_b.get_device_ptr_readonly() != nullptr));
+	assert_throw((gpu_memory_result.get_device_ptr() != nullptr));
+
+	assert_throw((gpu_memory_a.item_count() != 0));
+	assert_throw((gpu_memory_a.item_count() == gpu_memory_b.item_count()));
+	assert_throw((gpu_memory_a.item_count() == gpu_memory_result.item_count()));
 
 	unsigned int size = gpu_memory_a.item_count();
-	
+
 	cuda_sync();
 	gpu_add_matrices_kernel << < get_block_count(size), THREADS_PER_BLOCK >> > (
 		gpu_memory_a.get_device_ptr_readonly(),
@@ -262,7 +309,7 @@ void gpu_subtract(
 	matrix& gpu_memory_result)
 {
 	unsigned int size = gpu_memory_a.item_count();
-	
+
 	cuda_sync();
 	gpu_subtract_matrices_kernel << < get_block_count(size), THREADS_PER_BLOCK >> > (
 		gpu_memory_a.get_device_ptr_readonly(),
@@ -517,7 +564,7 @@ void gpu_fc_backprop(
 	e_activation_t activation_fn)
 {
 	unsigned int size = activations.item_count();
-	
+
 	cuda_sync();
 	gpu_fc_backprop_kernel << <get_block_count(size), THREADS_PER_BLOCK >> > (
 		activations.get_device_ptr_readonly(),

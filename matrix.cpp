@@ -774,17 +774,24 @@ float matrix::get_at_host(vector3 pos) const
 
 void matrix::dot_product_flat(const matrix& a, const matrix& flat, matrix& result_flat)
 {
+
+	/*
 	a.if_not_initialized_throw();
 	flat.if_not_initialized_throw();
 	result_flat.if_not_initialized_throw();
-
 	if (a.get_width() != flat.item_count() ||
 		a.get_height() != result_flat.item_count() ||
 		a.get_depth() != 1 )//||
 		//result_flat.get_depth() != 1)
 	{
 		throw std::invalid_argument("dot product could not be performed. input matrices are in the wrong format");
-	}
+	}*/
+	assert_throw(a.is_initialized());
+	assert_throw(flat.is_initialized());
+	assert_throw(result_flat.is_initialized());
+	assert_throw(a.get_width() == flat.item_count());
+	assert_throw(a.get_height() == result_flat.item_count());
+	assert_throw(a.get_depth() == 1); // i think doesnt have to be checked. it would work with depth > 1
 
 	if (a.gpu_enabled &&
 		flat.gpu_enabled &&
@@ -808,10 +815,10 @@ void matrix::dot_product_flat(const matrix& a, const matrix& flat, matrix& resul
 
 void matrix::add(const matrix& a, const matrix& b, matrix& result)
 {
+	/*
 	a.if_not_initialized_throw();
 	b.if_not_initialized_throw();
 	result.if_not_initialized_throw();
-
 	if (a.get_width() != b.get_width() || a.get_height() != b.get_height() || a.get_depth() != b.get_depth())
 	{
 		throw std::invalid_argument("addition could not be performed. input matrices are in the wrong format");
@@ -820,7 +827,19 @@ void matrix::add(const matrix& a, const matrix& b, matrix& result)
 	{
 		throw std::invalid_argument("addition could not be performed. result matrix is not the correct size");
 	}
+	*/
+	assert_throw(a.is_initialized());
+	assert_throw(b.is_initialized());
+	assert_throw(result.is_initialized());
 
+	assert_throw(a.get_width() == b.get_width());
+	assert_throw(a.get_height() == b.get_height());
+	assert_throw(a.get_depth() == b.get_depth());
+	
+	assert_throw(a.get_width() == result.get_width());
+	assert_throw(a.get_height() == result.get_height());
+	assert_throw(a.get_depth() == result.get_depth());
+	
 	if (a.gpu_enabled &&
 		b.gpu_enabled &&
 		result.gpu_enabled)

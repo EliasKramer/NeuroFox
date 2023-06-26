@@ -7,6 +7,7 @@
 #include "vector3.hpp"
 #include "gpu_math.cuh"
 #include "enum_space.hpp"
+#include "assert_throw.hpp"
 
 class matrix {
 private:
