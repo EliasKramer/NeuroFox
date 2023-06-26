@@ -87,10 +87,10 @@ namespace CNNTest
 				| 2 | 4 |
 				+ - + - +
 			*/
-			layer.get_kernel_weights()[0].set_at(vector3(0, 1), 2.0f);
-			layer.get_kernel_weights()[0].set_at(vector3(1, 0), 3.0f);
-			layer.get_kernel_weights()[0].set_at(vector3(1, 1), 4.0f);
-			layer.get_kernel_weights()[0].set_at(vector3(0, 0), 1.0f);
+			layer.get_kernel_weights()[0].set_at_host(vector3(0, 1), 2.0f);
+			layer.get_kernel_weights()[0].set_at_host(vector3(1, 0), 3.0f);
+			layer.get_kernel_weights()[0].set_at_host(vector3(1, 1), 4.0f);
+			layer.get_kernel_weights()[0].set_at_host(vector3(0, 0), 1.0f);
 
 			/* bias matrix
 				+ - + - +
@@ -110,15 +110,15 @@ namespace CNNTest
 				| 3 | 6 | 9 |
 				+ - + - + - +
 			*/
-			input.set_at(vector3(0, 0), 1);
-			input.set_at(vector3(0, 1), 2);
-			input.set_at(vector3(0, 2), 3);
-			input.set_at(vector3(1, 0), 4);
-			input.set_at(vector3(1, 1), 5);
-			input.set_at(vector3(1, 2), 6);
-			input.set_at(vector3(2, 0), 7);
-			input.set_at(vector3(2, 1), 8);
-			input.set_at(vector3(2, 2), 9);
+			input.set_at_host(vector3(0, 0), 1);
+			input.set_at_host(vector3(0, 1), 2);
+			input.set_at_host(vector3(0, 2), 3);
+			input.set_at_host(vector3(1, 0), 4);
+			input.set_at_host(vector3(1, 1), 5);
+			input.set_at_host(vector3(1, 2), 6);
+			input.set_at_host(vector3(2, 0), 7);
+			input.set_at_host(vector3(2, 1), 8);
+			input.set_at_host(vector3(2, 2), 9);
 
 			layer.forward_propagation(input);
 

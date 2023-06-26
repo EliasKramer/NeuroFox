@@ -30,18 +30,16 @@ private:
 
 	void if_gpu_not_allocated_throw() const;
 	void allocate_device_mem();
-	void copy_host_to_device();
-	void copy_device_to_host();
+	void copy_host2device();
+	void copy_device2host();
 
 	void if_cuda_error_throw() const;
 
 	bool format_is_valid() const;
 	void allocate_host_mem();
-	void set_own_host_data_from(const std::vector<float> src);
-	void set_own_host_data_from(const matrix& src);
 
-	void copy_host_data_from(const matrix& src);
-	void copy_device_data_from(const matrix& src);
+	void copy_host2host_from(const matrix& src);
+	void copy_device2device_from(const matrix& src);
 
 	void delete_data_if_owning();
 
@@ -71,6 +69,7 @@ public:
 	bool host_data_is_updated() const;
 	void enable_gpu_mode();
 	bool is_in_gpu_mode() const;
+	bool is_owning_data() const;
 
 	void set_data_from_src(const matrix& src);
 	void set_all(float value);

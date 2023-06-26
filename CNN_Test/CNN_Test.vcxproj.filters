@@ -140,6 +140,9 @@
     <ClInclude Include="..\ConvolutionalNeuralNetwork\code\gpu_math.cuh">
       <Filter>Header Files\nn</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\_coding\Leonardo\LeonardoAi\NeuroFox\smart_assert.hpp">
+      <Filter>Header Files\nn</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\ConvolutionalNeuralNetwork\code\gpu_math.cu">

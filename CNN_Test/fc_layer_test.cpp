@@ -31,13 +31,13 @@ namespace CNNTest
 		TEST_METHOD(simple_forward_propagating)
 		{
 			matrix input(vector3(1, 1, 1));
-			input.set_at_flat(0, 2);
+			input.set_at_flat_host(0, 2);
 			fully_connected_layer fc_layer(1, relu_fn);
 			fc_layer.set_input_format(input.get_format());
 
 			//CONTINUE HERE
-			fc_layer.get_weights_ref().set_at_flat(0, 3);
-			fc_layer.get_biases_ref().set_at_flat(0, 1);
+			fc_layer.get_weights_ref().set_at_flat_host(0, 3);
+			fc_layer.get_biases_ref().set_at_flat_host(0, 1);
 
 			fc_layer.forward_propagation(input);
 
@@ -47,11 +47,11 @@ namespace CNNTest
 		{
 			matrix input(vector3(1, 5, 1));
 
-			input.set_at_flat(0, 2);
-			input.set_at_flat(1, 3);
-			input.set_at_flat(2, 4);
-			input.set_at_flat(3, 5);
-			input.set_at_flat(4, 6);
+			input.set_at_flat_host(0, 2);
+			input.set_at_flat_host(1, 3);
+			input.set_at_flat_host(2, 4);
+			input.set_at_flat_host(3, 5);
+			input.set_at_flat_host(4, 6);
 
 			fully_connected_layer fc_layer(3, relu_fn);
 			fc_layer.set_input_format(input.get_format());
@@ -59,7 +59,7 @@ namespace CNNTest
 			fc_layer.get_weights_ref().set_all(2);
 			fc_layer.get_biases_ref().set_all(1);
 
-			fc_layer.get_weights_ref().set_at(vector3(0, 0), -1);
+			fc_layer.get_weights_ref().set_at_host(vector3(0, 0), -1);
 
 			fc_layer.forward_propagation(input);
 

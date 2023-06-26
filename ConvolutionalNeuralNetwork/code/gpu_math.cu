@@ -224,15 +224,15 @@ void gpu_dot_product(
 	}
 	*/
 
-	assert_throw((gpu_weights.get_device_ptr_readonly() != nullptr));
-	assert_throw((gpu_input.get_device_ptr_readonly() != nullptr));
-	assert_throw((gpu_activations.get_device_ptr() != nullptr));
+	smart_assert((gpu_weights.get_device_ptr_readonly() != nullptr));
+	smart_assert((gpu_input.get_device_ptr_readonly() != nullptr));
+	smart_assert((gpu_activations.get_device_ptr() != nullptr));
 
-	assert_throw(gpu_weights.item_count() != 0);
-	assert_throw(gpu_input.item_count() != 0);
-	assert_throw(gpu_activations.item_count() != 0);
+	smart_assert(gpu_weights.item_count() != 0);
+	smart_assert(gpu_input.item_count() != 0);
+	smart_assert(gpu_activations.item_count() != 0);
 
-	assert_throw(gpu_activations.item_count() * gpu_input.item_count() == gpu_weights.item_count());
+	smart_assert(gpu_activations.item_count() * gpu_input.item_count() == gpu_weights.item_count());
 
 
 	unsigned int size = gpu_activations.item_count();
@@ -274,13 +274,13 @@ void gpu_add(
 	{
 		throw std::invalid_argument("gpu_add_matrices failed. size must be greater than 0");
 	}*/
-	assert_throw((gpu_memory_a.get_device_ptr_readonly() != nullptr));
-	assert_throw((gpu_memory_b.get_device_ptr_readonly() != nullptr));
-	assert_throw((gpu_memory_result.get_device_ptr() != nullptr));
+	smart_assert((gpu_memory_a.get_device_ptr_readonly() != nullptr));
+	smart_assert((gpu_memory_b.get_device_ptr_readonly() != nullptr));
+	smart_assert((gpu_memory_result.get_device_ptr() != nullptr));
 
-	assert_throw((gpu_memory_a.item_count() != 0));
-	assert_throw((gpu_memory_a.item_count() == gpu_memory_b.item_count()));
-	assert_throw((gpu_memory_a.item_count() == gpu_memory_result.item_count()));
+	smart_assert((gpu_memory_a.item_count() != 0));
+	smart_assert((gpu_memory_a.item_count() == gpu_memory_b.item_count()));
+	smart_assert((gpu_memory_a.item_count() == gpu_memory_result.item_count()));
 
 	unsigned int size = gpu_memory_a.item_count();
 

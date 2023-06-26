@@ -7,7 +7,7 @@
 void mnist_digit_overlord::label_to_matrix(unsigned char label, matrix& m) const
 {
 	m = matrix(vector3(1, 10, 1));
-	m.set_at(vector3(0, label), 1);
+	m.set_at_host(vector3(0, label), 1);
 }
 
 float mnist_digit_overlord::get_digit_cost(const matrix& output, const matrix& label) const
@@ -125,7 +125,7 @@ void mnist_digit_overlord::load_data(
 				//why is this "reading invalid data from image_buffer" ?
 				unsigned char pixel = image_buffer[pixel_idx];
 
-				current_image.set_at(vector3(j, k), (float)pixel / 255.0f);
+				current_image.set_at_host(vector3(j, k), (float)pixel / 255.0f);
 			}
 		}
 

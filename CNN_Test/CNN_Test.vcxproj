@@ -190,6 +190,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\_coding\Leonardo\LeonardoAi\NeuroFox\smart_assert.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\code\convolutional_layer.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\code\data_space.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\code\enum_space.hpp" />

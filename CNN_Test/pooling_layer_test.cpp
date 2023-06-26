@@ -64,7 +64,7 @@ namespace CNNTest
 		{
 			matrix input(vector3(6, 6, 2));
 			input.set_all(1);
-			input.set_at(vector3(0, 0, 0), 0);
+			input.set_at_host(vector3(0, 0, 0), 0);
 
 			pooling_layer pooling(2, 2, min_pooling);
 			pooling.set_input_format(input.get_format());
@@ -85,7 +85,7 @@ namespace CNNTest
 			matrix input(vector3(6, 6, 2));
 			input.enable_gpu_mode();
 			input.set_all(1);
-			input.set_at(vector3(0, 0, 0), 0);
+			input.set_at_host(vector3(0, 0, 0), 0);
 			input.sync_device_and_host();
 
 			pooling_layer pooling(2, 2, min_pooling);

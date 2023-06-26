@@ -22,7 +22,7 @@ namespace CNNTest
 			matrix m(vector3(2, 3, 4));
 			for (float i = 0; i < 24; i++)
 			{
-				m.set_at_flat(i, i);
+				m.set_at_flat_host(i, i);
 			}
 			std::vector<float> expected_values(24);
 			for (float i = 0; i < 24; i++)
@@ -48,7 +48,7 @@ namespace CNNTest
 			Assert::AreEqual(22.0f, initial_matrix.get_at_host(vector3(1, 0, 0)));
 			Assert::AreEqual(33.0f, initial_matrix.get_at_host(vector3(0, 1, 0)));
 			Assert::AreEqual(44.0f, initial_matrix.get_at_host(vector3(1, 1, 0)));
-			
+
 			Assert::AreEqual(55.0f, initial_matrix.get_at_host(vector3(0, 0, 1)));
 			Assert::AreEqual(66.0f, initial_matrix.get_at_host(vector3(1, 0, 1)));
 			Assert::AreEqual(77.0f, initial_matrix.get_at_host(vector3(0, 1, 1)));
@@ -57,30 +57,30 @@ namespace CNNTest
 		TEST_METHOD(setting_getting)
 		{
 			matrix m(vector3(2, 3, 4));
-			m.set_at(vector3(0, 0, 0), 1);
-			m.set_at(vector3(1, 0, 0), 2);
-			m.set_at(vector3(0, 1, 0), 3);
-			m.set_at(vector3(1, 1, 0), 4);
-			m.set_at(vector3(0, 2, 0), 5);
-			m.set_at(vector3(1, 2, 0), 6);
-			m.set_at(vector3(0, 0, 1), 7);
-			m.set_at(vector3(1, 0, 1), 8);
-			m.set_at(vector3(0, 1, 1), 9);
-			m.set_at(vector3(1, 1, 1), 10);
-			m.set_at(vector3(0, 2, 1), 11);
-			m.set_at(vector3(1, 2, 1), 12);
-			m.set_at(vector3(0, 0, 2), 13);
-			m.set_at(vector3(1, 0, 2), 14);
-			m.set_at(vector3(0, 1, 2), 15);
-			m.set_at(vector3(1, 1, 2), 16);
-			m.set_at(vector3(0, 2, 2), 17);
-			m.set_at(vector3(1, 2, 2), 18);
-			m.set_at(vector3(0, 0, 3), 19);
-			m.set_at(vector3(1, 0, 3), 20);
-			m.set_at(vector3(0, 1, 3), 21);
-			m.set_at(vector3(1, 1, 3), 22);
-			m.set_at(vector3(0, 2, 3), 23);
-			m.set_at(vector3(1, 2, 3), 24);
+			m.set_at_host(vector3(0, 0, 0), 1);
+			m.set_at_host(vector3(1, 0, 0), 2);
+			m.set_at_host(vector3(0, 1, 0), 3);
+			m.set_at_host(vector3(1, 1, 0), 4);
+			m.set_at_host(vector3(0, 2, 0), 5);
+			m.set_at_host(vector3(1, 2, 0), 6);
+			m.set_at_host(vector3(0, 0, 1), 7);
+			m.set_at_host(vector3(1, 0, 1), 8);
+			m.set_at_host(vector3(0, 1, 1), 9);
+			m.set_at_host(vector3(1, 1, 1), 10);
+			m.set_at_host(vector3(0, 2, 1), 11);
+			m.set_at_host(vector3(1, 2, 1), 12);
+			m.set_at_host(vector3(0, 0, 2), 13);
+			m.set_at_host(vector3(1, 0, 2), 14);
+			m.set_at_host(vector3(0, 1, 2), 15);
+			m.set_at_host(vector3(1, 1, 2), 16);
+			m.set_at_host(vector3(0, 2, 2), 17);
+			m.set_at_host(vector3(1, 2, 2), 18);
+			m.set_at_host(vector3(0, 0, 3), 19);
+			m.set_at_host(vector3(1, 0, 3), 20);
+			m.set_at_host(vector3(0, 1, 3), 21);
+			m.set_at_host(vector3(1, 1, 3), 22);
+			m.set_at_host(vector3(0, 2, 3), 23);
+			m.set_at_host(vector3(1, 2, 3), 24);
 			Assert::AreEqual(2, (int)m.get_at_host(vector3(1, 0, 0)));
 			Assert::AreEqual(1, (int)m.get_at_host(vector3(0, 0, 0)));
 			Assert::AreEqual(3, (int)m.get_at_host(vector3(0, 1, 0)));
@@ -118,7 +118,7 @@ namespace CNNTest
 			one_different.set_all(1);
 			size_different.set_all(1);
 
-			one_different.set_at(vector3(0, 0, 0), 2);
+			one_different.set_at_host(vector3(0, 0, 0), 2);
 
 			Assert::IsTrue(matrix::are_equal(original_matrix, original_matrix));
 
@@ -131,37 +131,104 @@ namespace CNNTest
 			Assert::IsFalse(matrix::are_equal(original_matrix, size_different));
 			Assert::IsFalse(matrix::are_equal(size_different, original_matrix));
 		}
-		TEST_METHOD(dot_test_2D)
+		TEST_METHOD(dot_product_flat)
 		{
-			matrix m1(vector3(2, 4, 1));
-			matrix m2(vector3(3, 2, 1));
+			matrix input(vector3(2, 2, 2), std::vector<float> {
+			0, 1,
+			2, 3,
 
-			m1.set_all(3);
-			m2.set_all(2);
+			4, 5,
+			6, 7
+			});
 
-			matrix m3(vector3(3, 4, 1));
-			matrix::dot_product(m1, m2, m3);
+			matrix result(vector3(1, 2, 3));
+			result.set_all(0);
 
-			for (int i = 0; i < m3.item_count(); i++)
-			{
-				Assert::AreEqual(12.0f, m3.get_at_flat_host(i));
-			}
+			matrix weights(vector3(input.item_count(), result.item_count(), 1), std::vector<float> {
+				0, 1, 2, 3, 4, 5, 6, 7, 
+				8, 9, 0, 1, 2, 3, 4, 5, 
+				6, 7, 8, 9, 0, 1, 2, 3, 
+				4, 5, 6, 7, 8, 9, 0, 1, 
+				2, 3, 4, 5, 6, 7, 8, 9, 
+				0, 1, 2, 3, 4, 5, 6, 7
+			});
+
+			matrix::dot_product_flat(weights, input, result);
+			/*
+										0, 
+										1,
+										2, 
+										3,
+										4, 
+										5,
+										6, 
+										7
+				0, 1, 2, 3, 4, 5, 6, 7| 0*0 + 1*1 + 2*2 + 3*3 + 4*4 + 5*5 + 6*6 + 7*7 = 140
+				8, 9, 0, 1, 2, 3, 4, 5| 8*0 + 9*1 + 0*2 + 1*3 + 2*4 + 3*5 + 4*6 + 5*7 = 94
+				6, 7, 8, 9, 0, 1, 2, 3| 6*0 + 7*1 + 8*2 + 9*3 + 0*4 + 1*5 + 2*6 + 3*7 = 88
+				4, 5, 6, 7, 8, 9, 0, 1| 4*0 + 5*1 + 6*2 + 7*3 + 8*4 + 9*5 + 0*6 + 1*7 = 122
+				2, 3, 4, 5, 6, 7, 8, 9| 2*0 + 3*1 + 4*2 + 5*3 + 6*4 + 7*5 + 8*6 + 9*7 = 196
+				0, 1, 2, 3, 4, 5, 6, 7| 0*0 + 1*1 + 2*2 + 3*3 + 4*4 + 5*5 + 6*6 + 7*7 = 140
+			*/
+
+			Assert::AreEqual(140.0f, result.get_at_flat_host(0));
+			Assert::AreEqual(94.0f, result.get_at_flat_host(1));
+			Assert::AreEqual(88.0f, result.get_at_flat_host(2));
+			Assert::AreEqual(122.0f, result.get_at_flat_host(3));
+			Assert::AreEqual(196.0f, result.get_at_flat_host(4));
+			Assert::AreEqual(140.0f, result.get_at_flat_host(5));
 		}
-		TEST_METHOD(dot_test_3D)
+		TEST_METHOD(dot_product_flat_gpu)
 		{
-			matrix m1(vector3(2, 4, 2));
-			matrix m2(vector3(3, 2, 2));
+			matrix input(vector3(2, 2, 2), std::vector<float> {
+				0, 1,
+					2, 3,
 
-			m1.set_all(3);
-			m2.set_all(2);
+					4, 5,
+					6, 7
+			});
 
-			matrix m3(vector3(3, 4, 2));
-			matrix::dot_product(m1, m2, m3);
+			matrix result(vector3(1, 2, 3));
+			result.set_all(0);
 
-			for (int i = 0; i < m3.item_count(); i++)
-			{
-				Assert::AreEqual(12.0f, m3.get_at_flat_host(i));
-			}
+			matrix weights(vector3(input.item_count(), result.item_count(), 1), std::vector<float> {
+				0, 1, 2, 3, 4, 5, 6, 7,
+					8, 9, 0, 1, 2, 3, 4, 5,
+					6, 7, 8, 9, 0, 1, 2, 3,
+					4, 5, 6, 7, 8, 9, 0, 1,
+					2, 3, 4, 5, 6, 7, 8, 9,
+					0, 1, 2, 3, 4, 5, 6, 7
+			});
+
+			input.enable_gpu_mode();
+			result.enable_gpu_mode();
+			weights.enable_gpu_mode();
+
+			matrix::dot_product_flat(weights, input, result);
+			/*
+										0,
+										1,
+										2,
+										3,
+										4,
+										5,
+										6,
+										7
+				0, 1, 2, 3, 4, 5, 6, 7| 0*0 + 1*1 + 2*2 + 3*3 + 4*4 + 5*5 + 6*6 + 7*7 = 140
+				8, 9, 0, 1, 2, 3, 4, 5| 8*0 + 9*1 + 0*2 + 1*3 + 2*4 + 3*5 + 4*6 + 5*7 = 94
+				6, 7, 8, 9, 0, 1, 2, 3| 6*0 + 7*1 + 8*2 + 9*3 + 0*4 + 1*5 + 2*6 + 3*7 = 88
+				4, 5, 6, 7, 8, 9, 0, 1| 4*0 + 5*1 + 6*2 + 7*3 + 8*4 + 9*5 + 0*6 + 1*7 = 122
+				2, 3, 4, 5, 6, 7, 8, 9| 2*0 + 3*1 + 4*2 + 5*3 + 6*4 + 7*5 + 8*6 + 9*7 = 196
+				0, 1, 2, 3, 4, 5, 6, 7| 0*0 + 1*1 + 2*2 + 3*3 + 4*4 + 5*5 + 6*6 + 7*7 = 140
+			*/
+			result.sync_device_and_host();
+
+			Assert::AreEqual(140.0f, result.get_at_flat_host(0));
+			Assert::AreEqual(94.0f, result.get_at_flat_host(1));
+			Assert::AreEqual(88.0f, result.get_at_flat_host(2));
+			Assert::AreEqual(122.0f, result.get_at_flat_host(3));
+			Assert::AreEqual(196.0f, result.get_at_flat_host(4));
+			Assert::AreEqual(140.0f, result.get_at_flat_host(5));
 		}
 		TEST_METHOD(valid_cross_correlation_test)
 		{
@@ -174,10 +241,10 @@ namespace CNNTest
 			*/
 			matrix kernel(vector3(2, 2, 1));
 
-			kernel.set_at(vector3(0, 0), 1);
-			kernel.set_at(vector3(0, 1), 2);
-			kernel.set_at(vector3(1, 0), 3);
-			kernel.set_at(vector3(1, 1), 4);
+			kernel.set_at_host(vector3(0, 0), 1);
+			kernel.set_at_host(vector3(0, 1), 2);
+			kernel.set_at_host(vector3(1, 0), 3);
+			kernel.set_at_host(vector3(1, 1), 4);
 
 			matrix input(vector3(3, 3, 1));
 
@@ -191,15 +258,15 @@ namespace CNNTest
 				+ - + - + - +
 			*/
 
-			input.set_at(vector3(0, 0), 1);
-			input.set_at(vector3(0, 1), 2);
-			input.set_at(vector3(0, 2), 3);
-			input.set_at(vector3(1, 0), 4);
-			input.set_at(vector3(1, 1), 5);
-			input.set_at(vector3(1, 2), 6);
-			input.set_at(vector3(2, 0), 7);
-			input.set_at(vector3(2, 1), 8);
-			input.set_at(vector3(2, 2), 9);
+			input.set_at_host(vector3(0, 0), 1);
+			input.set_at_host(vector3(0, 1), 2);
+			input.set_at_host(vector3(0, 2), 3);
+			input.set_at_host(vector3(1, 0), 4);
+			input.set_at_host(vector3(1, 1), 5);
+			input.set_at_host(vector3(1, 2), 6);
+			input.set_at_host(vector3(2, 0), 7);
+			input.set_at_host(vector3(2, 1), 8);
+			input.set_at_host(vector3(2, 2), 9);
 
 			matrix output(vector3(2, 2, 1));
 			output.set_all(0);
@@ -234,10 +301,10 @@ namespace CNNTest
 			matrix m2 = matrix(m);
 			Assert::IsTrue(matrix::are_equal(m, m2));
 
-			m2.set_at(vector3(0, 0, 0), 2);
+			m2.set_at_host(vector3(0, 0, 0), 2);
 			Assert::AreNotEqual(2.0f, m.get_at_host(vector3(0, 0, 0)));
 
-			m.set_at(vector3(0, 0, 1), 3);
+			m.set_at_host(vector3(0, 0, 1), 3);
 			Assert::AreNotEqual(3.0f, m2.get_at_host(vector3(0, 0, 1)));
 		}
 		TEST_METHOD(subtract)
@@ -246,7 +313,7 @@ namespace CNNTest
 			m.set_all(5);
 			matrix m2 = matrix(vector3(2, 3, 5));
 			m2.set_all(2);
-			
+
 			matrix result(vector3(2, 3, 5));
 
 			matrix::subtract(m, m2, result);
@@ -262,7 +329,7 @@ namespace CNNTest
 			m.set_all(2);
 			matrix m2 = matrix(vector3(2, 3, 5));
 			m2.set_all(5);
-			
+
 			matrix result(vector3(2, 3, 5));
 
 			matrix::subtract(m, m2, result);
@@ -317,13 +384,13 @@ namespace CNNTest
 		{
 			matrix m = matrix(vector3(2, 3, 5));
 			m.set_all(1);
-			m.set_at_flat(0, 0);
+			m.set_at_flat_host(0, 0);
 
 			m.apply_activation_function(e_activation_t::sigmoid_fn);
 
 			matrix expected(vector3(2, 3, 5));
 			expected.set_all(sigmoid(1));
-			expected.set_at_flat(0, sigmoid(0));
+			expected.set_at_flat_host(0, sigmoid(0));
 
 			Assert::IsTrue(matrix::are_equal(expected, m));
 		}
@@ -331,13 +398,13 @@ namespace CNNTest
 		{
 			matrix m = matrix(vector3(2, 3, 5));
 			m.set_all(-1);
-			m.set_at_flat(0, 5);
+			m.set_at_flat_host(0, 5);
 
 			m.apply_activation_function(e_activation_t::relu_fn);
 
 			matrix expected(vector3(2, 3, 5));
 			expected.set_all(relu(-1));
-			expected.set_at_flat(0, relu(5));
+			expected.set_at_flat_host(0, relu(5));
 
 			Assert::IsTrue(matrix::are_equal(expected, m));
 		}
@@ -345,7 +412,7 @@ namespace CNNTest
 		{
 			matrix m = matrix(vector3(2, 3, 5));
 			m.set_all(1);
-			m.set_at_flat(0, 0);
+			m.set_at_flat_host(0, 0);
 			m.enable_gpu_mode();
 
 			m.apply_activation_function(e_activation_t::sigmoid_fn);
@@ -353,7 +420,7 @@ namespace CNNTest
 
 			matrix expected(vector3(2, 3, 5));
 			expected.set_all(sigmoid(1));
-			expected.set_at_flat(0, sigmoid(0));
+			expected.set_at_flat_host(0, sigmoid(0));
 
 			Assert::IsTrue(matrix::are_equal(expected, m));
 		}
@@ -361,7 +428,7 @@ namespace CNNTest
 		{
 			matrix m = matrix(vector3(2, 3, 5));
 			m.set_all(-1);
-			m.set_at_flat(0, 5);
+			m.set_at_flat_host(0, 5);
 			m.enable_gpu_mode();
 
 			m.apply_activation_function(e_activation_t::relu_fn);
@@ -369,7 +436,7 @@ namespace CNNTest
 
 			matrix expected(vector3(2, 3, 5));
 			expected.set_all(relu(-1));
-			expected.set_at_flat(0, relu(5));
+			expected.set_at_flat_host(0, relu(5));
 
 			Assert::IsTrue(matrix::are_equal(expected, m));
 		}
