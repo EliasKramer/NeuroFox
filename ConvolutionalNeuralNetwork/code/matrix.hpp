@@ -6,8 +6,8 @@
 #include "math_functions.hpp"
 #include "vector3.hpp"
 #include "gpu_math.cuh"
-#include <cuda_runtime.h>
 #include "enum_space.hpp"
+#include "assert_throw.hpp"
 
 class matrix {
 private:
@@ -66,12 +66,16 @@ public:
 	~matrix();
 
 	void sync_device_and_host();
+	bool is_device_and_host_synced() const;
+	bool device_data_is_updated() const;
+	bool host_data_is_updated() const;
 	void enable_gpu_mode();
 	bool is_in_gpu_mode() const;
 
 	void set_data_from_src(const matrix& src);
 	void set_all(float value);
 	void apply_noise(float range);
+	void apply_noise(float min, float max);
 	void mutate(float range);
 
 	void write_to_ofstream(std::ofstream& file) const;
@@ -83,7 +87,7 @@ public:
 	size_t item_count() const;
 
 	float get_at_flat_host(size_t idx) const;
-	void set_at_flat(size_t idx, float value);
+	void set_at_flat_host(size_t idx, float value);
 	void add_at_flat(size_t idx, float value);
 
 	float* get_device_ptr();
@@ -103,14 +107,12 @@ public:
 	void set_row_from_matrix(const matrix& m, size_t row_idx, size_t item_idx);
 
 	//setter
-	void set_at(vector3 position, float value);
+	void set_at_host(vector3 position, float value);
 	void add_at_host(vector3 position, float value);
 
 	//getter
 	float get_at_host(vector3 pos) const;
 
-	//TODO - implement for gpu
-	static void dot_product(const matrix& a, const matrix& b, matrix& result);
 	static void dot_product_flat(const matrix& a, const matrix& flat, matrix& result_flat);
 
 	static void add(const matrix& a, const matrix& b, matrix& result);

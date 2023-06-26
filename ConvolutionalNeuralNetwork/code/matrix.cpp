@@ -93,6 +93,7 @@ void matrix::copy_device_to_host()
 		device_data,
 		item_count() * sizeof(float),
 		cudaMemcpyDeviceToHost);
+	if_cuda_error_throw();
 }
 
 void matrix::if_cuda_error_throw() const
@@ -356,6 +357,21 @@ void matrix::sync_device_and_host()
 	last_updated_data = nullptr;
 }
 
+bool matrix::is_device_and_host_synced() const
+{
+	return last_updated_data == nullptr;
+}
+
+bool matrix::device_data_is_updated() const
+{
+	return last_updated_data == device_data || is_device_and_host_synced();
+}
+
+bool matrix::host_data_is_updated() const
+{
+	return  last_updated_data == host_data || is_device_and_host_synced();
+}
+
 matrix& matrix::operator=(const matrix& other)
 {
 	other.if_not_initialized_throw();
@@ -429,11 +445,16 @@ void matrix::set_all(float value)
 
 void matrix::apply_noise(float range)
 {
+	apply_noise(-range, range);
+}
+
+void matrix::apply_noise(float min, float max)
+{
 	if_not_initialized_throw();
 
 	for (int i = 0; i < item_count(); i++)
 	{
-		host_data[i] += random_float_excl(-range, range);
+		host_data[i] += random_float_excl(min, max);
 	}
 
 	if (gpu_enabled)
@@ -495,7 +516,7 @@ float matrix::get_at_flat_host(size_t idx) const
 	return host_data[idx];
 }
 
-void matrix::set_at_flat(size_t idx, float value)
+void matrix::set_at_flat_host(size_t idx, float value)
 {
 	if_not_initialized_throw();
 
@@ -511,7 +532,7 @@ void matrix::set_at_flat(size_t idx, float value)
 
 void matrix::add_at_flat(size_t idx, float value)
 {
-	set_at_flat(idx, get_at_flat_host(idx) + value);
+	set_at_flat_host(idx, get_at_flat_host(idx) + value);
 }
 
 float* matrix::get_device_ptr()
@@ -576,6 +597,10 @@ void matrix::observe_row(matrix& m, size_t row_idx, size_t item_idx)
 	{
 		throw std::invalid_argument("item_idx must be in range");
 	}
+	if (m.is_in_gpu_mode() != is_in_gpu_mode())
+	{
+		throw std::invalid_argument("m must be in the same mode as this");
+	}
 	//if we have a matrix that is currently 3x3 it has an item count of 9
 	//lets say the given matrix is 12x12 (the given matrix is named m)
 	//we select the current row of the given matrix
@@ -620,6 +645,7 @@ void matrix::set_row_from_matrix(const matrix& m, size_t row_idx, size_t item_id
 {
 	m.if_not_initialized_throw();
 	if_not_initialized_throw();
+
 	if (!owning_data)
 	{
 		throw std::invalid_argument("this matrix must own its data");
@@ -631,6 +657,10 @@ void matrix::set_row_from_matrix(const matrix& m, size_t row_idx, size_t item_id
 	if (item_idx >= get_width())
 	{
 		throw std::invalid_argument("item_idx must be in range");
+	}
+	if (m.is_in_gpu_mode() != is_in_gpu_mode())
+	{
+		throw std::invalid_argument("both matrices must be in the same mode");
 	}
 	//lets say our matrix is 5x5, the item count is 25
 	//if our given matrix (named m) is 2x2, the item count is 4
@@ -697,13 +727,24 @@ void matrix::set_row_from_matrix(const matrix& m, size_t row_idx, size_t item_id
 		throw std::invalid_argument("the item count on this matrix must match the amount of items left in the given row");
 	}
 
-	float* new_ptr = get_ptr_item(host_data, item_idx, row_idx, 0);
-	memcpy(new_ptr, m.host_data, m.item_count() * sizeof(float));
+	if (is_in_gpu_mode())
+	{
+		float* new_ptr = get_ptr_item(device_data, item_idx, row_idx, 0);
 
-	set_host_as_last_updated();
+		cudaMemcpy(new_ptr, m.device_data, m.item_count() * sizeof(float), cudaMemcpyDeviceToDevice);
+		if_cuda_error_throw();
+		set_device_as_last_updated();
+	}
+	else
+	{
+		float* new_ptr = get_ptr_item(host_data, item_idx, row_idx, 0);
+		memcpy(new_ptr, m.host_data, m.item_count() * sizeof(float));
+
+		set_host_as_last_updated();
+	}
 }
 
-void matrix::set_at(vector3 pos, float value)
+void matrix::set_at_host(vector3 pos, float value)
 {
 	if_not_initialized_throw();
 	if_not_owning_throw();
@@ -718,7 +759,7 @@ void matrix::set_at(vector3 pos, float value)
 
 void matrix::add_at_host(vector3 pos, float value)
 {
-	set_at(pos, get_at_host(pos) + value);
+	set_at_host(pos, get_at_host(pos) + value);
 }
 
 float matrix::get_at_host(vector3 pos) const
@@ -731,59 +772,26 @@ float matrix::get_at_host(vector3 pos) const
 	return host_data[pos.get_index(format)];
 }
 
-void matrix::dot_product(const matrix& a, const matrix& b, matrix& result)
-{
-	a.if_not_initialized_throw();
-	b.if_not_initialized_throw();
-	result.if_not_initialized_throw();
-
-	if (a.get_width() != b.get_height() || a.get_depth() != b.get_depth())
-	{
-		throw std::invalid_argument("dot product could not be performed. input matrices are in the wrong format");
-	}
-	if (result.get_width() != b.get_width() || result.get_height() != a.get_height() || result.get_depth() != a.get_depth())
-	{
-		throw std::invalid_argument("dot product could not be performed. result matrix is not the correct size");
-	}
-
-	if (a.gpu_enabled || b.gpu_enabled || result.gpu_enabled)
-	{
-		throw std::exception("no proper dot product implemented on the gpu. use dot_product_flat");
-		result.set_device_as_last_updated();
-		return;
-	}
-
-	for (int z = 0; z < result.get_depth(); z++)
-	{
-		for (int y = 0; y < result.get_height(); y++)
-		{
-			for (int x = 0; x < result.get_width(); x++)
-			{
-				float sum = 0;
-				for (int i = 0; i < a.get_width(); i++)
-				{
-					sum += a.get_at_host(vector3(i, y, z)) * b.get_at_host(vector3(x, i, z));
-				}
-				result.set_at(vector3(x, y, z), sum);
-			}
-		}
-	}
-	result.set_host_as_last_updated();
-}
-
 void matrix::dot_product_flat(const matrix& a, const matrix& flat, matrix& result_flat)
 {
+
+	/*
 	a.if_not_initialized_throw();
 	flat.if_not_initialized_throw();
 	result_flat.if_not_initialized_throw();
-
 	if (a.get_width() != flat.item_count() ||
 		a.get_height() != result_flat.item_count() ||
-		a.get_depth() != 1 ||
-		result_flat.get_depth() != 1)
+		a.get_depth() != 1 )//||
+		//result_flat.get_depth() != 1)
 	{
 		throw std::invalid_argument("dot product could not be performed. input matrices are in the wrong format");
-	}
+	}*/
+	assert_throw(a.is_initialized());
+	assert_throw(flat.is_initialized());
+	assert_throw(result_flat.is_initialized());
+	assert_throw(a.get_width() == flat.item_count());
+	assert_throw(a.get_height() == result_flat.item_count());
+	assert_throw(a.get_depth() == 1); // i think doesnt have to be checked. it would work with depth > 1
 
 	if (a.gpu_enabled &&
 		flat.gpu_enabled &&
@@ -796,7 +804,7 @@ void matrix::dot_product_flat(const matrix& a, const matrix& flat, matrix& resul
 
 	for (int y = 0; y < a.get_height(); y++)
 	{
-		result_flat.set_at_flat(y, 0);
+		result_flat.set_at_flat_host(y, 0);
 		for (int x = 0; x < a.get_width(); x++)
 		{
 			result_flat.add_at_flat(y, a.get_at_host(vector3(x, y)) * flat.get_at_flat_host(x));
@@ -807,10 +815,10 @@ void matrix::dot_product_flat(const matrix& a, const matrix& flat, matrix& resul
 
 void matrix::add(const matrix& a, const matrix& b, matrix& result)
 {
+	/*
 	a.if_not_initialized_throw();
 	b.if_not_initialized_throw();
 	result.if_not_initialized_throw();
-
 	if (a.get_width() != b.get_width() || a.get_height() != b.get_height() || a.get_depth() != b.get_depth())
 	{
 		throw std::invalid_argument("addition could not be performed. input matrices are in the wrong format");
@@ -819,7 +827,19 @@ void matrix::add(const matrix& a, const matrix& b, matrix& result)
 	{
 		throw std::invalid_argument("addition could not be performed. result matrix is not the correct size");
 	}
+	*/
+	assert_throw(a.is_initialized());
+	assert_throw(b.is_initialized());
+	assert_throw(result.is_initialized());
 
+	assert_throw(a.get_width() == b.get_width());
+	assert_throw(a.get_height() == b.get_height());
+	assert_throw(a.get_depth() == b.get_depth());
+	
+	assert_throw(a.get_width() == result.get_width());
+	assert_throw(a.get_height() == result.get_height());
+	assert_throw(a.get_depth() == result.get_depth());
+	
 	if (a.gpu_enabled &&
 		b.gpu_enabled &&
 		result.gpu_enabled)
@@ -975,13 +995,13 @@ void matrix::pooling(
 				switch (pooling_type)
 				{
 				case max_pooling:
-					output.set_at(vector3(x, y, d), max);
+					output.set_at_host(vector3(x, y, d), max);
 					break;
 				case min_pooling:
-					output.set_at(vector3(x, y, d), min);
+					output.set_at_host(vector3(x, y, d), min);
 					break;
 				case average_pooling:
-					output.set_at(vector3(x, y, d), sum / (kernel_size * kernel_size));
+					output.set_at_host(vector3(x, y, d), sum / (kernel_size * kernel_size));
 					break;
 				default:
 					throw std::runtime_error("Invalid pooling type");
@@ -1053,13 +1073,13 @@ void matrix::fully_connected_backprop(
 			float weight = weights.get_at_host(vector3(input_idx, neuron_idx));
 
 			weight_deltas.add_at_host(
-				vector3(input_idx, neuron_idx), 
+				vector3(input_idx, neuron_idx),
 				error_value * activation_derivative * input_value);
 
 			//passing error is null when this is the first layer
 			if (passing_error != nullptr)
 			{
-				passing_error->set_at_flat(input_idx, error_value * activation_derivative * weight);
+				passing_error->set_at_flat_host(input_idx, error_value * activation_derivative * weight);
 			}
 		}
 	}
