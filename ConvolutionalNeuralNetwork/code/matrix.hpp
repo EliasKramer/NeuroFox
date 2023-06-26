@@ -112,6 +112,9 @@ public:
 	//getter
 	float get_at_host(vector3 pos) const;
 
+	//matrix contains at least one item that is not zero
+	bool contains_non_zero_items();
+
 	static void dot_product_flat(const matrix& a, const matrix& flat, matrix& result_flat);
 
 	static void add(const matrix& a, const matrix& b, matrix& result);
@@ -139,7 +142,7 @@ public:
 
 	static bool are_equal(const matrix& a, const matrix& b);
 	static bool are_equal(const matrix& a, const matrix& b, float tolerance);
-	static bool equal_format(const matrix& a, const matrix& b);
+	static bool nn_equal_format(const matrix& a, const matrix& b);
 
 
 	static void cross_correlation(

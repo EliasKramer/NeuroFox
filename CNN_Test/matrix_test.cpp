@@ -134,34 +134,34 @@ namespace CNNTest
 		TEST_METHOD(dot_product_flat)
 		{
 			matrix input(vector3(2, 2, 2), std::vector<float> {
-			0, 1,
-			2, 3,
+				0, 1,
+					2, 3,
 
-			4, 5,
-			6, 7
+					4, 5,
+					6, 7
 			});
 
 			matrix result(vector3(1, 2, 3));
 			result.set_all(0);
 
 			matrix weights(vector3(input.item_count(), result.item_count(), 1), std::vector<float> {
-				0, 1, 2, 3, 4, 5, 6, 7, 
-				8, 9, 0, 1, 2, 3, 4, 5, 
-				6, 7, 8, 9, 0, 1, 2, 3, 
-				4, 5, 6, 7, 8, 9, 0, 1, 
-				2, 3, 4, 5, 6, 7, 8, 9, 
-				0, 1, 2, 3, 4, 5, 6, 7
+				0, 1, 2, 3, 4, 5, 6, 7,
+					8, 9, 0, 1, 2, 3, 4, 5,
+					6, 7, 8, 9, 0, 1, 2, 3,
+					4, 5, 6, 7, 8, 9, 0, 1,
+					2, 3, 4, 5, 6, 7, 8, 9,
+					0, 1, 2, 3, 4, 5, 6, 7
 			});
 
 			matrix::dot_product_flat(weights, input, result);
 			/*
-										0, 
+										0,
 										1,
-										2, 
+										2,
 										3,
-										4, 
+										4,
 										5,
-										6, 
+										6,
 										7
 				0, 1, 2, 3, 4, 5, 6, 7| 0*0 + 1*1 + 2*2 + 3*3 + 4*4 + 5*5 + 6*6 + 7*7 = 140
 				8, 9, 0, 1, 2, 3, 4, 5| 8*0 + 9*1 + 0*2 + 1*3 + 2*4 + 3*5 + 4*6 + 5*7 = 94
@@ -439,6 +439,29 @@ namespace CNNTest
 			expected.set_at_flat_host(0, relu(5));
 
 			Assert::IsTrue(matrix::are_equal(expected, m));
+		}
+		TEST_METHOD(not_all_items_zero_host_test)
+		{
+			matrix m = matrix(vector3(2, 3, 5));
+			m.set_all(0);
+
+			Assert::IsFalse(m.contains_non_zero_items());
+
+			m.set_at_flat_host(0, 1);
+			Assert::IsTrue(m.contains_non_zero_items());
+		}
+		TEST_METHOD(not_all_items_zero_device_test)
+		{
+			matrix m = matrix(vector3(100, 3, 5));
+			m.set_all(0);
+			m.enable_gpu_mode();
+
+			Assert::IsFalse(m.contains_non_zero_items());
+
+			m.set_at_flat_host(m.item_count() - 1, 1);
+			m.sync_device_and_host();
+
+			Assert::IsTrue(m.contains_non_zero_items());
 		}
 	};
 }

@@ -170,8 +170,8 @@ void mnist_digit_overlord::enable_gpu()
 	auto end = std::chrono::high_resolution_clock::now();
 	std::cout
 		<< "copied to gpu, took "
-		<< std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()
-		<< "ms" << std::endl;
+		<< ms_to_str(std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count())
+		<< std::endl;
 }
 
 mnist_digit_overlord::mnist_digit_overlord()
@@ -191,19 +191,19 @@ mnist_digit_overlord::mnist_digit_overlord()
 		base_path + "\\t10k-labels.idx1-ubyte");
 	auto end = std::chrono::high_resolution_clock::now();
 	std::cout << "data loaded, took " <<
-		std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() <<
-		"ms" <<
+		ms_to_str(std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()) <<
 		std::endl;
 
 	nn.set_input_format(vector3(28, 28, 1));
 	//nn.add_pooling_layer(2, 2, e_pooling_type_t::average_pooling);
 	//nn.add_convolutional_layer(2, 3, 1, e_activation_t::sigmoid_fn);
 	//nn.add_fully_connected_layer(16, e_activation_t::sigmoid_fn);
-	nn.add_fully_connected_layer(16, e_activation_t::sigmoid_fn);
-	nn.add_fully_connected_layer(vector3(1, 10, 1), e_activation_t::sigmoid_fn);
+	nn.add_fully_connected_layer(20, e_activation_t::leaky_relu_fn);
+	nn.add_fully_connected_layer(20, e_activation_t::leaky_relu_fn);
+	nn.add_fully_connected_layer(vector3(1, 10, 1), e_activation_t::leaky_relu_fn);
 	nn.set_all_parameters(0);
 
-	nn.apply_noise(0.1f);
+	nn.apply_noise(.1);
 	enable_gpu();
 }
 
@@ -214,7 +214,7 @@ void mnist_digit_overlord::debug_function()
 	load_from_file();
 	neural_network after = nn;
 
-	bool same_format = before.equal_format(after);
+	bool same_format = before.nn_equal_format(after);
 	bool same_parameters = before.equal_parameter(after);
 
 	std::cout << "same format: " << same_format << std::endl;
@@ -233,8 +233,8 @@ void mnist_digit_overlord::save_to_file()
 	auto end = std::chrono::high_resolution_clock::now();
 	std::cout
 		<< "saved to file, took "
-		<< std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()
-		<< "us" << std::endl;
+		<< ms_to_str(std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count())
+		<< std::endl;
 }
 
 void mnist_digit_overlord::load_from_file()
@@ -248,8 +248,8 @@ void mnist_digit_overlord::load_from_file()
 	auto end = std::chrono::high_resolution_clock::now();
 	std::cout
 		<< "loaded from file, took "
-		<< std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()
-		<< "us" << std::endl;
+		<< ms_to_str(std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count())
+		<< std::endl;
 }
 
 void mnist_digit_overlord::print_nn_size() const
@@ -311,12 +311,11 @@ void mnist_digit_overlord::train(
 
 	auto start = std::chrono::high_resolution_clock::now();
 
-	nn.learn_on_ds(ds_training, epochs, batch_size, learning_rate);
+	nn.learn_on_ds(ds_training, epochs, batch_size, learning_rate, true);
 
 	auto end = std::chrono::high_resolution_clock::now();
 
 	std::cout << "training finished, took " <<
-		std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() <<
-		"ms" <<
+		ms_to_str(std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()) <<
 		std::endl;
 }

@@ -180,6 +180,17 @@ const matrix& data_space::get_current_data()
 
 	return data_iterator;
 }
+matrix& data_space::get_current_data_REMOVE_LATER()
+{
+	if_not_initialized_throw();
+	/*
+	float* data_ptr = data_table.get_ptr_row(iterator_idx, 0);
+	data_iterator.set_ptr_as_source(data_ptr);
+	*/
+	data_iterator.observe_row(data_table, iterator_idx);
+
+	return data_iterator;
+}
 
 const matrix& data_space::get_current_label()
 {

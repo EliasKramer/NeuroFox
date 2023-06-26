@@ -40,10 +40,10 @@ namespace CNNTest
 			not_same_3.add_fully_connected_layer(15, e_activation_t::relu_fn);
 			not_same_3.set_all_parameters(1.0f);
 
-			Assert::AreEqual(true, nn.equal_format(same));
-			Assert::AreEqual(false, nn.equal_format(not_same_1));
-			Assert::AreEqual(false, nn.equal_format(not_same_2));
-			Assert::AreEqual(false, nn.equal_format(not_same_3));
+			Assert::AreEqual(true, nn.nn_equal_format(same));
+			Assert::AreEqual(false, nn.nn_equal_format(not_same_1));
+			Assert::AreEqual(false, nn.nn_equal_format(not_same_2));
+			Assert::AreEqual(false, nn.nn_equal_format(not_same_3));
 		}
 		TEST_METHOD(nn_equal_parameter_test)
 		{
@@ -85,12 +85,12 @@ namespace CNNTest
 			nn.set_all_parameters(1.0f);
 
 			neural_network copy(nn);
-			Assert::AreEqual(true, nn.equal_format(copy));
+			Assert::AreEqual(true, nn.nn_equal_format(copy));
 			Assert::AreEqual(true, nn.equal_parameter(copy));
 
 			copy.mutate(5);
 			Assert::AreEqual(false, nn.equal_parameter(copy));
-			Assert::AreEqual(true, nn.equal_format(copy));
+			Assert::AreEqual(true, nn.nn_equal_format(copy));
 		}
 		TEST_METHOD(nn_set_parameter_test)
 		{
@@ -104,12 +104,12 @@ namespace CNNTest
 			copy.mutate(5);
 			
 			Assert::AreEqual(false, nn.equal_parameter(copy));
-			Assert::AreEqual(true, nn.equal_format(copy));
+			Assert::AreEqual(true, nn.nn_equal_format(copy));
 
 			copy.set_parameters(nn);
 
 			Assert::AreEqual(true, nn.equal_parameter(copy));
-			Assert::AreEqual(true, nn.equal_format(copy));
+			Assert::AreEqual(true, nn.nn_equal_format(copy));
 		}
 	};
 }

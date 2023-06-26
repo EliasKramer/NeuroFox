@@ -73,6 +73,7 @@ public:
 	void copy_to_gpu();
 
 	const matrix& get_current_data();
+	matrix& get_current_data_REMOVE_LATER();
 	const matrix& get_current_label();
 	void set_current_data(const matrix& m);
 	void set_current_label(const matrix& m);

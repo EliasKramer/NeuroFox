@@ -123,7 +123,7 @@ void matrix::copy_host2host_from(const matrix& src)
 	smart_assert(src.is_initialized());
 
 	smart_assert(is_owning_data());
-	smart_assert(equal_format(*this, src));
+	smart_assert(nn_equal_format(*this, src));
 
 	std::copy(src.host_data, src.host_data + item_count(), this->host_data);
 	set_host_as_last_updated();
@@ -140,7 +140,7 @@ void matrix::copy_device2device_from(const matrix& src)
 	smart_assert(is_in_gpu_mode());
 	smart_assert(src.is_in_gpu_mode());
 	
-	smart_assert(equal_format(*this, src));
+	smart_assert(nn_equal_format(*this, src));
 
 	cudaMemcpy(
 		device_data,
@@ -677,6 +677,23 @@ float matrix::get_at_host(vector3 pos) const
 	return host_data[pos.get_index(format)];
 }
 
+bool matrix::contains_non_zero_items() {
+	smart_assert(is_initialized());
+
+	//tried to do this in cuda as well,
+	//but it was slower than doing it on the cpu
+	sync_device_and_host();
+	
+	for (int i = 0; i < item_count(); i++)
+	{
+		if (host_data[i] != 0)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 void matrix::dot_product_flat(const matrix& a, const matrix& flat, matrix& result_flat)
 {
 	smart_assert(a.is_initialized());
@@ -768,8 +785,8 @@ void matrix::subtract(const matrix& a, const matrix& b, matrix& result)
 	smart_assert(result.is_initialized());
 	smart_assert(result.is_owning_data());
 
-	smart_assert(equal_format(a, b));
-	smart_assert(equal_format(b, result));
+	smart_assert(nn_equal_format(a, b));
+	smart_assert(nn_equal_format(b, result));
 
 	if (a.gpu_enabled &&
 		b.gpu_enabled &&
@@ -906,7 +923,7 @@ void matrix::fully_connected_backprop(
 	smart_assert(weight_deltas.is_owning_data());
 	smart_assert(passing_error == nullptr || passing_error->is_initialized());
 
-	smart_assert(matrix::equal_format(activations, error));
+	smart_assert(matrix::nn_equal_format(activations, error));
 
 	if (activations.is_in_gpu_mode() &&
 		weights.is_in_gpu_mode() &&
@@ -982,7 +999,7 @@ bool matrix::are_equal(const matrix& a, const matrix& b, float tolerance)
 	a.if_not_initialized_throw();
 	b.if_not_initialized_throw();
 
-	if (!equal_format(a, b))
+	if (!nn_equal_format(a, b))
 	{
 		return false;
 	}
@@ -997,7 +1014,7 @@ bool matrix::are_equal(const matrix& a, const matrix& b, float tolerance)
 	return true;
 }
 
-bool matrix::equal_format(const matrix& a, const matrix& b)
+bool matrix::nn_equal_format(const matrix& a, const matrix& b)
 {
 	return vector3::are_equal(a.format, b.format);
 }
@@ -1109,7 +1126,7 @@ void matrix::apply_deltas(
 	smart_assert(delta.is_initialized());
 	smart_assert(delta.is_owning_data()); // this must be true, because we set the deltas to zero after applying them
 	smart_assert(delta.gpu_enabled == gpu_enabled);
-	smart_assert(matrix::equal_format(*this, delta));
+	smart_assert(matrix::nn_equal_format(*this, delta));
 
 	if (gpu_enabled)
 	{
