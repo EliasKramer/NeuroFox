@@ -61,7 +61,7 @@ public:
 	void enable_gpu_mode() override;
 	void disable_gpu() override;
 
-	bool equal_format(const layer& other) override;
+	bool nn_equal_format(const layer& other) override;
 	bool equal_parameter(const layer& other) override;
 	void set_parameters(const layer& other) override;
 

@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "util.hpp"
 
 class test_result
 {
