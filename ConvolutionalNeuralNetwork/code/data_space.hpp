@@ -29,6 +29,7 @@ private:
 	matrix data_table;
 
 	size_t iterator_idx = 0;
+	std::vector<size_t> shuffle_table;
 	
 	matrix data_iterator;
 	matrix label_iterator;
@@ -41,6 +42,8 @@ private:
 
 	void if_not_initialized_throw() const;
 	void allocate_data_table();
+
+	void init_shuffle_table();
 public:
 	data_space();
 	data_space(size_t given_item_count, vector3 data_format);
@@ -59,6 +62,8 @@ public:
 
 	size_t get_item_count() const;
 
+	void shuffle();
+
 	void iterator_next();
 	void iterator_reset();
 	bool iterator_has_next() const;
@@ -72,8 +77,8 @@ public:
 
 	void copy_to_gpu();
 
-	const matrix& get_current_data();
-	matrix& get_current_data_REMOVE_LATER();
+	const matrix& get_current_data_readonly();
+	matrix& get_current_data();
 	const matrix& get_current_label();
 	void set_current_data(const matrix& m);
 	void set_current_label(const matrix& m);

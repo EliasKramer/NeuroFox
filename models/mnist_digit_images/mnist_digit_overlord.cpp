@@ -204,7 +204,7 @@ mnist_digit_overlord::mnist_digit_overlord()
 	nn.set_all_parameters(0);
 
 	nn.apply_noise(.1);
-	enable_gpu();
+	//enable_gpu();
 }
 
 void mnist_digit_overlord::debug_function()
@@ -270,7 +270,7 @@ test_result mnist_digit_overlord::test()
 
 	do
 	{
-		const matrix& input = ds_test.get_current_data();
+		const matrix& input = ds_test.get_current_data_readonly();
 		const matrix& label = ds_test.get_current_label();
 		nn.forward_propagation(input);
 		nn.get_output().sync_device_and_host();
@@ -311,7 +311,26 @@ void mnist_digit_overlord::train(
 
 	auto start = std::chrono::high_resolution_clock::now();
 
-	nn.learn_on_ds(ds_training, epochs, batch_size, learning_rate, true);
+	float inital_learning_rate = learning_rate;
+	float current_learing_rate = inital_learning_rate;
+	float percent_correct = 0;
+	for (size_t i = 0; i < epochs; i++)
+	{
+		nn.learn_on_ds(ds_training, 1, batch_size, current_learing_rate, false);
+		test_result res = test();
+		float perc_diff = res.accuracy - percent_correct;
+		std::cout << res.to_string();
+		std::cout << "epoch " << i << ": " << res.accuracy << " (" << perc_diff << ")" << std::endl;
+		if (perc_diff < 0.005)
+		{
+			current_learing_rate *= .8f;
+		}
+		else {
+			current_learing_rate /= .9f;
+		}
+		percent_correct = res.accuracy;
+		std::cout << "learning rate: " << current_learing_rate << std::endl;
+	}
 
 	auto end = std::chrono::high_resolution_clock::now();
 

@@ -319,9 +319,9 @@ void neural_network::learn_on_ds(
 	float learning_rate,
 	bool input_zero_check)
 {
-	smart_assert(ds.get_current_data().is_in_gpu_mode() == is_in_gpu_mode());
+	smart_assert(ds.get_current_data_readonly().is_in_gpu_mode() == is_in_gpu_mode());
 	smart_assert(ds.get_current_label().is_in_gpu_mode() == is_in_gpu_mode());
-	smart_assert(vector3::are_equal(ds.get_current_data().get_format(), input_format));
+	smart_assert(vector3::are_equal(ds.get_current_data_readonly().get_format(), input_format));
 	smart_assert(vector3::are_equal(ds.get_current_label().get_format(), get_output_readonly().get_format()));
 	smart_assert(ds.get_item_count() > 0);
 
@@ -342,7 +342,7 @@ void neural_network::learn_on_ds(
 				ds.iterator_next();
 			}
 
-			matrix& input = ds.get_current_data_REMOVE_LATER();
+			matrix& input = ds.get_current_data();
 			const matrix& label = ds.get_current_label();
 			
 			if (!input_zero_check || input.contains_non_zero_items())
@@ -363,6 +363,7 @@ void neural_network::learn_on_ds(
 			apply_deltas(batch_item, learning_rate);
 			batch_item = 0;
 		}
+		ds.shuffle();
 	}
 }
 

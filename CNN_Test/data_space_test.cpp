@@ -64,11 +64,11 @@ namespace CNNTest
 			m2.set_all(2.0f);
 
 
-			matrix m = ds.get_current_data();
+			matrix m = ds.get_current_data_readonly();
 			Assert::IsTrue(matrix::are_equal(m1, m));
 
 			ds.iterator_next();
-			m = ds.get_current_data();
+			m = ds.get_current_data_readonly();
 			Assert::IsTrue(matrix::are_equal(m2, m));
 		}
 		TEST_METHOD(get_data_and_label_test)
@@ -104,7 +104,7 @@ namespace CNNTest
 			matrix expected_data(vector3(2, 2, 3));
 			matrix expected_label(vector3(1, 2, 1));
 
-			matrix m = ds.get_current_data();
+			matrix m = ds.get_current_data_readonly();
 			matrix l = ds.get_current_label();
 			expected_data.set_all(1.0f);
 			expected_data.set_at_flat_host(0, 0.9f);
@@ -115,7 +115,7 @@ namespace CNNTest
 
 			ds.iterator_next();
 
-			m = ds.get_current_data();
+			m = ds.get_current_data_readonly();
 			l = ds.get_current_label();
 			expected_data.set_all(5.0f);
 			expected_data.set_at_flat_host(0, 4.9f);

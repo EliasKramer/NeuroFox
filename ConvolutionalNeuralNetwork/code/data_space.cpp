@@ -40,6 +40,17 @@ void data_space::allocate_data_table()
 	data_table.set_all(0);
 }
 
+void data_space::init_shuffle_table()
+{
+	if_not_initialized_throw();
+	shuffle_table.clear();
+	shuffle_table.resize(item_count);
+	for (size_t i = 0; i < item_count; i++)
+	{
+		shuffle_table[i] = i;
+	}
+}
+
 data_space::data_space()
 {}
 
@@ -51,7 +62,8 @@ data_space::data_space(
 		given_item_count,
 		data_format,
 		vector3(0, 0, 0))
-{}
+{
+}
 
 data_space::data_space(
 	size_t given_item_count,
@@ -63,6 +75,7 @@ data_space::data_space(
 	item_count(given_item_count)
 {
 	allocate_data_table();
+	init_shuffle_table();
 }
 
 data_space::data_space(
@@ -106,6 +119,7 @@ data_space& data_space::operator=(const data_space& other)
 {
 	if (this != &other)
 	{
+		shuffle_table = other.shuffle_table;
 		data_table = other.data_table;
 		data_iterator = other.data_iterator;
 		label_iterator = other.label_iterator;
@@ -119,6 +133,15 @@ data_space& data_space::operator=(const data_space& other)
 size_t data_space::get_item_count() const
 {
 	return item_count;
+}
+
+void data_space::shuffle()
+{
+	if_not_initialized_throw();
+
+	std::random_device rd;
+	std::mt19937 generator(rd());
+	std::shuffle(shuffle_table.begin(), shuffle_table.end(), generator);
 }
 
 void data_space::iterator_next()
@@ -169,25 +192,19 @@ void data_space::copy_to_gpu()
 	copied_to_gpu = true;
 }
 
-const matrix& data_space::get_current_data()
+const matrix& data_space::get_current_data_readonly()
 {
 	if_not_initialized_throw();
-	/*
-	float* data_ptr = data_table.get_ptr_row(iterator_idx, 0);
-	data_iterator.set_ptr_as_source(data_ptr);
-	*/
-	data_iterator.observe_row(data_table, iterator_idx);
+
+	data_iterator.observe_row(data_table, shuffle_table[iterator_idx]);
 
 	return data_iterator;
 }
-matrix& data_space::get_current_data_REMOVE_LATER()
+matrix& data_space::get_current_data()
 {
 	if_not_initialized_throw();
-	/*
-	float* data_ptr = data_table.get_ptr_row(iterator_idx, 0);
-	data_iterator.set_ptr_as_source(data_ptr);
-	*/
-	data_iterator.observe_row(data_table, iterator_idx);
+
+	data_iterator.observe_row(data_table, shuffle_table[iterator_idx]);
 
 	return data_iterator;
 }
@@ -200,11 +217,8 @@ const matrix& data_space::get_current_label()
 	{
 		throw std::exception("trying to access label, which is not set");
 	}
-	/*
-	float* label_ptr = data_table.get_ptr_item(data_item_count(), iterator_idx, 0);
-	label_iterator.set_ptr_as_source(label_ptr);
-	*/
-	label_iterator.observe_row(data_table, iterator_idx, data_item_count());
+
+	label_iterator.observe_row(data_table, shuffle_table[iterator_idx], data_item_count());
 
 	return label_iterator;
 }
@@ -212,11 +226,11 @@ const matrix& data_space::get_current_label()
 void data_space::set_current_data(const matrix& m)
 {
 	if_not_initialized_throw();
-	set_data_in_table_at(m, iterator_idx);
+	set_data_in_table_at(m, shuffle_table[iterator_idx]);
 }
 
 void data_space::set_current_label(const matrix& m)
 {
 	if_not_initialized_throw();
-	set_label_in_table_at(m, iterator_idx);
+	set_label_in_table_at(m, shuffle_table[iterator_idx]);
 }
