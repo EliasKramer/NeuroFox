@@ -67,7 +67,7 @@ public:
 	virtual void enable_gpu_mode();
 	virtual void disable_gpu();
 
-	virtual bool equal_format(const layer& other);
+	virtual bool nn_equal_format(const layer& other);
 	virtual bool equal_parameter(const layer& other) = 0;
 	virtual void set_parameters(const layer& other) = 0;
 

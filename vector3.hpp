@@ -15,6 +15,8 @@ public:
 
 	vector3(std::ifstream& file);
 
+	~vector3();
+
 	bool is_in_bounds(const vector3& format) const;
 	size_t get_index(const vector3& format) const;
 	size_t item_count() const;
