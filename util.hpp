@@ -4,7 +4,6 @@
 #include <random>
 #include <string>
 #include "vector3.hpp"
-#include <iostream>
 
 constexpr float FLOAT_TOLERANCE = 0.000001f;
 
@@ -54,5 +53,3 @@ size_t convolution_output_size(
 	size_t input_size,
 	size_t filter_size,
 	size_t stride);
-
-std::string ms_to_str(size_t ms);

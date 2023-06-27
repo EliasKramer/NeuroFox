@@ -3,7 +3,7 @@
 void layer::valid_input_check(const matrix& input) const
 {
 	if (input_format.item_count() == 0 || // the input format is not set
-		matrix::nn_equal_format(input_format, input) == false)
+		matrix::equal_format(input_format, input) == false)
 	{
 		throw std::runtime_error("input format is not set or does not match the input format");
 	}
@@ -102,7 +102,7 @@ matrix* layer::get_error_p()
 
 void layer::set_error_for_last_layer(const matrix& expected)
 {
-	if (!matrix::nn_equal_format(activations, expected))
+	if (!matrix::equal_format(activations, expected))
 	{
 		throw std::runtime_error("setting error for the last layer could not be done. wrong expected matrix format");
 	}
@@ -127,14 +127,14 @@ void layer::disable_gpu()
 	//gpu_error = nullptr;
 }
 
-bool layer::nn_equal_format(const layer& other)
+bool layer::equal_format(const layer& other)
 {
 	return
 		input_format == other.input_format &&
 		type == other.type &&
-		matrix::nn_equal_format(activations, other.activations) &&
-		matrix::nn_equal_format(error, other.error) &&
-		matrix::nn_equal_format(input_format, other.input_format);
+		matrix::equal_format(activations, other.activations) &&
+		matrix::equal_format(error, other.error) &&
+		matrix::equal_format(input_format, other.input_format);
 }
 
 void layer::write_to_ofstream(std::ofstream& file) const

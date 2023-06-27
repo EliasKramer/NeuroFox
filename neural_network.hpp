@@ -74,9 +74,7 @@ public:
 		data_space& ds, 
 		size_t epochs, 
 		size_t batch_size, 
-		float learning_rate,
-		bool input_zero_check
-	);
+		float learning_rate);
 
 	//we need the training_data_count for 
 	//calculating the average of the deltas
@@ -85,7 +83,7 @@ public:
 	void enable_gpu_mode();
 	bool is_in_gpu_mode();
 
-	bool nn_equal_format(const neural_network& other);
+	bool equal_format(const neural_network& other);
 	bool equal_parameter(const neural_network& other);
 	void set_parameters(const neural_network& other);
 

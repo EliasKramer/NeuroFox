@@ -6,8 +6,8 @@
 #include "math_functions.hpp"
 #include "vector3.hpp"
 #include "gpu_math.cuh"
+#include <cuda_runtime.h>
 #include "enum_space.hpp"
-#include "assert_throw.hpp"
 
 class matrix {
 private:
@@ -30,16 +30,18 @@ private:
 
 	void if_gpu_not_allocated_throw() const;
 	void allocate_device_mem();
-	void copy_host2device();
-	void copy_device2host();
+	void copy_host_to_device();
+	void copy_device_to_host();
 
 	void if_cuda_error_throw() const;
 
 	bool format_is_valid() const;
 	void allocate_host_mem();
+	void set_own_host_data_from(const std::vector<float> src);
+	void set_own_host_data_from(const matrix& src);
 
-	void copy_host2host_from(const matrix& src);
-	void copy_device2device_from(const matrix& src);
+	void copy_host_data_from(const matrix& src);
+	void copy_device_data_from(const matrix& src);
 
 	void delete_data_if_owning();
 
@@ -64,17 +66,12 @@ public:
 	~matrix();
 
 	void sync_device_and_host();
-	bool is_device_and_host_synced() const;
-	bool device_data_is_updated() const;
-	bool host_data_is_updated() const;
 	void enable_gpu_mode();
 	bool is_in_gpu_mode() const;
-	bool is_owning_data() const;
 
 	void set_data_from_src(const matrix& src);
 	void set_all(float value);
 	void apply_noise(float range);
-	void apply_noise(float min, float max);
 	void mutate(float range);
 
 	void write_to_ofstream(std::ofstream& file) const;
@@ -86,7 +83,7 @@ public:
 	size_t item_count() const;
 
 	float get_at_flat_host(size_t idx) const;
-	void set_at_flat_host(size_t idx, float value);
+	void set_at_flat(size_t idx, float value);
 	void add_at_flat(size_t idx, float value);
 
 	float* get_device_ptr();
@@ -106,15 +103,14 @@ public:
 	void set_row_from_matrix(const matrix& m, size_t row_idx, size_t item_idx);
 
 	//setter
-	void set_at_host(vector3 position, float value);
+	void set_at(vector3 position, float value);
 	void add_at_host(vector3 position, float value);
 
 	//getter
 	float get_at_host(vector3 pos) const;
 
-	//matrix contains at least one item that is not zero
-	bool contains_non_zero_items();
-
+	//TODO - implement for gpu
+	static void dot_product(const matrix& a, const matrix& b, matrix& result);
 	static void dot_product_flat(const matrix& a, const matrix& flat, matrix& result_flat);
 
 	static void add(const matrix& a, const matrix& b, matrix& result);
@@ -142,7 +138,7 @@ public:
 
 	static bool are_equal(const matrix& a, const matrix& b);
 	static bool are_equal(const matrix& a, const matrix& b, float tolerance);
-	static bool nn_equal_format(const matrix& a, const matrix& b);
+	static bool equal_format(const matrix& a, const matrix& b);
 
 
 	static void cross_correlation(

@@ -137,9 +137,9 @@ void pooling_layer::disable_gpu()
 	gpu_enabled = false;
 }
 
-bool pooling_layer::nn_equal_format(const layer& other)
+bool pooling_layer::equal_format(const layer& other)
 {
-	if (layer::nn_equal_format(other))
+	if (layer::equal_format(other))
 	{
 		const pooling_layer& other_cast = dynamic_cast<const pooling_layer&>(other);
 
@@ -153,7 +153,7 @@ bool pooling_layer::nn_equal_format(const layer& other)
 
 bool pooling_layer::equal_parameter(const layer& other)
 {
-	return nn_equal_format(other);
+	return equal_format(other);
 }
 
 void pooling_layer::set_parameters(const layer& other)

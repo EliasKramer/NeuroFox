@@ -126,20 +126,23 @@ size_t neural_network::get_param_byte_size() const
 
 void neural_network::set_input_format(vector3 given_input_format)
 {
-	smart_assert(input_format.item_count() == 0, "Cannot set input format twice.");
+	if (input_format.item_count() != 0)
+		throw std::runtime_error("Cannot set input format twice.");
 
 	this->input_format = given_input_format;
 }
 
 const matrix& neural_network::get_output_readonly() const
 {
-	smart_assert(layers.empty() == false);
+	if (layers.empty())
+		throw std::runtime_error("Cannot get output of neural network with no layers.");
 	return layers.back().get()->get_activations_readonly();
 }
 
 matrix& neural_network::get_output()
 {
-	smart_assert(layers.empty() == false);
+	if (layers.empty())
+		throw std::runtime_error("Cannot get output of neural network with no layers.");
 	return layers.back().get()->get_activations();
 }
 
@@ -172,7 +175,10 @@ void neural_network::add_layer(std::unique_ptr<layer>&& given_layer)
 
 float neural_network::calculate_cost(const matrix& expected_output)
 {
-	smart_assert(matrix::nn_equal_format(get_output_readonly(), expected_output));
+	if (matrix::equal_format(get_output_readonly(), expected_output) == false)
+	{
+		throw std::runtime_error("Output format does not match expected output format.");
+	}
 
 	float cost = 0.0f;
 	for (int i = 0; i < expected_output.item_count(); i++)
@@ -253,8 +259,10 @@ void neural_network::apply_noise(float range)
 
 void neural_network::mutate(float range)
 {
-	smart_assert(parameter_layer_indices.empty() == false);
-
+	if (parameter_layer_indices.empty())
+	{
+		throw std::runtime_error("Cannot mutate. No parameter layers have been added yet.");
+	}
 	int layer_idx = parameter_layer_indices[random_idx((int)parameter_layer_indices.size())];
 
 	if (is_in_gpu_mode())
@@ -272,8 +280,10 @@ void neural_network::mutate(float range)
 
 void neural_network::forward_propagation(const matrix& input)
 {
-	smart_assert(input.is_in_gpu_mode() == is_in_gpu_mode());
-
+	if (input.is_in_gpu_mode() != is_in_gpu_mode())
+	{
+		throw std::runtime_error("Input data is not in the same mode as the neural network.");
+	}
 	matrix* last_layer = nullptr;
 	//std::vector<std::unique_ptr<layer>>::iterator::value_type
 	for (auto& l : layers)
@@ -316,14 +326,21 @@ void neural_network::learn_on_ds(
 	data_space& ds,
 	size_t epochs,
 	size_t batch_size,
-	float learning_rate,
-	bool input_zero_check)
+	float learning_rate)
 {
-	smart_assert(ds.get_current_data_readonly().is_in_gpu_mode() == is_in_gpu_mode());
-	smart_assert(ds.get_current_label().is_in_gpu_mode() == is_in_gpu_mode());
-	smart_assert(vector3::are_equal(ds.get_current_data_readonly().get_format(), input_format));
-	smart_assert(vector3::are_equal(ds.get_current_label().get_format(), get_output_readonly().get_format()));
-	smart_assert(ds.get_item_count() > 0);
+	if (ds.get_current_data().is_in_gpu_mode() != is_in_gpu_mode())
+	{
+		throw std::runtime_error("Data space is not in the same mode as the neural network.");
+	}
+	if (vector3::are_equal(ds.get_current_data().get_format(), input_format) == false ||
+		vector3::are_equal(ds.get_current_label().get_format(), get_output_readonly().get_format()) == false)
+	{
+		throw std::runtime_error("Data space is not in the same format as the neural network.");
+	}
+	if (ds.get_item_count() == 0)
+	{
+		throw std::runtime_error("Data space is empty.");
+	}
 
 	for (size_t curr_epoch = 0; curr_epoch < epochs; curr_epoch++)
 	{
@@ -342,28 +359,17 @@ void neural_network::learn_on_ds(
 				ds.iterator_next();
 			}
 
-			matrix& input = ds.get_current_data();
+			batch_item++;
+			const matrix& input = ds.get_current_data();
 			const matrix& label = ds.get_current_label();
-			
-			if (!input_zero_check || input.contains_non_zero_items())
-			{
-				batch_item++;
-				back_propagation(input, label);
+			back_propagation(input, label);
 
-				if (batch_item >= batch_size)
-				{
-					apply_deltas(batch_size, learning_rate);
-					batch_item = 0;
-				}
+			if (batch_item >= batch_size)
+			{
+				apply_deltas(batch_size, learning_rate);
+				batch_item = 0;
 			}
 		}
-		//apply the remaining deltas, that were not applied in the loop
-		if (batch_item > 0)
-		{
-			apply_deltas(batch_item, learning_rate);
-			batch_item = 0;
-		}
-		ds.shuffle();
 	}
 }
 
@@ -391,8 +397,6 @@ void neural_network::enable_gpu_mode()
 		throw std::runtime_error("No CUDA capable devices (GPUs) found.");
 	}
 
-	cudaSetDevice(0);
-
 	for (auto& l : layers)
 	{
 		l->enable_gpu_mode();
@@ -408,7 +412,7 @@ bool neural_network::is_in_gpu_mode()
 	return gpu_enabled;
 }
 
-bool neural_network::nn_equal_format(const neural_network& other)
+bool neural_network::equal_format(const neural_network& other)
 {
 	if (layers.size() != other.layers.size())
 	{
@@ -416,7 +420,7 @@ bool neural_network::nn_equal_format(const neural_network& other)
 	}
 	for (int i = 0; i < layers.size(); i++)
 	{
-		if (!layers[i]->nn_equal_format(*other.layers[i]))
+		if (!layers[i]->equal_format(*other.layers[i]))
 		{
 			return false;
 		}
@@ -442,7 +446,10 @@ bool neural_network::equal_parameter(const neural_network& other)
 
 void neural_network::set_parameters(const neural_network& other)
 {
-	smart_assert(nn_equal_format(other));
+	if (!equal_format(other))
+	{
+		throw std::runtime_error("Cannot set parameter. Format of the networks is not equal.");
+	}
 	for (auto& l : parameter_layer_indices)
 	{
 		layers[l]->set_parameters(*other.layers[l]);

@@ -4,7 +4,7 @@ int random_idx(int size)
 {
 	static std::random_device rd;
 	static std::mt19937 gen(rd());
-	std::uniform_int_distribution
+	static std::uniform_int_distribution
 		<int> dis(0, size);
 	return dis(gen) % size;
 }
@@ -24,30 +24,12 @@ bool biased_coin_toss(float true_bias, float false_bias)
 
 float random_float_excl(float min, float max)
 {
-	if(min > max)
-		throw std::invalid_argument("min must be less than max");
-
 	static std::random_device rd;
 	static std::mt19937 gen(rd());
-	std::uniform_real_distribution<float> dis(
+	static std::uniform_real_distribution<float> dis(
 		min,
-		max - std::numeric_limits<float>::epsilon()
-	);
-
-	float ret_val = dis(gen);
-
-	if (ret_val < min || ret_val >= max)
-	{
-		//why does this get called TODO FIX
-		std::cout << "random_float_excl returned a value outside of the range"
-			<< " min: " << min
-			<< " max: " << max
-			<< " ret_val: " << ret_val
-			<< std::endl;
-		return min;
-	}
-
-	return ret_val;
+		max);
+	return dis(gen);
 }
 
 bool is_whole_number(float number)
@@ -133,51 +115,4 @@ size_t convolution_output_size(
 	}
 
 	return (input_size - filter_size) / stride + 1;
-}
-
-std::string ms_to_str(size_t ms)
-{
-	size_t second = 1000;
-	size_t minute = 60 * second;
-	size_t hour = 60 * minute;
-	size_t day = 24 * hour;
-	size_t week = 7 * day;
-	size_t month = 30 * day;
-	size_t year = 365 * day;
-
-	size_t ms_remaining = ms;
-	size_t year_count = ms / year;
-	ms_remaining -= year_count * year;
-	size_t month_count = ms_remaining / month;
-	ms_remaining -= month_count * month;
-	size_t week_count = ms_remaining / week;
-	ms_remaining -= week_count * week;
-	size_t day_count = ms_remaining / day;
-	ms_remaining -= day_count * day;
-	size_t hour_count = ms_remaining / hour;
-	ms_remaining -= hour_count * hour;
-	size_t minute_count = ms_remaining / minute;
-	ms_remaining -= minute_count * minute;
-	size_t second_count = ms_remaining / second;
-	ms_remaining -= second_count * second;
-
-	std::string result = "";
-	if (year_count > 0)
-		result += std::to_string(year_count) + "y ";
-	if (month_count > 0)
-		result += std::to_string(month_count) + "mo ";
-	if (week_count > 0)
-		result += std::to_string(week_count) + "w ";
-	if (day_count > 0)
-		result += std::to_string(day_count) + "d ";
-	if (hour_count > 0)
-		result += std::to_string(hour_count) + "h ";
-	if (minute_count > 0)
-		result += std::to_string(minute_count) + "m ";
-	if (second_count > 0)
-		result += std::to_string(second_count) + "s ";
-	if (ms_remaining > 0)
-		result += std::to_string(ms_remaining) + "ms ";
-
-	return result == "" ? "0ms" : result;
 }

@@ -251,9 +251,9 @@ void convolutional_layer::disable_gpu()
 	//gpu_kernel_biases = nullptr;
 }
 
-bool convolutional_layer::nn_equal_format(const layer& other)
+bool convolutional_layer::equal_format(const layer& other)
 {
-	if (layer::nn_equal_format(other))
+	if (layer::equal_format(other))
 	{
 		const convolutional_layer& other_conv = dynamic_cast<const convolutional_layer&>(other);
 
@@ -269,7 +269,7 @@ bool convolutional_layer::nn_equal_format(const layer& other)
 
 bool convolutional_layer::equal_parameter(const layer& other)
 {
-	if (layer::nn_equal_format(other))
+	if (layer::equal_format(other))
 	{
 		const convolutional_layer& other_conv = dynamic_cast<const convolutional_layer&>(other);
 
@@ -288,7 +288,7 @@ bool convolutional_layer::equal_parameter(const layer& other)
 
 void convolutional_layer::set_parameters(const layer& other)
 {
-	if (layer::nn_equal_format(other))
+	if (layer::equal_format(other))
 	{
 		const convolutional_layer& other_conv = dynamic_cast<const convolutional_layer&>(other);
 

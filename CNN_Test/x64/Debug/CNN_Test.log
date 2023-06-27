@@ -1,0 +1,4 @@
+﻿  matrix.cpp
+C:\Users\krame\Desktop\all\_homemadeAI\conv_nn\ConvolutionalNeuralNetwork\code\assert_throw.hpp(12,1): warning C4005: 'smart_assert': macro redefinition
+C:\Users\krame\Desktop\all\_homemadeAI\conv_nn\ConvolutionalNeuralNetwork\code\assert_throw.hpp(11,1): message : see previous definition of 'smart_assert'
+  CNN_Test.vcxproj -> C:\Users\krame\Desktop\all\_homemadeAI\conv_nn\x64\Debug\CNN_Test.dll
