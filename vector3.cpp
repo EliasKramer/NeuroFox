@@ -23,11 +23,6 @@ vector3::vector3(std::ifstream& file)
 	file.read((char*)&z, sizeof(z));
 }
 
-vector3::~vector3()
-{
-	int x = 0;
-}
-
 bool vector3::is_in_bounds(const vector3& format) const
 {
 	return x < format.x && y < format.y && z < format.z;
