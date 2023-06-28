@@ -24,7 +24,6 @@ private:
 	void set_host_as_last_updated();
 	void set_device_as_last_updated();
 
-	bool is_initialized() const;
 	void if_not_initialized_throw() const;
 	void if_not_owning_throw() const;
 
@@ -60,8 +59,11 @@ public:
 	matrix& operator=(const matrix& other);
 
 	bool operator==(const matrix& other) const;
+	bool operator!=(const matrix& other) const;
 
 	~matrix();
+
+	bool is_initialized() const;
 
 	void sync_device_and_host();
 	bool is_device_and_host_synced() const;

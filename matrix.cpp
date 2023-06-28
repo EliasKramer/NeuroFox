@@ -19,11 +19,6 @@ void matrix::set_device_as_last_updated()
 	last_updated_data = device_data;
 }
 
-bool matrix::is_initialized() const
-{
-	return host_data != nullptr && format.item_count() != 0;
-}
-
 void matrix::if_not_initialized_throw() const
 {
 	if (!is_initialized())
@@ -281,6 +276,11 @@ matrix::~matrix()
 	delete_data_if_owning();
 }
 
+bool matrix::is_initialized() const
+{
+	return host_data != nullptr && format.item_count() != 0;
+}
+
 void matrix::sync_device_and_host()
 {
 	if (last_updated_data == nullptr || !gpu_enabled)
@@ -344,6 +344,11 @@ matrix& matrix::operator=(const matrix& other)
 bool matrix::operator==(const matrix& other) const
 {
 	return matrix::are_equal(*this, other);
+}
+
+bool matrix::operator!=(const matrix& other) const
+{
+	return !(*this == other);
 }
 
 void matrix::set_data_from_src(const matrix& src)
@@ -510,6 +515,7 @@ void matrix::observe_row(matrix& m, size_t row_idx)
 }
 void matrix::observe_row(matrix& m, size_t row_idx, size_t item_idx)
 {
+	smart_assert(m != *this);
 	smart_assert(m.is_initialized());
 	smart_assert(m.is_in_gpu_mode() == is_in_gpu_mode());
 	smart_assert(row_idx < m.get_height());
@@ -562,6 +568,7 @@ void matrix::set_row_from_matrix(const matrix& m, size_t row_idx)
 }
 void matrix::set_row_from_matrix(const matrix& m, size_t row_idx, size_t item_idx)
 {
+	smart_assert(m != *this);
 	smart_assert(is_initialized());
 	smart_assert(m.is_initialized());
 	smart_assert(is_owning_data());

@@ -325,26 +325,22 @@ void neural_network::learn_on_ds(
 	smart_assert(vector3::are_equal(ds.get_current_label().get_format(), get_output_readonly().get_format()));
 	smart_assert(ds.get_item_count() > 0);
 
+	matrix input(ds.get_data_format());
+	matrix label(ds.get_label_format());
+	if (is_in_gpu_mode())
+	{
+		input.enable_gpu_mode();
+		label.enable_gpu_mode();
+	}
+
 	for (size_t curr_epoch = 0; curr_epoch < epochs; curr_epoch++)
 	{
 		size_t batch_item = 0;
-		ds.iterator_reset();
-		bool first = true;
-		while (ds.iterator_has_next())
+		for (int i = 0; i < ds.get_item_count(); i++)
 		{
-			//we do this check in order to get every item. 
-			//if we did not do that, we would skip the first item
-			if (first)
-			{
-				first = false;
-			}
-			else {
-				ds.iterator_next();
-			}
+			ds.observe_data_at_idx(input, i);
+			ds.observe_label_at_idx(label, i);
 
-			matrix& input = ds.get_current_data();
-			const matrix& label = ds.get_current_label();
-			
 			if (!input_zero_check || input.contains_non_zero_items())
 			{
 				batch_item++;
