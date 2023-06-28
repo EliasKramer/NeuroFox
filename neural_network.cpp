@@ -172,7 +172,7 @@ void neural_network::add_layer(std::unique_ptr<layer>&& given_layer)
 
 float neural_network::calculate_cost(const matrix& expected_output)
 {
-	smart_assert(matrix::nn_equal_format(get_output_readonly(), expected_output));
+	smart_assert(matrix::equal_format(get_output_readonly(), expected_output));
 
 	float cost = 0.0f;
 	for (int i = 0; i < expected_output.item_count(); i++)
@@ -403,7 +403,7 @@ void neural_network::enable_gpu_mode()
 	sync_device_and_host();
 }
 
-bool neural_network::is_in_gpu_mode()
+bool neural_network::is_in_gpu_mode() const
 {
 	return gpu_enabled;
 }
@@ -416,7 +416,7 @@ bool neural_network::nn_equal_format(const neural_network& other)
 	}
 	for (int i = 0; i < layers.size(); i++)
 	{
-		if (!layers[i]->nn_equal_format(*other.layers[i]))
+		if (!layers[i]->equal_format(*other.layers[i]))
 		{
 			return false;
 		}
@@ -443,6 +443,8 @@ bool neural_network::equal_parameter(const neural_network& other)
 void neural_network::set_parameters(const neural_network& other)
 {
 	smart_assert(nn_equal_format(other));
+	smart_assert(is_in_gpu_mode() == other.is_in_gpu_mode());
+
 	for (auto& l : parameter_layer_indices)
 	{
 		layers[l]->set_parameters(*other.layers[l]);

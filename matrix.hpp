@@ -142,7 +142,7 @@ public:
 
 	static bool are_equal(const matrix& a, const matrix& b);
 	static bool are_equal(const matrix& a, const matrix& b, float tolerance);
-	static bool nn_equal_format(const matrix& a, const matrix& b);
+	static bool equal_format(const matrix& a, const matrix& b);
 
 
 	static void cross_correlation(
