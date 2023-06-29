@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include <string>
 
 #pragma once
 class vector3
@@ -24,4 +25,6 @@ public:
 	static bool are_equal(const vector3& v1, const vector3& v2);
 	bool operator==(const vector3& other) const;
 	bool operator!=(const vector3& other) const;
+
+	std::string to_string() const;
 };

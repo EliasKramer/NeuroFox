@@ -66,3 +66,8 @@ bool vector3::operator!=(const vector3& other) const
 {
 	return !are_equal(*this, other);
 }
+
+std::string vector3::to_string() const
+{
+	return std::to_string(x) + "x" + std::to_string(y) + "x" + std::to_string(z);
+}

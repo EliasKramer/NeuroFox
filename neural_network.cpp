@@ -319,10 +319,9 @@ void neural_network::learn_on_ds(
 	float learning_rate,
 	bool input_zero_check)
 {
-	smart_assert(ds.get_current_data_readonly().is_in_gpu_mode() == is_in_gpu_mode());
-	smart_assert(ds.get_current_label().is_in_gpu_mode() == is_in_gpu_mode());
-	smart_assert(vector3::are_equal(ds.get_current_data_readonly().get_format(), input_format));
-	smart_assert(vector3::are_equal(ds.get_current_label().get_format(), get_output_readonly().get_format()));
+	smart_assert(ds.is_in_gpu_mode() == is_in_gpu_mode());
+	smart_assert(vector3::are_equal(ds.get_data_format(), input_format));
+	smart_assert(vector3::are_equal(ds.get_label_format(), get_output_readonly().get_format()));
 	smart_assert(ds.get_item_count() > 0);
 
 	matrix input(ds.get_data_format());

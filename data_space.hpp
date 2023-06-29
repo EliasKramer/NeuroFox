@@ -1,5 +1,7 @@
 #pragma once
 #include "matrix.hpp"
+#include <mutex>
+
 class data_space
 {
 private:
@@ -26,12 +28,13 @@ private:
 		+-------------+-----+
 	*/
 	matrix data_table;
-
-	size_t iterator_idx = 0;
 	std::vector<size_t> shuffle_table;
 	
 	vector3 data_format;
 	vector3 label_format;
+
+	std::mutex data_mutex;
+	std::mutex label_mutex;
 
 	size_t label_item_count();
 	size_t data_item_count();
@@ -43,8 +46,6 @@ private:
 
 	void init_shuffle_table();
 
-	bool is_initialized() const;
-	bool is_in_gpu_mode() const;
 public:
 	data_space();
 	data_space(size_t given_item_count, vector3 data_format);
@@ -61,6 +62,9 @@ public:
 
 	data_space& operator=(const data_space& other);
 
+	bool is_initialized() const;
+	bool is_in_gpu_mode() const;
+	
 	size_t get_item_count() const;
 	vector3 get_data_format() const;
 	vector3 get_label_format() const;
@@ -73,4 +77,6 @@ public:
 	void set_label(const matrix& m, size_t idx);
 
 	void copy_to_gpu();
+
+	std::string to_string();
 };
