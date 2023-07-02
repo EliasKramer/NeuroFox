@@ -20,10 +20,10 @@ private:
 	float* device_data;
 
 	float* last_updated_data = nullptr;
-public:
+
 	void set_host_as_last_updated();
 	void set_device_as_last_updated();
-private:
+
 	void if_not_initialized_throw() const;
 	void if_not_owning_throw() const;
 

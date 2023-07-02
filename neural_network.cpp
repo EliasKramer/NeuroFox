@@ -124,12 +124,6 @@ size_t neural_network::get_param_byte_size() const
 	return get_param_count() * sizeof(float);
 }
 
-std::unique_ptr<layer>& neural_network::get_layer(size_t index)
-{
-	smart_assert(index < layers.size(), "Index out of bounds.");
-	return layers[index];
-}
-
 void neural_network::set_input_format(vector3 given_input_format)
 {
 	smart_assert(input_format.item_count() == 0, "Cannot set input format twice.");
@@ -282,6 +276,7 @@ void neural_network::forward_propagation(const matrix& input)
 
 	matrix* last_layer = nullptr;
 	//std::vector<std::unique_ptr<layer>>::iterator::value_type
+	std::lock_guard<std::mutex> lock(forward_mutex);
 	for (auto& l : layers)
 	{
 		l->forward_propagation(
@@ -298,6 +293,7 @@ void neural_network::back_propagation(const matrix& given_data, const matrix& gi
 	//feeding the data through
 	forward_propagation(given_data);
 
+	std::lock_guard<std::mutex> lock(back_mutex);
 	//calculating the cost derivative
 	get_last_layer()->set_error_for_last_layer(given_label);
 

@@ -300,7 +300,7 @@ void matrix::sync_device_and_host()
 	{
 		throw std::runtime_error("last_updated_data is not pointing to host or device");
 	}
-}
+ }
 
 bool matrix::is_device_and_host_synced() const
 {
@@ -561,11 +561,12 @@ void matrix::observe_row(matrix& m, size_t row_idx, size_t item_idx)
 	}
 	owning_data = false;
 
+	/*
 	m.last_updated_data ==
 		m.host_data ? set_host_as_last_updated() :
 		m.device_data ? set_device_as_last_updated() :
 		last_updated_data = nullptr;
-
+	*/
 }
 
 void matrix::set_row_from_matrix(const matrix& m, size_t row_idx)
