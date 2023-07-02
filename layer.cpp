@@ -102,12 +102,10 @@ matrix* layer::get_error_p()
 
 void layer::set_error_for_last_layer(const matrix& expected)
 {
-	if (!matrix::equal_format(activations, expected))
-	{
-		throw std::runtime_error("setting error for the last layer could not be done. wrong expected matrix format");
-	}
+	smart_assert(matrix::equal_format(activations, expected));
+
 	//this calculates the const derivative
-	error.set_all(0);
+	error.set_all(0); // i don think that is necessary - has to be tested
 	matrix::subtract(activations, expected, error);
 	error.scalar_multiplication(2);
 }

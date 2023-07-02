@@ -28,8 +28,8 @@ private:
 
 	float calculate_cost(const matrix& expected_output);
 
-	void sync_device_and_host();
 public:
+	void sync_device_and_host();
 
 	neural_network();
 	neural_network(const std::string& file);
@@ -41,6 +41,8 @@ public:
 	size_t get_param_count() const;
 	//returns the number of bytes the nn needs to store all parameters (weights and biases)
 	size_t get_param_byte_size() const;
+
+	std::unique_ptr<layer>& get_layer(size_t index);
 
 	//sets the input matrix to a certain format
 	void set_input_format(vector3 input_format);

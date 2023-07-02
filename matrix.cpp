@@ -56,7 +56,7 @@ void matrix::allocate_device_mem()
 void matrix::copy_host2device()
 {
 	smart_assert(is_initialized());
-	smart_assert(is_owning_data());
+	//smart_assert(is_owning_data()); //copying to a non-owning matrix is allowed - but it is not tested
 	smart_assert(is_in_gpu_mode());
 
 	cudaMemcpy(
@@ -71,7 +71,7 @@ void matrix::copy_host2device()
 void matrix::copy_device2host()
 {
 	smart_assert(is_initialized());
-	smart_assert(is_owning_data());
+	//smart_assert(is_owning_data());//copying to a non-owning matrix is allowed - but it is not tested
 	smart_assert(is_in_gpu_mode());
 
 	cudaMemcpy(
@@ -552,7 +552,7 @@ void matrix::observe_row(matrix& m, size_t row_idx, size_t item_idx)
 	smart_assert((m.get_width() - item_count() - item_idx) >= 0);
 
 	delete_data_if_owning();
-
+	
 	host_data = m.get_ptr_item(m.host_data, item_idx, row_idx, 0);
 
 	if (gpu_enabled)
@@ -560,6 +560,12 @@ void matrix::observe_row(matrix& m, size_t row_idx, size_t item_idx)
 		device_data = m.get_ptr_item(m.device_data, item_idx, row_idx, 0);
 	}
 	owning_data = false;
+
+	m.last_updated_data ==
+		m.host_data ? set_host_as_last_updated() :
+		m.device_data ? set_device_as_last_updated() :
+		last_updated_data = nullptr;
+
 }
 
 void matrix::set_row_from_matrix(const matrix& m, size_t row_idx)

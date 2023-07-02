@@ -124,6 +124,12 @@ size_t neural_network::get_param_byte_size() const
 	return get_param_count() * sizeof(float);
 }
 
+std::unique_ptr<layer>& neural_network::get_layer(size_t index)
+{
+	smart_assert(index < layers.size(), "Index out of bounds.");
+	return layers[index];
+}
+
 void neural_network::set_input_format(vector3 given_input_format)
 {
 	smart_assert(input_format.item_count() == 0, "Cannot set input format twice.");
