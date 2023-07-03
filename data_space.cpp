@@ -153,6 +153,12 @@ void data_space::shuffle()
 	std::shuffle(shuffle_table.begin(), shuffle_table.end(), generator);
 }
 
+size_t data_space::byte_size() const
+{
+	smart_assert(is_initialized());
+	return data_table.item_count() * sizeof(float);
+}
+
 void data_space::observe_data_at_idx(matrix& observer_matrix, size_t idx)
 {
 	smart_assert(is_initialized());

@@ -71,6 +71,8 @@ public:
 
 	void shuffle();
 
+	size_t byte_size() const;
+
 	void observe_data_at_idx(matrix& observer_matrix, size_t idx);
 	void observe_label_at_idx(matrix& observer_matrix, size_t idx);
 	void set_data(const matrix& m, size_t idx);
