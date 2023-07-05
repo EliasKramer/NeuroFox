@@ -80,5 +80,7 @@ public:
 
 	void copy_to_gpu();
 
+	void clear();
+
 	std::string to_string();
 };

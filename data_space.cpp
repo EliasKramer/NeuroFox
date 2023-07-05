@@ -208,6 +208,16 @@ void data_space::copy_to_gpu()
 	data_table.enable_gpu_mode();
 }
 
+void data_space::clear()
+{
+	smart_assert(is_initialized());
+	
+	std::lock_guard<std::mutex> lock1(label_mutex);
+	std::lock_guard<std::mutex> lock2(data_mutex);
+
+	data_table.set_all(0);
+}
+
 std::string data_space::to_string()
 {
 	std::string result = "";
