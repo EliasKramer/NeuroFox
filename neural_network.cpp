@@ -373,6 +373,20 @@ void neural_network::apply_deltas(size_t training_data_count, float learning_rat
 		layers[l]->apply_deltas(training_data_count, learning_rate);
 	}
 }
+void neural_network::xavier_initialization()
+{
+	for (int i = 0; i < layers.size(); i++)
+	{
+		layers[i]->set_all_parameters(0.0f);
+
+		size_t input_size = layers[i]->get_input_format().item_count();
+		size_t outputsize = layers[i]->get_activations_readonly().item_count();
+
+		float range = sqrtf(6.0f / ((float)input_size + (float)outputsize));
+
+		layers[i]->apply_noise(range);
+	}
+}
 void neural_network::enable_gpu_mode()
 {
 	int device_count = 0;
@@ -446,6 +460,19 @@ void neural_network::set_parameters(const neural_network& other)
 	{
 		layers[l]->set_parameters(*other.layers[l]);
 	}
+}
+
+std::string neural_network::parameter_analysis() const
+{
+	//all layers
+
+	std::string result = "Parameter analysis:\n";
+	for (auto& l : layers)
+	{
+		result += l->parameter_analysis();
+	}
+
+	return result;
 }
 
 void neural_network::save_to_file(const std::string& file_path)

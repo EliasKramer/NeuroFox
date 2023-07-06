@@ -108,6 +108,14 @@ void fully_connected_layer::mutate(float range)
 	}
 }
 
+std::string fully_connected_layer::parameter_analysis() const
+{
+	std::string ret_val = layer::parameter_analysis();
+	ret_val += "Weights: \n" + weights.analyse_string();
+	ret_val += "Biases: \n" + biases.analyse_string() + "\n";
+	return ret_val;
+}
+
 void fully_connected_layer::sync_device_and_host()
 {
 	layer::sync_device_and_host();

@@ -446,6 +446,99 @@ size_t matrix::item_count() const
 	return format.item_count();
 }
 
+float matrix::avg_values() const
+{
+	smart_assert(is_initialized());
+	smart_assert(host_data_is_updated());
+
+	float sum = 0.0f;
+	for (int i = 0; i < item_count(); i++)
+	{
+		sum += host_data[i];
+	}
+	return sum / item_count();
+}
+
+float matrix::std_dev() const
+{
+	smart_assert(is_initialized());
+	smart_assert(host_data_is_updated());
+
+	float avg = avg_values();
+	float sum = 0.0f;
+	for (int i = 0; i < item_count(); i++)
+	{
+		sum += powf(host_data[i] - avg, 2.0f);
+	}
+	return sqrtf(sum / item_count());
+}
+
+float matrix::max_value() const
+{
+	smart_assert(is_initialized());
+	smart_assert(host_data_is_updated());
+
+	float max = host_data[0];
+	for (int i = 1; i < item_count(); i++)
+	{
+		if (host_data[i] > max)
+		{
+			max = host_data[i];
+		}
+	}
+	return max;
+}
+
+float matrix::min_value() const
+{
+	smart_assert(is_initialized());
+	smart_assert(host_data_is_updated());
+
+	float min = host_data[0];
+	for (int i = 1; i < item_count(); i++)
+	{
+		if (host_data[i] < min)
+		{
+			min = host_data[i];
+		}
+	}
+	return min;
+}
+
+float matrix::percentile(float percentage) const
+{
+	smart_assert(is_initialized());
+	smart_assert(host_data_is_updated());
+	smart_assert(percentage >= 0.0f && percentage <= 1.0f);
+	
+	float* sorted = new float[item_count()];
+	memcpy(sorted, host_data, sizeof(float) * item_count());
+	std::sort(sorted, sorted + item_count());
+
+	float idx_f = percentage * item_count();
+	size_t idx = (size_t)idx_f;
+
+	float value = sorted[idx];
+
+	delete[] sorted;
+
+	return value;
+}
+
+std::string matrix::analyse_string() const
+{
+	std::string str = "";
+	str += format.to_string() + "\n";
+	str += "avg: " + std::to_string(avg_values()) + "\n";
+	str += "std_dev: " + std::to_string(std_dev()) + "\n";
+	str += "max: " + std::to_string(max_value()) + "\n";
+	str += "min: " + std::to_string(min_value()) + "\n";
+	str += "percentile(0.25): " + std::to_string(percentile(0.25f)) + "\n";
+	str += "percentile(0.5): " + std::to_string(percentile(0.5f)) + "\n";
+	str += "percentile(0.75): " + std::to_string(percentile(0.75f)) + "\n";
+	return str;
+}
+
 float matrix::get_at_flat_host(size_t idx) const
 {
 	smart_assert(is_initialized());

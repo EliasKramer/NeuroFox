@@ -87,6 +87,13 @@ public:
 	size_t get_depth() const;
 	size_t item_count() const;
 
+	float avg_values() const;
+	float std_dev() const;
+	float max_value() const;
+	float min_value() const;
+	float percentile(float percentage) const;
+	std::string analyse_string() const;
+
 	float get_at_flat_host(size_t idx) const;
 	void set_at_flat_host(size_t idx, float value);
 	void add_at_flat(size_t idx, float value);

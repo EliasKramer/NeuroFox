@@ -36,6 +36,7 @@ public:
 	size_t get_param_byte_size() const;
 
 	virtual void set_input_format(vector3 given_input_format);
+	const vector3& get_input_format() const;
 	
 	const matrix& get_activations_readonly() const;
 	matrix& get_activations();
@@ -53,6 +54,8 @@ public:
 	virtual void apply_noise(float range) = 0;
 	//add a random value between range and -range to one weight or bias 
 	virtual void mutate(float range) = 0;
+
+	virtual std::string parameter_analysis() const;
 
 	virtual void sync_device_and_host();
 

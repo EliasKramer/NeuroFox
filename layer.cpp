@@ -75,6 +75,12 @@ void layer::set_input_format(vector3 given_input_format)
 	this->input_format = given_input_format;
 }
 
+const vector3& layer::get_input_format() const
+{
+	smart_assert(input_format.item_count() != 0);
+	return input_format;
+}
+
 const matrix& layer::get_activations_readonly() const
 {
 	return activations;
@@ -140,6 +146,19 @@ void layer::write_to_ofstream(std::ofstream& file) const
 	file.write((char*)&type, sizeof(e_layer_type_t));
 	input_format.write_to_ofstream(file);
 	activations.get_format().write_to_ofstream(file);
+}
+
+std::string layer::parameter_analysis() const
+{
+	std::string ret_val =
+		type == pooling ? "pooling layer\n" :
+		type == convolutional ? "convolutional layer\n" :
+		type == fully_connected ? "fully connected layer\n" :
+		"invalid layer type\n";
+	ret_val += "input format: " + input_format.to_string() + "\n";
+	ret_val += "activation format: " + activations.get_format().to_string() + "\n";
+
+	return ret_val;
 }
 
 void layer::sync_device_and_host()

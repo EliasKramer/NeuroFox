@@ -52,6 +52,8 @@ public:
 	//add a random value between range and -range to one weight or bias 
 	void mutate(float range) override;
 
+	std::string parameter_analysis() const override;
+
 	void sync_device_and_host() override;
 
 	void forward_propagation(const matrix& input) override;

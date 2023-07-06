@@ -36,6 +36,8 @@ public:
 	void apply_noise(float range) override;
 	void mutate(float range) override;
 
+	std::string parameter_analysis() const override;
+
 	void sync_device_and_host() override;
 
 	void forward_propagation(const matrix& input) override;

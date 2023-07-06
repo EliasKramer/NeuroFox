@@ -103,6 +103,11 @@ void pooling_layer::mutate(float range)
 	throw std::invalid_argument("pooling layer does not have any parameters");
 }
 
+std::string pooling_layer::parameter_analysis() const
+{
+	return layer::parameter_analysis();
+}
+
 void pooling_layer::sync_device_and_host()
 {
 	layer::sync_device_and_host();
