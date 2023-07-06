@@ -183,6 +183,23 @@ void convolutional_layer::mutate(float range)
 	}
 }
 
+std::string convolutional_layer::parameter_analysis() const
+{
+	std::string ret_val = layer::parameter_analysis();
+
+	ret_val += std::string("\nkernel size: ") + std::to_string(kernel_size);
+	ret_val += std::string("\nstride: ") + std::to_string(stride);
+	ret_val += std::string("\nkernel count: ") + std::to_string(kernel_count);
+	
+	for(int i = 0; i < kernel_weights.size(); i++)
+		ret_val += std::string("\nkernel ") + std::to_string(i) 
+		+ std::string(" weights: \n") + kernel_weights[i].analyse_string() + "\n";
+
+	ret_val += std::string("\nkernel biases: \n") + kernel_biases.analyse_string() + "\n";
+
+	return ret_val;
+}
+
 void convolutional_layer::sync_device_and_host()
 {
 	layer::sync_device_and_host();
@@ -251,9 +268,9 @@ void convolutional_layer::disable_gpu()
 	//gpu_kernel_biases = nullptr;
 }
 
-bool convolutional_layer::nn_equal_format(const layer& other)
+bool convolutional_layer::equal_format(const layer& other)
 {
-	if (layer::nn_equal_format(other))
+	if (layer::equal_format(other))
 	{
 		const convolutional_layer& other_conv = dynamic_cast<const convolutional_layer&>(other);
 
@@ -269,7 +286,7 @@ bool convolutional_layer::nn_equal_format(const layer& other)
 
 bool convolutional_layer::equal_parameter(const layer& other)
 {
-	if (layer::nn_equal_format(other))
+	if (layer::equal_format(other))
 	{
 		const convolutional_layer& other_conv = dynamic_cast<const convolutional_layer&>(other);
 
@@ -288,7 +305,7 @@ bool convolutional_layer::equal_parameter(const layer& other)
 
 void convolutional_layer::set_parameters(const layer& other)
 {
-	if (layer::nn_equal_format(other))
+	if (layer::equal_format(other))
 	{
 		const convolutional_layer& other_conv = dynamic_cast<const convolutional_layer&>(other);
 

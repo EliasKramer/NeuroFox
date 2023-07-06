@@ -22,6 +22,9 @@ private:
 
 	bool gpu_enabled = false;
 
+	std::mutex forward_mutex;
+	std::mutex back_mutex;
+
 	layer* get_last_layer();
 
 	void add_layer(std::unique_ptr<layer>&& given_layer);
@@ -81,13 +84,17 @@ public:
 	//we need the training_data_count for 
 	//calculating the average of the deltas
 	void apply_deltas(size_t training_data_count, float learning_rate);
+	//uniform xavier initialization
+	void xavier_initialization();
 
 	void enable_gpu_mode();
-	bool is_in_gpu_mode();
+	bool is_in_gpu_mode() const;
 
 	bool nn_equal_format(const neural_network& other);
 	bool equal_parameter(const neural_network& other);
 	void set_parameters(const neural_network& other);
+
+	std::string parameter_analysis() const;
 
 	//this is not const, because we need to sync the device and host memory before saving
 	void save_to_file(const std::string& file_path);

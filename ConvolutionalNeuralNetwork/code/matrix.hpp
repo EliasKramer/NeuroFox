@@ -24,7 +24,6 @@ private:
 	void set_host_as_last_updated();
 	void set_device_as_last_updated();
 
-	bool is_initialized() const;
 	void if_not_initialized_throw() const;
 	void if_not_owning_throw() const;
 
@@ -60,8 +59,11 @@ public:
 	matrix& operator=(const matrix& other);
 
 	bool operator==(const matrix& other) const;
+	bool operator!=(const matrix& other) const;
 
 	~matrix();
+
+	bool is_initialized() const;
 
 	void sync_device_and_host();
 	bool is_device_and_host_synced() const;
@@ -84,6 +86,13 @@ public:
 	size_t get_height() const;
 	size_t get_depth() const;
 	size_t item_count() const;
+
+	float avg_values() const;
+	float std_dev() const;
+	float max_value() const;
+	float min_value() const;
+	float percentile(float percentage) const;
+	std::string analyse_string() const;
 
 	float get_at_flat_host(size_t idx) const;
 	void set_at_flat_host(size_t idx, float value);
@@ -142,7 +151,7 @@ public:
 
 	static bool are_equal(const matrix& a, const matrix& b);
 	static bool are_equal(const matrix& a, const matrix& b, float tolerance);
-	static bool nn_equal_format(const matrix& a, const matrix& b);
+	static bool equal_format(const matrix& a, const matrix& b);
 
 
 	static void cross_correlation(

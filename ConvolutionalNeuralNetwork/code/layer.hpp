@@ -36,6 +36,7 @@ public:
 	size_t get_param_byte_size() const;
 
 	virtual void set_input_format(vector3 given_input_format);
+	const vector3& get_input_format() const;
 	
 	const matrix& get_activations_readonly() const;
 	matrix& get_activations();
@@ -54,6 +55,8 @@ public:
 	//add a random value between range and -range to one weight or bias 
 	virtual void mutate(float range) = 0;
 
+	virtual std::string parameter_analysis() const;
+
 	virtual void sync_device_and_host();
 
 	virtual void forward_propagation(const matrix& input);
@@ -67,7 +70,7 @@ public:
 	virtual void enable_gpu_mode();
 	virtual void disable_gpu();
 
-	virtual bool nn_equal_format(const layer& other);
+	virtual bool equal_format(const layer& other);
 	virtual bool equal_parameter(const layer& other) = 0;
 	virtual void set_parameters(const layer& other) = 0;
 

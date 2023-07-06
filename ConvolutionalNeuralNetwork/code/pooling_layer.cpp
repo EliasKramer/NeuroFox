@@ -103,6 +103,11 @@ void pooling_layer::mutate(float range)
 	throw std::invalid_argument("pooling layer does not have any parameters");
 }
 
+std::string pooling_layer::parameter_analysis() const
+{
+	return layer::parameter_analysis();
+}
+
 void pooling_layer::sync_device_and_host()
 {
 	layer::sync_device_and_host();
@@ -137,9 +142,9 @@ void pooling_layer::disable_gpu()
 	gpu_enabled = false;
 }
 
-bool pooling_layer::nn_equal_format(const layer& other)
+bool pooling_layer::equal_format(const layer& other)
 {
-	if (layer::nn_equal_format(other))
+	if (layer::equal_format(other))
 	{
 		const pooling_layer& other_cast = dynamic_cast<const pooling_layer&>(other);
 
@@ -153,7 +158,7 @@ bool pooling_layer::nn_equal_format(const layer& other)
 
 bool pooling_layer::equal_parameter(const layer& other)
 {
-	return nn_equal_format(other);
+	return equal_format(other);
 }
 
 void pooling_layer::set_parameters(const layer& other)

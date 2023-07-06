@@ -108,6 +108,14 @@ void fully_connected_layer::mutate(float range)
 	}
 }
 
+std::string fully_connected_layer::parameter_analysis() const
+{
+	std::string ret_val = layer::parameter_analysis();
+	ret_val += "Weights: \n" + weights.analyse_string();
+	ret_val += "Biases: \n" + biases.analyse_string() + "\n";
+	return ret_val;
+}
+
 void fully_connected_layer::sync_device_and_host()
 {
 	layer::sync_device_and_host();
@@ -163,9 +171,9 @@ void fully_connected_layer::disable_gpu()
 {
 }
 
-bool fully_connected_layer::nn_equal_format(const layer& other)
+bool fully_connected_layer::equal_format(const layer& other)
 {
-	if (layer::nn_equal_format(other))
+	if (layer::equal_format(other))
 	{
 		const fully_connected_layer& other_casted = dynamic_cast<const fully_connected_layer&>(other);
 		//we could check for the deltas as well, but they should always be the same format
@@ -173,15 +181,15 @@ bool fully_connected_layer::nn_equal_format(const layer& other)
 		//biases should have the same format as bias deltas
 		return
 			activation_fn == other_casted.activation_fn &&
-			matrix::nn_equal_format(weights, other_casted.weights) &&
-			matrix::nn_equal_format(biases, other_casted.biases);
+			matrix::equal_format(weights, other_casted.weights) &&
+			matrix::equal_format(biases, other_casted.biases);
 	}
 	return false;
 }
 
 bool fully_connected_layer::equal_parameter(const layer& other)
 {
-	if (nn_equal_format(other))
+	if (equal_format(other))
 	{
 		const fully_connected_layer& other_casted = dynamic_cast<const fully_connected_layer&>(other);
 		return
@@ -194,7 +202,7 @@ bool fully_connected_layer::equal_parameter(const layer& other)
 
 void fully_connected_layer::set_parameters(const layer& other)
 {
-	if (nn_equal_format(other))
+	if (equal_format(other))
 	{
 		const fully_connected_layer& other_casted = dynamic_cast<const fully_connected_layer&>(other);
 		weights.set_data_from_src(other_casted.weights);

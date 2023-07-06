@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include <string>
 
 #pragma once
 class vector3
@@ -15,8 +16,6 @@ public:
 
 	vector3(std::ifstream& file);
 
-	~vector3();
-
 	bool is_in_bounds(const vector3& format) const;
 	size_t get_index(const vector3& format) const;
 	size_t item_count() const;
@@ -26,4 +25,6 @@ public:
 	static bool are_equal(const vector3& v1, const vector3& v2);
 	bool operator==(const vector3& other) const;
 	bool operator!=(const vector3& other) const;
+
+	std::string to_string() const;
 };

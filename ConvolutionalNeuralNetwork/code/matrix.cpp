@@ -19,11 +19,6 @@ void matrix::set_device_as_last_updated()
 	last_updated_data = device_data;
 }
 
-bool matrix::is_initialized() const
-{
-	return host_data != nullptr && format.item_count() != 0;
-}
-
 void matrix::if_not_initialized_throw() const
 {
 	if (!is_initialized())
@@ -61,7 +56,7 @@ void matrix::allocate_device_mem()
 void matrix::copy_host2device()
 {
 	smart_assert(is_initialized());
-	smart_assert(is_owning_data());
+	//smart_assert(is_owning_data()); //copying to a non-owning matrix is allowed - but it is not tested
 	smart_assert(is_in_gpu_mode());
 
 	cudaMemcpy(
@@ -76,7 +71,7 @@ void matrix::copy_host2device()
 void matrix::copy_device2host()
 {
 	smart_assert(is_initialized());
-	smart_assert(is_owning_data());
+	//smart_assert(is_owning_data());//copying to a non-owning matrix is allowed - but it is not tested
 	smart_assert(is_in_gpu_mode());
 
 	cudaMemcpy(
@@ -123,7 +118,7 @@ void matrix::copy_host2host_from(const matrix& src)
 	smart_assert(src.is_initialized());
 
 	smart_assert(is_owning_data());
-	smart_assert(nn_equal_format(*this, src));
+	smart_assert(equal_format(*this, src));
 
 	std::copy(src.host_data, src.host_data + item_count(), this->host_data);
 	set_host_as_last_updated();
@@ -140,7 +135,7 @@ void matrix::copy_device2device_from(const matrix& src)
 	smart_assert(is_in_gpu_mode());
 	smart_assert(src.is_in_gpu_mode());
 	
-	smart_assert(nn_equal_format(*this, src));
+	smart_assert(equal_format(*this, src));
 
 	cudaMemcpy(
 		device_data,
@@ -281,6 +276,11 @@ matrix::~matrix()
 	delete_data_if_owning();
 }
 
+bool matrix::is_initialized() const
+{
+	return host_data != nullptr && format.item_count() != 0;
+}
+
 void matrix::sync_device_and_host()
 {
 	if (last_updated_data == nullptr || !gpu_enabled)
@@ -300,7 +300,7 @@ void matrix::sync_device_and_host()
 	{
 		throw std::runtime_error("last_updated_data is not pointing to host or device");
 	}
-}
+ }
 
 bool matrix::is_device_and_host_synced() const
 {
@@ -344,6 +344,11 @@ matrix& matrix::operator=(const matrix& other)
 bool matrix::operator==(const matrix& other) const
 {
 	return matrix::are_equal(*this, other);
+}
+
+bool matrix::operator!=(const matrix& other) const
+{
+	return !(*this == other);
 }
 
 void matrix::set_data_from_src(const matrix& src)
@@ -441,6 +446,99 @@ size_t matrix::item_count() const
 	return format.item_count();
 }
 
+float matrix::avg_values() const
+{
+	smart_assert(is_initialized());
+	smart_assert(host_data_is_updated());
+
+	float sum = 0.0f;
+	for (int i = 0; i < item_count(); i++)
+	{
+		sum += host_data[i];
+	}
+	return sum / item_count();
+}
+
+float matrix::std_dev() const
+{
+	smart_assert(is_initialized());
+	smart_assert(host_data_is_updated());
+
+	float avg = avg_values();
+	float sum = 0.0f;
+	for (int i = 0; i < item_count(); i++)
+	{
+		sum += powf(host_data[i] - avg, 2.0f);
+	}
+	return sqrtf(sum / item_count());
+}
+
+float matrix::max_value() const
+{
+	smart_assert(is_initialized());
+	smart_assert(host_data_is_updated());
+
+	float max = host_data[0];
+	for (int i = 1; i < item_count(); i++)
+	{
+		if (host_data[i] > max)
+		{
+			max = host_data[i];
+		}
+	}
+	return max;
+}
+
+float matrix::min_value() const
+{
+	smart_assert(is_initialized());
+	smart_assert(host_data_is_updated());
+
+	float min = host_data[0];
+	for (int i = 1; i < item_count(); i++)
+	{
+		if (host_data[i] < min)
+		{
+			min = host_data[i];
+		}
+	}
+	return min;
+}
+
+float matrix::percentile(float percentage) const
+{
+	smart_assert(is_initialized());
+	smart_assert(host_data_is_updated());
+	smart_assert(percentage >= 0.0f && percentage <= 1.0f);
+	
+	float* sorted = new float[item_count()];
+	memcpy(sorted, host_data, sizeof(float) * item_count());
+	std::sort(sorted, sorted + item_count());
+
+	float idx_f = percentage * item_count();
+	size_t idx = (size_t)idx_f;
+
+	float value = sorted[idx];
+
+	delete[] sorted;
+
+	return value;
+}
+
+std::string matrix::analyse_string() const
+{
+	std::string str = "";
+	str += format.to_string() + "\n";
+	str += "avg: " + std::to_string(avg_values()) + "\n";
+	str += "std_dev: " + std::to_string(std_dev()) + "\n";
+	str += "max: " + std::to_string(max_value()) + "\n";
+	str += "min: " + std::to_string(min_value()) + "\n";
+	str += "percentile(0.25): " + std::to_string(percentile(0.25f)) + "\n";
+	str += "percentile(0.5): " + std::to_string(percentile(0.5f)) + "\n";
+	str += "percentile(0.75): " + std::to_string(percentile(0.75f)) + "\n";
+	return str;
+}
+
 float matrix::get_at_flat_host(size_t idx) const
 {
 	smart_assert(is_initialized());
@@ -510,6 +608,7 @@ void matrix::observe_row(matrix& m, size_t row_idx)
 }
 void matrix::observe_row(matrix& m, size_t row_idx, size_t item_idx)
 {
+	smart_assert(m != *this);
 	smart_assert(m.is_initialized());
 	smart_assert(m.is_in_gpu_mode() == is_in_gpu_mode());
 	smart_assert(row_idx < m.get_height());
@@ -546,7 +645,7 @@ void matrix::observe_row(matrix& m, size_t row_idx, size_t item_idx)
 	smart_assert((m.get_width() - item_count() - item_idx) >= 0);
 
 	delete_data_if_owning();
-
+	
 	host_data = m.get_ptr_item(m.host_data, item_idx, row_idx, 0);
 
 	if (gpu_enabled)
@@ -554,6 +653,13 @@ void matrix::observe_row(matrix& m, size_t row_idx, size_t item_idx)
 		device_data = m.get_ptr_item(m.device_data, item_idx, row_idx, 0);
 	}
 	owning_data = false;
+
+	/*
+	m.last_updated_data ==
+		m.host_data ? set_host_as_last_updated() :
+		m.device_data ? set_device_as_last_updated() :
+		last_updated_data = nullptr;
+	*/
 }
 
 void matrix::set_row_from_matrix(const matrix& m, size_t row_idx)
@@ -562,6 +668,7 @@ void matrix::set_row_from_matrix(const matrix& m, size_t row_idx)
 }
 void matrix::set_row_from_matrix(const matrix& m, size_t row_idx, size_t item_idx)
 {
+	smart_assert(m != *this);
 	smart_assert(is_initialized());
 	smart_assert(m.is_initialized());
 	smart_assert(is_owning_data());
@@ -785,8 +892,8 @@ void matrix::subtract(const matrix& a, const matrix& b, matrix& result)
 	smart_assert(result.is_initialized());
 	smart_assert(result.is_owning_data());
 
-	smart_assert(nn_equal_format(a, b));
-	smart_assert(nn_equal_format(b, result));
+	smart_assert(equal_format(a, b));
+	smart_assert(equal_format(b, result));
 
 	if (a.gpu_enabled &&
 		b.gpu_enabled &&
@@ -923,7 +1030,7 @@ void matrix::fully_connected_backprop(
 	smart_assert(weight_deltas.is_owning_data());
 	smart_assert(passing_error == nullptr || passing_error->is_initialized());
 
-	smart_assert(matrix::nn_equal_format(activations, error));
+	smart_assert(matrix::equal_format(activations, error));
 
 	if (activations.is_in_gpu_mode() &&
 		weights.is_in_gpu_mode() &&
@@ -999,7 +1106,7 @@ bool matrix::are_equal(const matrix& a, const matrix& b, float tolerance)
 	a.if_not_initialized_throw();
 	b.if_not_initialized_throw();
 
-	if (!nn_equal_format(a, b))
+	if (!equal_format(a, b))
 	{
 		return false;
 	}
@@ -1014,7 +1121,7 @@ bool matrix::are_equal(const matrix& a, const matrix& b, float tolerance)
 	return true;
 }
 
-bool matrix::nn_equal_format(const matrix& a, const matrix& b)
+bool matrix::equal_format(const matrix& a, const matrix& b)
 {
 	return vector3::are_equal(a.format, b.format);
 }
@@ -1126,7 +1233,7 @@ void matrix::apply_deltas(
 	smart_assert(delta.is_initialized());
 	smart_assert(delta.is_owning_data()); // this must be true, because we set the deltas to zero after applying them
 	smart_assert(delta.gpu_enabled == gpu_enabled);
-	smart_assert(matrix::nn_equal_format(*this, delta));
+	smart_assert(matrix::equal_format(*this, delta));
 
 	if (gpu_enabled)
 	{

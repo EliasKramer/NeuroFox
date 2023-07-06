@@ -172,7 +172,7 @@ void neural_network::add_layer(std::unique_ptr<layer>&& given_layer)
 
 float neural_network::calculate_cost(const matrix& expected_output)
 {
-	smart_assert(matrix::nn_equal_format(get_output_readonly(), expected_output));
+	smart_assert(matrix::equal_format(get_output_readonly(), expected_output));
 
 	float cost = 0.0f;
 	for (int i = 0; i < expected_output.item_count(); i++)
@@ -276,6 +276,7 @@ void neural_network::forward_propagation(const matrix& input)
 
 	matrix* last_layer = nullptr;
 	//std::vector<std::unique_ptr<layer>>::iterator::value_type
+	std::lock_guard<std::mutex> lock(forward_mutex);
 	for (auto& l : layers)
 	{
 		l->forward_propagation(
@@ -292,6 +293,7 @@ void neural_network::back_propagation(const matrix& given_data, const matrix& gi
 	//feeding the data through
 	forward_propagation(given_data);
 
+	std::lock_guard<std::mutex> lock(back_mutex);
 	//calculating the cost derivative
 	get_last_layer()->set_error_for_last_layer(given_label);
 
@@ -319,32 +321,27 @@ void neural_network::learn_on_ds(
 	float learning_rate,
 	bool input_zero_check)
 {
-	smart_assert(ds.get_current_data_readonly().is_in_gpu_mode() == is_in_gpu_mode());
-	smart_assert(ds.get_current_label().is_in_gpu_mode() == is_in_gpu_mode());
-	smart_assert(vector3::are_equal(ds.get_current_data_readonly().get_format(), input_format));
-	smart_assert(vector3::are_equal(ds.get_current_label().get_format(), get_output_readonly().get_format()));
+	smart_assert(ds.is_in_gpu_mode() == is_in_gpu_mode());
+	smart_assert(vector3::are_equal(ds.get_data_format(), input_format));
+	smart_assert(vector3::are_equal(ds.get_label_format(), get_output_readonly().get_format()));
 	smart_assert(ds.get_item_count() > 0);
+
+	matrix input(ds.get_data_format());
+	matrix label(ds.get_label_format());
+	if (is_in_gpu_mode())
+	{
+		input.enable_gpu_mode();
+		label.enable_gpu_mode();
+	}
 
 	for (size_t curr_epoch = 0; curr_epoch < epochs; curr_epoch++)
 	{
 		size_t batch_item = 0;
-		ds.iterator_reset();
-		bool first = true;
-		while (ds.iterator_has_next())
+		for (int i = 0; i < ds.get_item_count(); i++)
 		{
-			//we do this check in order to get every item. 
-			//if we did not do that, we would skip the first item
-			if (first)
-			{
-				first = false;
-			}
-			else {
-				ds.iterator_next();
-			}
+			ds.observe_data_at_idx(input, i);
+			ds.observe_label_at_idx(label, i);
 
-			matrix& input = ds.get_current_data();
-			const matrix& label = ds.get_current_label();
-			
 			if (!input_zero_check || input.contains_non_zero_items())
 			{
 				batch_item++;
@@ -376,6 +373,20 @@ void neural_network::apply_deltas(size_t training_data_count, float learning_rat
 		layers[l]->apply_deltas(training_data_count, learning_rate);
 	}
 }
+void neural_network::xavier_initialization()
+{
+	for (int i = 0; i < layers.size(); i++)
+	{
+		layers[i]->set_all_parameters(0.0f);
+
+		size_t input_size = layers[i]->get_input_format().item_count();
+		size_t outputsize = layers[i]->get_activations_readonly().item_count();
+
+		float range = sqrtf(6.0f / ((float)input_size + (float)outputsize));
+
+		layers[i]->apply_noise(range);
+	}
+}
 void neural_network::enable_gpu_mode()
 {
 	int device_count = 0;
@@ -403,7 +414,7 @@ void neural_network::enable_gpu_mode()
 	sync_device_and_host();
 }
 
-bool neural_network::is_in_gpu_mode()
+bool neural_network::is_in_gpu_mode() const
 {
 	return gpu_enabled;
 }
@@ -416,7 +427,7 @@ bool neural_network::nn_equal_format(const neural_network& other)
 	}
 	for (int i = 0; i < layers.size(); i++)
 	{
-		if (!layers[i]->nn_equal_format(*other.layers[i]))
+		if (!layers[i]->equal_format(*other.layers[i]))
 		{
 			return false;
 		}
@@ -443,10 +454,25 @@ bool neural_network::equal_parameter(const neural_network& other)
 void neural_network::set_parameters(const neural_network& other)
 {
 	smart_assert(nn_equal_format(other));
+	smart_assert(is_in_gpu_mode() == other.is_in_gpu_mode());
+
 	for (auto& l : parameter_layer_indices)
 	{
 		layers[l]->set_parameters(*other.layers[l]);
 	}
+}
+
+std::string neural_network::parameter_analysis() const
+{
+	//all layers
+
+	std::string result = "Parameter analysis:\n";
+	for (auto& l : layers)
+	{
+		result += l->parameter_analysis();
+	}
+
+	return result;
 }
 
 void neural_network::save_to_file(const std::string& file_path)

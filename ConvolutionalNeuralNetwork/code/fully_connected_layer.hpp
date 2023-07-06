@@ -21,7 +21,7 @@ public:
 		size_t number_of_neurons,
 		e_activation_t activation_function
 	);
-	
+
 	fully_connected_layer(
 		vector3 activation_format,
 		e_activation_t activation_function
@@ -36,7 +36,7 @@ public:
 	std::unique_ptr<layer> clone() const override;
 
 	size_t get_parameter_count() const override;
-	
+
 	void set_input_format(vector3 input_format) override;
 
 	const matrix& get_weights() const;
@@ -51,6 +51,8 @@ public:
 	//add a random value between range and -range to one weight or bias 
 	void mutate(float range) override;
 
+	std::string parameter_analysis() const override;
+
 	void sync_device_and_host() override;
 
 	void forward_propagation(const matrix& input) override;
@@ -61,7 +63,7 @@ public:
 	void enable_gpu_mode() override;
 	void disable_gpu() override;
 
-	bool nn_equal_format(const layer& other) override;
+	bool equal_format(const layer& other) override;
 	bool equal_parameter(const layer& other) override;
 	void set_parameters(const layer& other) override;
 
