@@ -384,6 +384,8 @@ void neural_network::xavier_initialization()
 
 		float range = sqrtf(6.0f / ((float)input_size + (float)outputsize));
 
+		std::cout << "layer " << i << " range: " << range << std::endl;
+
 		layers[i]->apply_noise(range);
 	}
 }

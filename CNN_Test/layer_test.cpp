@@ -33,8 +33,8 @@ namespace CNNTest
 			fully_connected_layer not_same((size_t)15, e_activation_t::relu_fn);
 			not_same.set_input_format(vector3(3, 6, 2));
 
-			Assert::AreEqual(start.nn_equal_format(not_same), false);
-			Assert::AreEqual(start.nn_equal_format(same), true);
+			Assert::AreEqual(start.equal_format(not_same), false);
+			Assert::AreEqual(start.equal_format(same), true);
 		}
 		TEST_METHOD(layer_equal_format_activation_fn_test)
 		{
@@ -47,8 +47,8 @@ namespace CNNTest
 			convolutional_layer not_same(3, 2, 2, e_activation_t::relu_fn);
 			not_same.set_input_format(vector3(4, 4, 1));
 
-			Assert::AreEqual(start.nn_equal_format(not_same), false);
-			Assert::AreEqual(start.nn_equal_format(same), true);
+			Assert::AreEqual(start.equal_format(not_same), false);
+			Assert::AreEqual(start.equal_format(same), true);
 		}
 		TEST_METHOD(layer_equal_format_pooling_layer_test)
 		{
@@ -59,8 +59,8 @@ namespace CNNTest
 			pooling_layer not_same(2, 2, e_pooling_type_t::average_pooling);
 			not_same.set_input_format(vector3(4, 4, 1));
 
-			Assert::AreEqual(start.nn_equal_format(not_same), false);
-			Assert::AreEqual(start.nn_equal_format(same), true);
+			Assert::AreEqual(start.equal_format(not_same), false);
+			Assert::AreEqual(start.equal_format(same), true);
 		}
 		TEST_METHOD(layer_equal_parameter_same_type_test)
 		{
@@ -71,8 +71,8 @@ namespace CNNTest
 			convolutional_layer not_same(1, 1, 1, e_activation_t::relu_fn);
 			not_same.set_input_format(vector3(1, 1, 1));
 
-			Assert::AreEqual(start.nn_equal_format(not_same), false);
-			Assert::AreEqual(start.nn_equal_format(same), true);
+			Assert::AreEqual(start.equal_format(not_same), false);
+			Assert::AreEqual(start.equal_format(same), true);
 		}
 		TEST_METHOD(layer_equal_parameter_mutated_test)
 		{
@@ -104,8 +104,8 @@ namespace CNNTest
 			Assert::AreEqual(start.equal_parameter(*not_same), false);
 			Assert::AreEqual(start.equal_parameter(*same), true);
 
-			Assert::AreEqual(start.nn_equal_format(*not_same), true);
-			Assert::AreEqual(start.nn_equal_format(*same), true);
+			Assert::AreEqual(start.equal_format(*not_same), true);
+			Assert::AreEqual(start.equal_format(*same), true);
 		}
 		TEST_METHOD(layer_copy_constructor_test)
 		{
@@ -120,8 +120,8 @@ namespace CNNTest
 			Assert::AreEqual(start.equal_parameter(not_same), false);
 			Assert::AreEqual(start.equal_parameter(same), true);
 
-			Assert::AreEqual(start.nn_equal_format(not_same), true);
-			Assert::AreEqual(start.nn_equal_format(same), true);
+			Assert::AreEqual(start.equal_format(not_same), true);
+			Assert::AreEqual(start.equal_format(same), true);
 		}
 		TEST_METHOD(layer_set_parameter_test)
 		{

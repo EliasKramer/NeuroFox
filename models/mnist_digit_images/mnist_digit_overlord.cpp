@@ -131,11 +131,9 @@ void mnist_digit_overlord::load_data(
 
 		unsigned char label = label_buffer[i];
 		label_to_matrix(label, curr_label);
-		ds.set_current_label(curr_label);
-		ds.set_current_data(current_image);
-		ds.iterator_next();
+		ds.set_label(curr_label, i);
+		ds.set_data(current_image, i);
 	}
-	ds.iterator_reset();
 
 	delete[] image_buffer;
 	delete[] label_buffer;
@@ -203,7 +201,8 @@ mnist_digit_overlord::mnist_digit_overlord()
 	nn.add_fully_connected_layer(vector3(1, 10, 1), e_activation_t::leaky_relu_fn);
 	nn.set_all_parameters(0);
 
-	nn.apply_noise(.1);
+	//nn.apply_noise(.1);
+	nn.xavier_initialization();
 	//enable_gpu();
 }
 
@@ -259,7 +258,7 @@ void mnist_digit_overlord::print_nn_size() const
 
 test_result mnist_digit_overlord::test()
 {
-	ds_test.iterator_reset();
+	smart_assert(ds_test.is_in_gpu_mode() == nn.is_in_gpu_mode());
 	test_result result;
 
 	size_t correct = 0;
@@ -268,10 +267,18 @@ test_result mnist_digit_overlord::test()
 
 	auto start = std::chrono::high_resolution_clock::now();
 
-	do
+	matrix input(vector3(28, 28, 1));
+	matrix label(vector3(1, 10, 1));
+	if (ds_test.is_in_gpu_mode())
 	{
-		const matrix& input = ds_test.get_current_data_readonly();
-		const matrix& label = ds_test.get_current_label();
+		input.enable_gpu_mode();
+		label.enable_gpu_mode();
+	}
+
+	for (int i = 0; i < ds_test.get_item_count(); i++)
+	{
+		ds_test.observe_data_at_idx(input, i);
+		ds_test.observe_label_at_idx(label, i);
 		nn.forward_propagation(input);
 		nn.get_output().sync_device_and_host();
 
@@ -283,9 +290,9 @@ test_result mnist_digit_overlord::test()
 		{
 			correct++;
 		}
-		ds_test.iterator_next();
 		total++;
-	} while (ds_test.iterator_has_next());
+	}
+
 	auto end = std::chrono::high_resolution_clock::now();
 
 	result.accuracy = (float)correct / (float)total;

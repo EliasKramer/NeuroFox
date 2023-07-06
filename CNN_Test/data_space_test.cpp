@@ -64,11 +64,11 @@ namespace CNNTest
 			m2.set_all(2.0f);
 
 
-			matrix m = ds.get_current_data_readonly();
+			matrix m(vector3(2, 2, 1));
+			ds.observe_data_at_idx(m, 0);
 			Assert::IsTrue(matrix::are_equal(m1, m));
 
-			ds.iterator_next();
-			m = ds.get_current_data_readonly();
+			ds.observe_data_at_idx(m, 1);
 			Assert::IsTrue(matrix::are_equal(m2, m));
 		}
 		TEST_METHOD(get_data_and_label_test)
@@ -96,27 +96,33 @@ namespace CNNTest
 			label.push_back(label_format);
 
 			data_space ds(
-				data_format.get_format(), 
-				label_format.get_format(), 
-				data, 
+				data_format.get_format(),
+				label_format.get_format(),
+				data,
 				label);
 
 			matrix expected_data(vector3(2, 2, 3));
 			matrix expected_label(vector3(1, 2, 1));
 
-			matrix m = ds.get_current_data_readonly();
-			matrix l = ds.get_current_label();
+			//actual
+			matrix m(vector3(2, 2, 3));
+			ds.observe_data_at_idx(m, 0);
+			matrix l(vector3(1, 2, 1));
+			ds.observe_label_at_idx(l, 0);
+
+			//expected
 			expected_data.set_all(1.0f);
 			expected_data.set_at_flat_host(0, 0.9f);
 			expected_label.set_all(1.5f);
 			expected_label.set_at_flat_host(0, 0.4f);
+
+
+
 			Assert::IsTrue(matrix::are_equal(m, expected_data));
 			Assert::IsTrue(matrix::are_equal(l, expected_label));
 
-			ds.iterator_next();
-
-			m = ds.get_current_data_readonly();
-			l = ds.get_current_label();
+			ds.observe_data_at_idx(m, 1);
+			ds.observe_label_at_idx(l, 1);
 			expected_data.set_all(5.0f);
 			expected_data.set_at_flat_host(0, 4.9f);
 			expected_label.set_all(5.5f);
