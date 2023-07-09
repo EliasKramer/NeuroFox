@@ -126,7 +126,7 @@ size_t neural_network::get_param_byte_size() const
 
 void neural_network::set_input_format(vector3 given_input_format)
 {
-	smart_assert(input_format.item_count() == 0, "Cannot set input format twice.");
+	smart_assert(input_format.item_count() == 0); //Cannot set input format twice
 
 	this->input_format = given_input_format;
 }

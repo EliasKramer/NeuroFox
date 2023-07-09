@@ -1,4 +1,5 @@
 #include "util.hpp"
+#include <iomanip>
 
 int random_idx(int size)
 {
@@ -24,7 +25,7 @@ bool biased_coin_toss(float true_bias, float false_bias)
 
 float random_float_excl(float min, float max)
 {
-	if(min > max)
+	if (min > max)
 		throw std::invalid_argument("min must be less than max");
 
 	static std::random_device rd;
@@ -137,47 +138,64 @@ size_t convolution_output_size(
 
 std::string ms_to_str(size_t ms)
 {
-	size_t second = 1000;
-	size_t minute = 60 * second;
-	size_t hour = 60 * minute;
-	size_t day = 24 * hour;
-	size_t week = 7 * day;
-	size_t month = 30 * day;
-	size_t year = 365 * day;
+	return ms_to_str(ms, 2);
+}
 
-	size_t ms_remaining = ms;
-	size_t year_count = ms / year;
-	ms_remaining -= year_count * year;
-	size_t month_count = ms_remaining / month;
-	ms_remaining -= month_count * month;
-	size_t week_count = ms_remaining / week;
-	ms_remaining -= week_count * week;
-	size_t day_count = ms_remaining / day;
-	ms_remaining -= day_count * day;
-	size_t hour_count = ms_remaining / hour;
-	ms_remaining -= hour_count * hour;
-	size_t minute_count = ms_remaining / minute;
-	ms_remaining -= minute_count * minute;
-	size_t second_count = ms_remaining / second;
-	ms_remaining -= second_count * second;
+std::string ms_to_str(size_t given_ms, size_t max_unit_count)
+{
+	//this whole thing is a hack, i know
+	const static size_t millisecond = 1;
+	const static size_t second = 1000;
+	const static size_t minute = 60 * second;
+	const static size_t hour = 60 * minute;
+	const static size_t day = 24 * hour;
+	const static size_t week = 7 * day;
+	const static size_t month = 30 * day;
+	const static size_t year = 365 * day;
 
+	const static size_t time_lengths[] = { year, month, week, day, hour, minute, second, millisecond };
+	const static std::string time_unit_names[] = { "y", "m", "w", "d", "h", "min", "s", "ms"};
+
+	size_t ms_remaining = given_ms;
+	
 	std::string result = "";
-	if (year_count > 0)
-		result += std::to_string(year_count) + "y ";
-	if (month_count > 0)
-		result += std::to_string(month_count) + "mo ";
-	if (week_count > 0)
-		result += std::to_string(week_count) + "w ";
-	if (day_count > 0)
-		result += std::to_string(day_count) + "d ";
-	if (hour_count > 0)
-		result += std::to_string(hour_count) + "h ";
-	if (minute_count > 0)
-		result += std::to_string(minute_count) + "m ";
-	if (second_count > 0)
-		result += std::to_string(second_count) + "s ";
-	if (ms_remaining > 0)
-		result += std::to_string(ms_remaining) + "ms ";
+
+	size_t time_unit_count_remaining = max_unit_count;
+
+	for (int i = 0; i < 8 && time_unit_count_remaining > 0; i++)
+	{
+		//hours, minutes, seconds, etc
+		size_t current_unit = time_lengths[i]; 		
+		//how many units fit into our given ms count
+		size_t time_units = ms_remaining / time_lengths[i];
+		//how many ms are left over after we take out the units
+		ms_remaining -= time_units * time_lengths[i];
+
+		if (time_units > 0)
+		{
+			result += std::to_string(time_units) + time_unit_names[i] + " ";
+			time_unit_count_remaining--;
+		}
+	}
 
 	return result == "" ? "0ms" : result;
+}
+
+//quick and dirty
+std::string get_current_time_str()
+{
+	// Get the current time
+	std::time_t currentTime = std::time(nullptr);
+	std::tm localTime;
+	localtime_s(&localTime, &currentTime);
+
+	// Format the current time
+	char timeBuffer[6]; // Format: hh:mm
+	std::strftime(timeBuffer, sizeof(timeBuffer), "%H:%M", &localTime);
+
+	char dateBuffer[6]; // Format: dd.mm
+	std::strftime(dateBuffer, sizeof(dateBuffer), "%d.%m", &localTime);
+
+	// Return the formatted time as a string
+	return std::string(timeBuffer) + " " + std::string(dateBuffer);
 }
