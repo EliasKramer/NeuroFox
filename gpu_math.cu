@@ -558,6 +558,7 @@ void gpu_fc_backprop(
 __global__ void gpu_apply_deltas_kernel(
 	float* a,
 	float* delta,
+	float* momentum,
 	int training_data_count,
 	float learning_rate,
 	unsigned int size
@@ -566,7 +567,11 @@ __global__ void gpu_apply_deltas_kernel(
 	unsigned int index = blockIdx.x * blockDim.x + threadIdx.x;
 	if (index < size)
 	{
-		a[index] -= ((delta[index] / (float)training_data_count) * learning_rate);
+		float beta = 0.9f;
+		float curr_delta = delta[index] / (float)training_data_count;
+		momentum[index] = beta * momentum[index] + (1 - beta) * curr_delta;
+
+		a[index] -= (momentum[index] * learning_rate);
 		delta[index] = 0;
 	}
 }
@@ -574,17 +579,20 @@ __global__ void gpu_apply_deltas_kernel(
 void gpu_apply_deltas(
 	matrix& a,
 	matrix& delta,
+	matrix& momentum,
 	size_t training_data_count,
 	float learning_rate)
 {
 	smart_assert((a.get_device_ptr() != nullptr));
 	smart_assert((delta.get_device_ptr() != nullptr));
+	smart_assert((momentum.get_device_ptr() != nullptr));
 
 	unsigned int size = a.item_count();
 	cuda_sync();
 	gpu_apply_deltas_kernel << < get_block_count(size), THREADS_PER_BLOCK >> > (
 		a.get_device_ptr(),
 		delta.get_device_ptr(),
+		momentum.get_device_ptr(),
 		training_data_count,
 		learning_rate,
 		a.item_count()

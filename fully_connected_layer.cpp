@@ -16,7 +16,8 @@ fully_connected_layer::fully_connected_layer(
 	layer(activation_format, e_layer_type_t::fully_connected),
 	activation_fn(activation_function),
 	biases(activation_format),
-	bias_deltas(activation_format)
+	bias_deltas(activation_format),
+	bias_momentum(activation_format)
 {}
 
 fully_connected_layer::fully_connected_layer(std::ifstream& file)
@@ -25,8 +26,12 @@ fully_connected_layer::fully_connected_layer(std::ifstream& file)
 	file.read((char*)&activation_fn, sizeof(activation_fn));
 	weights = matrix(file);
 	biases = matrix(file);
+
 	weight_deltas = matrix(weights.get_format());
 	bias_deltas = matrix(biases.get_format());
+
+	weight_momentum = matrix(weights.get_format());
+	bias_momentum = matrix(biases.get_format());
 }
 
 fully_connected_layer::fully_connected_layer(
@@ -35,9 +40,11 @@ fully_connected_layer::fully_connected_layer(
 	layer(other),
 	weights(other.weights),
 	biases(other.biases),
+	activation_fn(other.activation_fn),
 	weight_deltas(other.weight_deltas, false), //do not copy the deltas
 	bias_deltas(other.bias_deltas, false), //do not copy the deltas
-	activation_fn(other.activation_fn)
+	weight_momentum(other.weight_momentum, false), //do not copy the momentum
+	bias_momentum(other.bias_momentum, false) //du not copy the momentum
 {}
 
 std::unique_ptr<layer> fully_connected_layer::clone() const
@@ -60,6 +67,7 @@ void fully_connected_layer::set_input_format(vector3 input_format)
 			activations.item_count(),
 			(size_t)1));
 	weight_deltas = matrix(weights.get_format());
+	weight_momentum = matrix(weights.get_format());
 }
 
 const matrix& fully_connected_layer::get_weights() const
@@ -124,6 +132,8 @@ void fully_connected_layer::sync_device_and_host()
 	biases.sync_device_and_host();
 	weight_deltas.sync_device_and_host();
 	bias_deltas.sync_device_and_host();
+	weight_momentum.sync_device_and_host();
+	bias_momentum.sync_device_and_host();
 }
 
 void fully_connected_layer::forward_propagation(const matrix& input)
@@ -153,8 +163,8 @@ void fully_connected_layer::back_propagation(const matrix& input, matrix* passin
 
 void fully_connected_layer::apply_deltas(size_t training_data_count, float learning_rate)
 {
-	biases.apply_deltas(bias_deltas, training_data_count, learning_rate);
-	weights.apply_deltas(weight_deltas, training_data_count, learning_rate);
+	biases.apply_deltas(bias_deltas, bias_momentum, training_data_count, learning_rate);
+	weights.apply_deltas(weight_deltas, weight_momentum, training_data_count, learning_rate);
 }
 
 void fully_connected_layer::enable_gpu_mode()
@@ -165,6 +175,8 @@ void fully_connected_layer::enable_gpu_mode()
 	biases.enable_gpu_mode();
 	weight_deltas.enable_gpu_mode();
 	bias_deltas.enable_gpu_mode();
+	weight_momentum.enable_gpu_mode();
+	bias_momentum.enable_gpu_mode();
 }
 
 void fully_connected_layer::disable_gpu()
