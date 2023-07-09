@@ -162,7 +162,11 @@ public:
 	//static void valid_convolution(const matrix& input, const matrix& kernel, matrix& output);
 	//static void full_cross_correlation(const matrix& input, const matrix& kernel, matrix& output, int stride);
 	
-	void apply_deltas(matrix& delta, size_t training_data_count, float learning_rate);
+	void apply_deltas(
+		matrix& delta, 
+		matrix& momentum,
+		size_t training_data_count, 
+		float learning_rate);
 
 	void scalar_multiplication(float a);
 	void apply_activation_function(e_activation_t activation_fn);
@@ -250,6 +254,7 @@ void gpu_fc_backprop(
 void gpu_apply_deltas(
 	matrix& a,
 	matrix& delta,
+	matrix& momentum,
 	size_t training_data_count,
 	float learning_rate);
 

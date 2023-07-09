@@ -243,7 +243,7 @@ std::string data_space::to_string()
 	{
 		observe_data_at_idx(data_observer, i);
 		observe_label_at_idx(label_observer, i);
-
+		result += std::to_string(i) + ":\n";
 		result += "data: \n" + data_observer.get_string() + "\n";
 		result += "label: \n" + label_observer.get_string() + "\n";
 		result += "-------------\n";

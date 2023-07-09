@@ -126,7 +126,7 @@ size_t neural_network::get_param_byte_size() const
 
 void neural_network::set_input_format(vector3 given_input_format)
 {
-	smart_assert(input_format.item_count() == 0, "Cannot set input format twice.");
+	smart_assert(input_format.item_count() == 0); //Cannot set input format twice
 
 	this->input_format = given_input_format;
 }
@@ -383,8 +383,6 @@ void neural_network::xavier_initialization()
 		size_t outputsize = layers[i]->get_activations_readonly().item_count();
 
 		float range = sqrtf(6.0f / ((float)input_size + (float)outputsize));
-
-		std::cout << "layer " << i << " range: " << range << std::endl;
 
 		layers[i]->apply_noise(range);
 	}

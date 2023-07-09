@@ -14,22 +14,22 @@ private:
 	matrix weight_deltas;
 	matrix bias_deltas;
 
-	e_activation_t activation_fn;
-public:
+	matrix weight_momentum;
+	matrix bias_momentum;
 
+	e_activation_t activation_fn;
+
+public:
 	fully_connected_layer(
 		size_t number_of_neurons,
-		e_activation_t activation_function
-	);
+		e_activation_t activation_function);
 
 	fully_connected_layer(
 		vector3 activation_format,
-		e_activation_t activation_function
-	);
+		e_activation_t activation_function);
 
 	fully_connected_layer(
-		std::ifstream& file
-	);
+		std::ifstream& file);
 
 	fully_connected_layer(const fully_connected_layer& other);
 

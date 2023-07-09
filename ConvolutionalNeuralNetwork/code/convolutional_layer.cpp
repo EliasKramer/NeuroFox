@@ -246,7 +246,7 @@ void convolutional_layer::back_propagation(const matrix& input, matrix* passing_
 
 void convolutional_layer::apply_deltas(size_t training_data_count, float learning_rate)
 {
-	//TODO
+	throw std::exception("not implemented");
 }
 
 void convolutional_layer::enable_gpu_mode()

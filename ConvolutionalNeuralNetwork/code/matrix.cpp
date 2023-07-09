@@ -1225,21 +1225,30 @@ void matrix::cross_correlation(
 
 void matrix::apply_deltas(
 	matrix& delta,
+	matrix& momentum,
 	size_t training_data_count,
 	float learning_rate)
 {
 	smart_assert(is_initialized());
 	smart_assert(is_owning_data());
+
 	smart_assert(delta.is_initialized());
 	smart_assert(delta.is_owning_data()); // this must be true, because we set the deltas to zero after applying them
 	smart_assert(delta.gpu_enabled == gpu_enabled);
+
+	smart_assert(momentum.is_initialized());
+	smart_assert(momentum.is_owning_data());
+	smart_assert(momentum.gpu_enabled == gpu_enabled);
+
 	smart_assert(matrix::equal_format(*this, delta));
+	smart_assert(matrix::equal_format(delta, momentum));
 
 	if (gpu_enabled)
 	{
 		gpu_apply_deltas(
 			*this,
 			delta,
+			momentum,
 			training_data_count,
 			learning_rate
 		);
@@ -1249,7 +1258,12 @@ void matrix::apply_deltas(
 	}
 	for (int i = 0; i < item_count(); i++)
 	{
-		host_data[i] -= ((delta.host_data[i] / (float)training_data_count) * learning_rate);
+		float beta = 0.9f;
+		//the delta variable holds the sum of all desired changes. dividing it by the data count will return the average
+		float curr_delta = delta.host_data[i] / (float)training_data_count;
+		//gradient decent with momentum
+		momentum.host_data[i] = beta * momentum.host_data[i] + (1 - beta) * curr_delta;
+		host_data[i] -= (momentum.host_data[i] * learning_rate);
 		delta.host_data[i] = 0;
 	}
 	set_host_as_last_updated();

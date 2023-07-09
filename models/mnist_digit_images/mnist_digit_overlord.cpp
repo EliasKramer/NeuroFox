@@ -199,11 +199,10 @@ mnist_digit_overlord::mnist_digit_overlord()
 	nn.add_fully_connected_layer(20, e_activation_t::leaky_relu_fn);
 	nn.add_fully_connected_layer(20, e_activation_t::leaky_relu_fn);
 	nn.add_fully_connected_layer(vector3(1, 10, 1), e_activation_t::leaky_relu_fn);
-	nn.set_all_parameters(0);
 
 	//nn.apply_noise(.1);
 	nn.xavier_initialization();
-	//enable_gpu();
+	enable_gpu();
 }
 
 void mnist_digit_overlord::debug_function()
@@ -328,13 +327,7 @@ void mnist_digit_overlord::train(
 		float perc_diff = res.accuracy - percent_correct;
 		std::cout << res.to_string();
 		std::cout << "epoch " << i << ": " << res.accuracy << " (" << perc_diff << ")" << std::endl;
-		if (perc_diff < 0.005)
-		{
-			current_learing_rate *= .8f;
-		}
-		else {
-			current_learing_rate /= .9f;
-		}
+		//current_learing_rate = 0.9f * current_learing_rate;
 		percent_correct = res.accuracy;
 		std::cout << "learning rate: " << current_learing_rate << std::endl;
 	}
