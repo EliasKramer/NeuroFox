@@ -154,10 +154,10 @@ std::string ms_to_str(size_t given_ms, size_t max_unit_count)
 	const static size_t year = 365 * day;
 
 	const static size_t time_lengths[] = { year, month, week, day, hour, minute, second, millisecond };
-	const static std::string time_unit_names[] = { "y", "m", "w", "d", "h", "min", "s", "ms"};
+	const static std::string time_unit_names[] = { "y", "m", "w", "d", "h", "min", "s", "ms" };
 
 	size_t ms_remaining = given_ms;
-	
+
 	std::string result = "";
 
 	size_t time_unit_count_remaining = max_unit_count;
@@ -165,7 +165,7 @@ std::string ms_to_str(size_t given_ms, size_t max_unit_count)
 	for (int i = 0; i < 8 && time_unit_count_remaining > 0; i++)
 	{
 		//hours, minutes, seconds, etc
-		size_t current_unit = time_lengths[i]; 		
+		size_t current_unit = time_lengths[i];
 		//how many units fit into our given ms count
 		size_t time_units = ms_remaining / time_lengths[i];
 		//how many ms are left over after we take out the units
@@ -197,5 +197,5 @@ std::string get_current_time_str()
 	std::strftime(dateBuffer, sizeof(dateBuffer), "%d.%m", &localTime);
 
 	// Return the formatted time as a string
-	return std::string(timeBuffer) + " " + std::string(dateBuffer);
+	return  std::string(dateBuffer) + " " + std::string(timeBuffer);
 }
