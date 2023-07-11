@@ -184,6 +184,22 @@ float neural_network::calculate_cost(const matrix& expected_output)
 	return cost;
 }
 
+size_t neural_network::idx_of_max(const matrix& m) const
+{
+	size_t max_idx = 0;
+	float max = m.get_at_host(vector3(0, 0));
+	for (size_t idx = 1; idx < m.item_count(); idx++)
+	{
+		float curr = m.get_at_flat_host(idx);
+		if (curr > max)
+		{
+			max = curr;
+			max_idx = idx;
+		}
+	}
+	return max_idx;
+}
+
 void neural_network::sync_device_and_host()
 {
 	if (gpu_enabled)
@@ -362,6 +378,82 @@ void neural_network::learn_on_ds(
 		}
 		ds.shuffle();
 	}
+}
+/*size_t mnist_digit_overlord::idx_of_max(const matrix& m) const
+{
+	size_t max_idx = 0;
+	float max = m.get_at_host(vector3(0, 0));
+	for (size_t idx = 1; idx < m.item_count(); idx++)
+	{
+		float curr = m.get_at_flat_host(idx);
+		if (curr > max)
+		{
+			max = curr;
+			max_idx = idx;
+		}
+	}
+	return max_idx;
+}
+
+
+float mnist_digit_overlord::get_digit_cost(const matrix& output, const matrix& label) const
+{
+	float cost = 0;
+	for (size_t i = 0; i < output.item_count(); i++)
+	{
+		cost +=
+			(output.get_at_flat_host(i) - label.get_at_flat_host(i)) *
+			(output.get_at_flat_host(i) - label.get_at_flat_host(i));
+	}
+	return cost;
+}
+*/
+
+test_result neural_network::test_on_ds(data_space& ds)
+{
+	smart_assert(ds.is_in_gpu_mode() == is_in_gpu_mode());
+	test_result result;
+
+	size_t correct = 0;
+	float cost_sum = 0;
+	size_t total = 0;
+
+	auto start = std::chrono::high_resolution_clock::now();
+
+	matrix input(input_format);
+	matrix label(get_output().get_format());
+	if (ds.is_in_gpu_mode())
+	{
+		input.enable_gpu_mode();
+		label.enable_gpu_mode();
+	}
+
+	for (int i = 0; i < ds.get_item_count(); i++)
+	{
+		ds.observe_data_at_idx(input, i);
+		ds.observe_label_at_idx(label, i);
+		forward_propagation(input);
+		get_output().sync_device_and_host();
+
+		cost_sum += calculate_cost(label);
+		  
+		size_t idx = idx_of_max(get_output_readonly());
+		size_t label_idx = idx_of_max(label);
+		if (idx == label_idx)
+		{
+			correct++;
+		}
+		total++;
+	}
+
+	auto end = std::chrono::high_resolution_clock::now();
+
+	result.accuracy = (float)correct / (float)total;
+	result.data_count = total;
+	result.time_in_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+	result.avg_cost = (float)cost_sum / (float)total;
+
+	return result;
 }
 
 void neural_network::apply_deltas(size_t training_data_count, float learning_rate)

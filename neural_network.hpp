@@ -31,6 +31,8 @@ private:
 
 	float calculate_cost(const matrix& expected_output);
 
+	size_t idx_of_max(const matrix& m) const;
+
 	void sync_device_and_host();
 public:
 
@@ -80,6 +82,8 @@ public:
 		float learning_rate,
 		bool input_zero_check
 	);
+
+	test_result test_on_ds(data_space& ds);
 
 	//we need the training_data_count for 
 	//calculating the average of the deltas
