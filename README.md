@@ -24,7 +24,7 @@
   * Can be used directly with a Neural Network
   * Pros
     * By allocating one big block of memory for to save a fixed amount of data, it is very space efficient
-      * by saving the metadata of a matrix (like format and if it is on the gpu or not) only once
+    * This can be achieved by saving the metadata of a matrix (like format and if it is on the gpu or not) only once
   * Cons
     * A big, contiguous block of memory is often hard to allocate, since you need a lot of free space on your
       RAM or GPU
