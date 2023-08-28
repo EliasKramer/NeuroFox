@@ -582,10 +582,22 @@ void gpu_fc_backprop(
 	check_for_error_and_synchronize();
 }
 
+__device__ float discount_device(float oldValue, float newValue, float discountFactor)
+{
+	return (oldValue * discountFactor) + ((1 - discountFactor) * newValue);
+}
+
+__device__ float fix_bias_device(float value, float discountFactor, int timeStep)
+{
+	return value / (1 - pow(discountFactor, timeStep));
+}
+
 __global__ void gpu_apply_deltas_kernel(
 	float* a,
 	float* delta,
 	float* momentum,
+	float* momentum_squared,
+	int time_step,
 	int training_data_count,
 	float learning_rate,
 	unsigned int size
@@ -594,11 +606,22 @@ __global__ void gpu_apply_deltas_kernel(
 	unsigned int index = blockIdx.x * blockDim.x + threadIdx.x;
 	if (index < size)
 	{
-		float beta = 0.9f;
-		float curr_delta = delta[index] / (float)training_data_count;
-		momentum[index] = beta * momentum[index] + (1 - beta) * curr_delta;
+		const float beta_1 = 0.9f;
+		const float beta_2 = 0.99f;
+		
+		float final_gradient = delta[index] / (float)training_data_count;
 
-		a[index] -= (momentum[index] * learning_rate);
+		momentum[index] = discount_device(momentum[index], final_gradient, beta_1);
+		momentum_squared[index] = discount_device(momentum_squared[index], final_gradient * final_gradient, beta_2);
+
+		float momentum_fixed = fix_bias_device(momentum[index], beta_1, time_step);
+		float momentum_squared_fixed = fix_bias_device(momentum_squared[index], beta_2, time_step);
+
+		float raw_delta = momentum_fixed / (sqrtf(momentum_squared_fixed) + (pow(10.0, -6)));
+		float final_delta = raw_delta * learning_rate;
+
+		a[index] -= final_delta;
+
 		delta[index] = 0;
 	}
 }
@@ -607,11 +630,15 @@ void gpu_apply_deltas(
 	matrix& a,
 	matrix& delta,
 	matrix& momentum,
+	matrix& momentum_squared,
+	int time_step,
 	size_t training_data_count,
 	float learning_rate)
 {
 	smart_assert((a.get_device_ptr() != nullptr));
 	smart_assert((delta.get_device_ptr() != nullptr));
+	smart_assert((momentum_squared.get_device_ptr() != nullptr));
+	smart_assert(time_step >= 1);
 	smart_assert((momentum.get_device_ptr() != nullptr));
 
 	unsigned int size = a.item_count();
@@ -620,6 +647,8 @@ void gpu_apply_deltas(
 		a.get_device_ptr(),
 		delta.get_device_ptr(),
 		momentum.get_device_ptr(),
+		momentum_squared.get_device_ptr(),
+		time_step,
 		training_data_count,
 		learning_rate,
 		a.item_count()

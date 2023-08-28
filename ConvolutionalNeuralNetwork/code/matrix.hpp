@@ -257,6 +257,8 @@ void gpu_apply_deltas(
 	matrix& a,
 	matrix& delta,
 	matrix& momentum,
+	matrix& momentum_squared,
+	int time_step,
 	size_t training_data_count,
 	float learning_rate);
 

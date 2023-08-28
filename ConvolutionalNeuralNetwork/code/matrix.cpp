@@ -1223,12 +1223,12 @@ void matrix::cross_correlation(
 	output.set_host_as_last_updated();
 }
 
-static double discount(float oldValue, float newValue, float discountFactor)
+static float discount(float oldValue, float newValue, float discountFactor)
 {
 	return (oldValue * discountFactor) + ((1 - discountFactor) * newValue);
 }
 
-static double fix_bias(float value, float discountFactor, int timeStep)
+static float fix_bias(float value, float discountFactor, int timeStep)
 {
 	return value / (1 - pow(discountFactor, timeStep));
 }
@@ -1257,11 +1257,12 @@ void matrix::apply_deltas(
 
 	if (gpu_enabled)
 	{
-		throw std::runtime_error("gpu not implemented");
 		gpu_apply_deltas(
 			*this,
 			delta,
 			momentum,
+			momentum_squared,
+			time_step,
 			training_data_count,
 			learning_rate
 		);
