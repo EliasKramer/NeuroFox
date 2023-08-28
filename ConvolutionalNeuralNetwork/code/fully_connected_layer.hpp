@@ -17,6 +17,11 @@ private:
 	matrix weight_momentum;
 	matrix bias_momentum;
 
+	matrix weight_momentum_squared;
+	matrix bias_momentum_squared;
+
+	int time_step = 1;
+
 	e_activation_t activation_fn;
 
 public:

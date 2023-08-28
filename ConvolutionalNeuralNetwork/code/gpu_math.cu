@@ -71,6 +71,11 @@ __device__ float gpu_single_leaky_relu(float x)
 	return x > 0 ? x : LEAKY_RELU_FACTOR * x;
 }
 
+__device__ float gpu_single_identity(float x)
+{
+	return x;
+}
+
 //not clean, but it has to do for now
 __device__ float gpu_single_activation(float x, int function_idx)
 {
@@ -86,9 +91,13 @@ __device__ float gpu_single_activation(float x, int function_idx)
 	{
 		return gpu_single_leaky_relu(x);
 	}
+	else if (function_idx == 3)
+	{
+		return gpu_single_identity(x);
+	}
 	else
 	{
-		printf("single_activation not implemented");
+		printf("single_activation not implemented %d", function_idx);
 		return 0;
 	}
 }
@@ -109,6 +118,11 @@ __device__ float gpu_single_leaky_relu_derivative(float x)
 	return x > 0 ? 1 : LEAKY_RELU_FACTOR;
 }
 
+__device__ float gpu_single_identity_derivative(float x)
+{
+	return 1;
+}
+
 //not clean, but it has to do for now
 __device__ float gpu_single_derivative(float x, int function_idx)
 {
@@ -123,6 +137,10 @@ __device__ float gpu_single_derivative(float x, int function_idx)
 	else if (function_idx == 2)
 	{
 		return gpu_single_leaky_relu_derivative(x);
+	}
+	else if (function_idx == 3)
+	{
+		return gpu_single_identity_derivative(x);
 	}
 	else
 	{
@@ -147,6 +165,11 @@ __device__ float gpu_single_leaky_relu_inverse(float x)
 	return x > 0 ? x : x / LEAKY_RELU_FACTOR;
 }
 
+__device__ float gpu_single_identity_inverse(float x)
+{
+	return x;
+}
+
 //not clean, but it has to do for now
 __device__ float gpu_single_inverse(float x, int function_idx)
 {
@@ -161,6 +184,10 @@ __device__ float gpu_single_inverse(float x, int function_idx)
 	else if (function_idx == 2)
 	{
 		return gpu_single_leaky_relu_inverse(x);
+	}
+	else if (function_idx == 3)
+	{
+		return gpu_single_identity_inverse(x);
 	}
 	else
 	{

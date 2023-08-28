@@ -16,5 +16,6 @@ typedef enum _layer_type {
 enum _activation {
 	sigmoid_fn = 0,
 	relu_fn = 1,
-	leaky_relu_fn = 2
+	leaky_relu_fn = 2,
+	identity_fn = 3,
 } typedef e_activation_t;

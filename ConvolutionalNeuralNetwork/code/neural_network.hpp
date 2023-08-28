@@ -31,8 +31,9 @@ private:
 
 	float calculate_cost(const matrix& expected_output);
 
-	void sync_device_and_host();
+	size_t idx_of_max(const matrix& m) const;
 public:
+	void sync_device_and_host();
 
 	neural_network();
 	neural_network(const std::string& file);
@@ -80,6 +81,8 @@ public:
 		float learning_rate,
 		bool input_zero_check
 	);
+
+	test_result test_on_ds(data_space& ds);
 
 	//we need the training_data_count for 
 	//calculating the average of the deltas

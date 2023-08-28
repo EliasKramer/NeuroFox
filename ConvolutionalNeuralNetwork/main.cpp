@@ -3,15 +3,21 @@
 
 int main()
 {
+
 	mnist_digit_overlord overlord;
-	
-	overlord.train(150, 100, 1.0f);
 
-	std::cout << "start testing" << std::endl;
-	test_result t_result = overlord.test();
-	std::cout << "testing done" << std::endl;
-	std::cout << t_result.to_string() << std::endl;
+	for (int i = 0; ; i++)
+	{
+		std::cout << "Epoch: " << i << std::endl;
 
+		overlord.train(1, 1, 0.0001f);
+
+		//std::cout << "start testing" << std::endl;
+		test_result t_result = overlord.test();
+		//std::cout << "testing done" << std::endl;
+		std::cout << t_result.to_string() << "\n\n";
+
+	}
 	return 0;
 
 	matrix m;

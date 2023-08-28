@@ -196,13 +196,13 @@ mnist_digit_overlord::mnist_digit_overlord()
 	//nn.add_pooling_layer(2, 2, e_pooling_type_t::average_pooling);
 	//nn.add_convolutional_layer(2, 3, 1, e_activation_t::sigmoid_fn);
 	//nn.add_fully_connected_layer(16, e_activation_t::sigmoid_fn);
-	nn.add_fully_connected_layer(20, e_activation_t::leaky_relu_fn);
-	nn.add_fully_connected_layer(20, e_activation_t::leaky_relu_fn);
+	nn.add_fully_connected_layer(26, e_activation_t::leaky_relu_fn);
+	nn.add_fully_connected_layer(26, e_activation_t::leaky_relu_fn);
 	nn.add_fully_connected_layer(vector3(1, 10, 1), e_activation_t::leaky_relu_fn);
 
 	//nn.apply_noise(.1);
 	nn.xavier_initialization();
-	enable_gpu();
+	//enable_gpu();
 }
 
 void mnist_digit_overlord::debug_function()
@@ -316,7 +316,8 @@ void mnist_digit_overlord::train(
 		<< std::endl;
 
 	auto start = std::chrono::high_resolution_clock::now();
-
+	nn.learn_on_ds(ds_training, epochs, batch_size, learning_rate, false);
+	/*
 	float inital_learning_rate = learning_rate;
 	float current_learing_rate = inital_learning_rate;
 	float percent_correct = 0;
@@ -331,7 +332,7 @@ void mnist_digit_overlord::train(
 		percent_correct = res.accuracy;
 		std::cout << "learning rate: " << current_learing_rate << std::endl;
 	}
-
+	*/
 	auto end = std::chrono::high_resolution_clock::now();
 
 	std::cout << "training finished, took " <<
