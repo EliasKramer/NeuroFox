@@ -110,7 +110,7 @@ void layer::set_error_for_last_layer(const matrix& expected)
 {
 	smart_assert(matrix::equal_format(activations, expected));
 
-	//this calculates the const derivative
+	//this calculates the cost derivative
 	error.set_all(0); // i don think that is necessary - has to be tested
 	matrix::subtract(activations, expected, error);
 	error.scalar_multiplication(2);
