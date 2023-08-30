@@ -17,7 +17,8 @@ fully_connected_layer::fully_connected_layer(
 	activation_fn(activation_function),
 	biases(activation_format),
 	bias_deltas(activation_format),
-	bias_momentum(activation_format)
+	bias_momentum(activation_format),
+	bias_momentum_squared(activation_format)
 {}
 
 fully_connected_layer::fully_connected_layer(std::ifstream& file)
@@ -32,6 +33,9 @@ fully_connected_layer::fully_connected_layer(std::ifstream& file)
 
 	weight_momentum = matrix(weights.get_format());
 	bias_momentum = matrix(biases.get_format());
+
+	weight_momentum_squared = matrix(weights.get_format());
+	bias_momentum_squared = matrix(biases.get_format());
 }
 
 fully_connected_layer::fully_connected_layer(
@@ -44,7 +48,9 @@ fully_connected_layer::fully_connected_layer(
 	weight_deltas(other.weight_deltas, false), //do not copy the deltas
 	bias_deltas(other.bias_deltas, false), //do not copy the deltas
 	weight_momentum(other.weight_momentum, false), //do not copy the momentum
-	bias_momentum(other.bias_momentum, false) //du not copy the momentum
+	bias_momentum(other.bias_momentum, false), //du not copy the momentum
+	weight_momentum_squared(other.weight_momentum_squared, false), //do not copy the momentum
+	bias_momentum_squared(other.bias_momentum_squared, false) //du not copy the momentum
 {}
 
 std::unique_ptr<layer> fully_connected_layer::clone() const
@@ -68,6 +74,7 @@ void fully_connected_layer::set_input_format(vector3 input_format)
 			(size_t)1));
 	weight_deltas = matrix(weights.get_format());
 	weight_momentum = matrix(weights.get_format());
+	weight_momentum_squared = matrix(weights.get_format());
 }
 
 const matrix& fully_connected_layer::get_weights() const
@@ -163,8 +170,9 @@ void fully_connected_layer::back_propagation(const matrix& input, matrix* passin
 
 void fully_connected_layer::apply_deltas(size_t training_data_count, float learning_rate)
 {
-	biases.apply_deltas(bias_deltas, bias_momentum, training_data_count, learning_rate);
-	weights.apply_deltas(weight_deltas, weight_momentum, training_data_count, learning_rate);
+	biases.apply_deltas(bias_deltas, bias_momentum, bias_momentum_squared, time_step, training_data_count, learning_rate);
+	weights.apply_deltas(weight_deltas, weight_momentum, weight_momentum_squared, time_step, training_data_count, learning_rate);
+	time_step++;
 }
 
 void fully_connected_layer::enable_gpu_mode()
@@ -177,6 +185,8 @@ void fully_connected_layer::enable_gpu_mode()
 	bias_deltas.enable_gpu_mode();
 	weight_momentum.enable_gpu_mode();
 	bias_momentum.enable_gpu_mode();
+	weight_momentum_squared.enable_gpu_mode();
+	bias_momentum_squared.enable_gpu_mode();
 }
 
 void fully_connected_layer::disable_gpu()

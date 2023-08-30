@@ -17,6 +17,11 @@ float leaky_relu(float x)
 	return x > 0 ? x : LEAKY_RELU_FACTOR * x;
 }
 
+float identity(float x)
+{
+	return x;
+}
+
 float sigmoid_derivative(float x)
 {
 	float sig = sigmoid(x);
@@ -33,6 +38,11 @@ float leaky_relu_derivative(float x)
 	return x > 0 ? 1.0f : LEAKY_RELU_FACTOR;
 }
 
+float identity_derivative(float x)
+{
+	return 1.0f;
+}
+
 float logit(float x)
 {
 	return log(x / (1.0f - x));
@@ -46,4 +56,9 @@ float inverse_relu(float x)
 float inverse_leaky_relu(float x)
 {
 	return x > 0 ? x : x / LEAKY_RELU_FACTOR;
+}
+
+float inverse_identity(float x)
+{
+	return x;
 }

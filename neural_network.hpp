@@ -32,9 +32,8 @@ private:
 	float calculate_cost(const matrix& expected_output);
 
 	size_t idx_of_max(const matrix& m) const;
-
-	void sync_device_and_host();
 public:
+	void sync_device_and_host();
 
 	neural_network();
 	neural_network(const std::string& file);

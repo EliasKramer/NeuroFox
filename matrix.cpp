@@ -15,7 +15,7 @@ void matrix::set_device_as_last_updated()
 	smart_assert(is_initialized());
 	smart_assert(gpu_enabled);
 	smart_assert(last_updated_data != host_data);
-	
+
 	last_updated_data = device_data;
 }
 
@@ -128,13 +128,13 @@ void matrix::copy_device2device_from(const matrix& src)
 {
 	smart_assert(is_initialized());
 	smart_assert(src.is_initialized());
-	
+
 	smart_assert(is_owning_data());
 	smart_assert(src.is_owning_data());
-	
+
 	smart_assert(is_in_gpu_mode());
 	smart_assert(src.is_in_gpu_mode());
-	
+
 	smart_assert(equal_format(*this, src));
 
 	cudaMemcpy(
@@ -223,7 +223,7 @@ matrix::matrix(
 	smart_assert(!given_vector.empty());
 	smart_assert(given_vector.size() == item_count());
 	smart_assert(is_owning_data()); //if this occurs, the format was not valid
-	
+
 	std::copy(given_vector.data(), given_vector.data() + item_count(), this->host_data);
 
 	set_host_as_last_updated();
@@ -300,7 +300,7 @@ void matrix::sync_device_and_host()
 	{
 		throw std::runtime_error("last_updated_data is not pointing to host or device");
 	}
- }
+}
 
 bool matrix::is_device_and_host_synced() const
 {
@@ -510,7 +510,7 @@ float matrix::percentile(float percentage) const
 	smart_assert(is_initialized());
 	smart_assert(host_data_is_updated());
 	smart_assert(percentage >= 0.0f && percentage <= 1.0f);
-	
+
 	float* sorted = new float[item_count()];
 	memcpy(sorted, host_data, sizeof(float) * item_count());
 	std::sort(sorted, sorted + item_count());
@@ -634,7 +634,7 @@ void matrix::observe_row(matrix& m, size_t row_idx, size_t item_idx)
 	// 
 	//so as soon as
 	//12 - 9 - item_idx < 0 we throw an error
-	
+
 	/*
 	if ((m.get_width() - item_count() - item_idx) < 0)
 	{
@@ -645,7 +645,7 @@ void matrix::observe_row(matrix& m, size_t row_idx, size_t item_idx)
 	smart_assert((m.get_width() - item_count() - item_idx) >= 0);
 
 	delete_data_if_owning();
-	
+
 	host_data = m.get_ptr_item(m.host_data, item_idx, row_idx, 0);
 
 	if (gpu_enabled)
@@ -790,7 +790,7 @@ bool matrix::contains_non_zero_items() {
 	//tried to do this in cuda as well,
 	//but it was slower than doing it on the cpu
 	sync_device_and_host();
-	
+
 	for (int i = 0; i < item_count(); i++)
 	{
 		if (host_data[i] != 0)
@@ -839,11 +839,11 @@ void matrix::add(const matrix& a, const matrix& b, matrix& result)
 	smart_assert(a.get_width() == b.get_width());
 	smart_assert(a.get_height() == b.get_height());
 	smart_assert(a.get_depth() == b.get_depth());
-	
+
 	smart_assert(a.get_width() == result.get_width());
 	smart_assert(a.get_height() == result.get_height());
 	smart_assert(a.get_depth() == result.get_depth());
-	
+
 	if (a.gpu_enabled &&
 		b.gpu_enabled &&
 		result.gpu_enabled)
@@ -1025,7 +1025,7 @@ void matrix::fully_connected_backprop(
 	smart_assert(error.is_initialized());
 	smart_assert(weight_deltas.is_initialized());
 	smart_assert(bias_deltas.is_initialized());
-	
+
 	smart_assert(bias_deltas.is_owning_data());
 	smart_assert(weight_deltas.is_owning_data());
 	smart_assert(passing_error == nullptr || passing_error->is_initialized());
@@ -1136,7 +1136,7 @@ void matrix::cross_correlation(
 	smart_assert(output.is_initialized());
 	smart_assert(output.is_owning_data());
 
-	smart_assert(kernels.size() > 0);	
+	smart_assert(kernels.size() > 0);
 
 	bool use_gpu = true;
 	use_gpu = use_gpu && input.gpu_enabled;
@@ -1223,9 +1223,21 @@ void matrix::cross_correlation(
 	output.set_host_as_last_updated();
 }
 
+static float discount(float oldValue, float newValue, float discountFactor)
+{
+	return (oldValue * discountFactor) + ((1 - discountFactor) * newValue);
+}
+
+static float fix_bias(float value, float discountFactor, int timeStep)
+{
+	return value / (1 - pow(discountFactor, timeStep));
+}
+
 void matrix::apply_deltas(
 	matrix& delta,
 	matrix& momentum,
+	matrix& momentum_squared,
+	int time_step,
 	size_t training_data_count,
 	float learning_rate)
 {
@@ -1249,6 +1261,8 @@ void matrix::apply_deltas(
 			*this,
 			delta,
 			momentum,
+			momentum_squared,
+			time_step,
 			training_data_count,
 			learning_rate
 		);
@@ -1256,14 +1270,25 @@ void matrix::apply_deltas(
 		delta.set_device_as_last_updated();
 		return;
 	}
+
+	const float beta_1 = 0.9f;
+	const float beta_2 = 0.99f;
+	
 	for (int i = 0; i < item_count(); i++)
 	{
-		float beta = 0.9f;
-		//the delta variable holds the sum of all desired changes. dividing it by the data count will return the average
-		float curr_delta = delta.host_data[i] / (float)training_data_count;
-		//gradient decent with momentum
-		momentum.host_data[i] = beta * momentum.host_data[i] + (1 - beta) * curr_delta;
-		host_data[i] -= (momentum.host_data[i] * learning_rate);
+		float final_gradient = delta.host_data[i] / (float)training_data_count;
+
+		momentum.set_at_flat_host(i, discount(momentum.get_at_flat_host(i), final_gradient, beta_1));
+		momentum_squared.set_at_flat_host(i, discount(momentum_squared.get_at_flat_host(i), final_gradient * final_gradient, beta_2));
+
+		float momentum_fixed = fix_bias(momentum.get_at_flat_host(i), beta_1, time_step);
+		float momentum_squared_fixed = fix_bias(momentum_squared.get_at_flat_host(i), beta_2, time_step);
+
+		float raw_delta = momentum_fixed / (sqrt(momentum_squared_fixed) + (pow(10.0, -6)));
+		float final_delta = raw_delta * learning_rate;
+
+		host_data[i] -= final_delta;
+
 		delta.host_data[i] = 0;
 	}
 	set_host_as_last_updated();

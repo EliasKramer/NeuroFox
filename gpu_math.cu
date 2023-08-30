@@ -71,6 +71,11 @@ __device__ float gpu_single_leaky_relu(float x)
 	return x > 0 ? x : LEAKY_RELU_FACTOR * x;
 }
 
+__device__ float gpu_single_identity(float x)
+{
+	return x;
+}
+
 //not clean, but it has to do for now
 __device__ float gpu_single_activation(float x, int function_idx)
 {
@@ -86,9 +91,13 @@ __device__ float gpu_single_activation(float x, int function_idx)
 	{
 		return gpu_single_leaky_relu(x);
 	}
+	else if (function_idx == 3)
+	{
+		return gpu_single_identity(x);
+	}
 	else
 	{
-		printf("single_activation not implemented");
+		printf("single_activation not implemented %d", function_idx);
 		return 0;
 	}
 }
@@ -109,6 +118,11 @@ __device__ float gpu_single_leaky_relu_derivative(float x)
 	return x > 0 ? 1 : LEAKY_RELU_FACTOR;
 }
 
+__device__ float gpu_single_identity_derivative(float x)
+{
+	return 1;
+}
+
 //not clean, but it has to do for now
 __device__ float gpu_single_derivative(float x, int function_idx)
 {
@@ -123,6 +137,10 @@ __device__ float gpu_single_derivative(float x, int function_idx)
 	else if (function_idx == 2)
 	{
 		return gpu_single_leaky_relu_derivative(x);
+	}
+	else if (function_idx == 3)
+	{
+		return gpu_single_identity_derivative(x);
 	}
 	else
 	{
@@ -147,6 +165,11 @@ __device__ float gpu_single_leaky_relu_inverse(float x)
 	return x > 0 ? x : x / LEAKY_RELU_FACTOR;
 }
 
+__device__ float gpu_single_identity_inverse(float x)
+{
+	return x;
+}
+
 //not clean, but it has to do for now
 __device__ float gpu_single_inverse(float x, int function_idx)
 {
@@ -161,6 +184,10 @@ __device__ float gpu_single_inverse(float x, int function_idx)
 	else if (function_idx == 2)
 	{
 		return gpu_single_leaky_relu_inverse(x);
+	}
+	else if (function_idx == 3)
+	{
+		return gpu_single_identity_inverse(x);
 	}
 	else
 	{
@@ -555,10 +582,22 @@ void gpu_fc_backprop(
 	check_for_error_and_synchronize();
 }
 
+__device__ float discount_device(float oldValue, float newValue, float discountFactor)
+{
+	return (oldValue * discountFactor) + ((1 - discountFactor) * newValue);
+}
+
+__device__ float fix_bias_device(float value, float discountFactor, int timeStep)
+{
+	return value / (1 - pow(discountFactor, timeStep));
+}
+
 __global__ void gpu_apply_deltas_kernel(
 	float* a,
 	float* delta,
 	float* momentum,
+	float* momentum_squared,
+	int time_step,
 	int training_data_count,
 	float learning_rate,
 	unsigned int size
@@ -567,11 +606,22 @@ __global__ void gpu_apply_deltas_kernel(
 	unsigned int index = blockIdx.x * blockDim.x + threadIdx.x;
 	if (index < size)
 	{
-		float beta = 0.9f;
-		float curr_delta = delta[index] / (float)training_data_count;
-		momentum[index] = beta * momentum[index] + (1 - beta) * curr_delta;
+		const float beta_1 = 0.9f;
+		const float beta_2 = 0.99f;
+		
+		float final_gradient = delta[index] / (float)training_data_count;
 
-		a[index] -= (momentum[index] * learning_rate);
+		momentum[index] = discount_device(momentum[index], final_gradient, beta_1);
+		momentum_squared[index] = discount_device(momentum_squared[index], final_gradient * final_gradient, beta_2);
+
+		float momentum_fixed = fix_bias_device(momentum[index], beta_1, time_step);
+		float momentum_squared_fixed = fix_bias_device(momentum_squared[index], beta_2, time_step);
+
+		float raw_delta = momentum_fixed / (sqrtf(momentum_squared_fixed) + (pow(10.0, -6)));
+		float final_delta = raw_delta * learning_rate;
+
+		a[index] -= final_delta;
+
 		delta[index] = 0;
 	}
 }
@@ -580,11 +630,15 @@ void gpu_apply_deltas(
 	matrix& a,
 	matrix& delta,
 	matrix& momentum,
+	matrix& momentum_squared,
+	int time_step,
 	size_t training_data_count,
 	float learning_rate)
 {
 	smart_assert((a.get_device_ptr() != nullptr));
 	smart_assert((delta.get_device_ptr() != nullptr));
+	smart_assert((momentum_squared.get_device_ptr() != nullptr));
+	smart_assert(time_step >= 1);
 	smart_assert((momentum.get_device_ptr() != nullptr));
 
 	unsigned int size = a.item_count();
@@ -593,6 +647,8 @@ void gpu_apply_deltas(
 		a.get_device_ptr(),
 		delta.get_device_ptr(),
 		momentum.get_device_ptr(),
+		momentum_squared.get_device_ptr(),
+		time_step,
 		training_data_count,
 		learning_rate,
 		a.item_count()

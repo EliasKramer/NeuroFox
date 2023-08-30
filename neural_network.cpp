@@ -435,11 +435,12 @@ test_result neural_network::test_on_ds(data_space& ds)
 		forward_propagation(input);
 		get_output().sync_device_and_host();
 
-		cost_sum += calculate_cost(label);
-		  
-		size_t idx = idx_of_max(get_output_readonly());
-		size_t label_idx = idx_of_max(label);
-		if (idx == label_idx)
+		cost_sum += calculate_cost(label);  
+
+		float value = get_output_readonly().get_at_flat_host(0);
+		float label_v = label.get_at_flat_host(0);
+		float threshold = 3;
+		if (std::abs(value - label_v) < threshold) //THIS ONLY WORKS FOR 1x1 labels - TODO: FIX THIS
 		{
 			correct++;
 		}
