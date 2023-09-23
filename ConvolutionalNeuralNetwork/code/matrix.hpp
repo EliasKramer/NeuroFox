@@ -159,6 +159,8 @@ public:
 	static bool are_equal(const matrix& a, const matrix& b, float tolerance);
 	static bool equal_format(const matrix& a, const matrix& b);
 
+	static void softmax(const matrix& input, matrix& result);
+	static void cross_entropy(const matrix& input, const matrix& target, matrix& result);
 
 	static void cross_correlation(
 		const matrix& input,

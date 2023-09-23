@@ -31,6 +31,7 @@ public:
 
 	std::unique_ptr<layer> clone() const override;
 
+	bool is_parameter_layer() const override;
 	size_t get_parameter_count() const override;
 
 	//getters

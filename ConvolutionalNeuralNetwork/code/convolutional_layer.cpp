@@ -67,6 +67,11 @@ std::unique_ptr<layer> convolutional_layer::clone() const
 	return std::make_unique<convolutional_layer>(*this);
 }
 
+bool convolutional_layer::is_parameter_layer() const
+{
+	return true;
+}
+
 size_t convolutional_layer::get_parameter_count() const
 {
 	size_t result = 0;

@@ -17,6 +17,11 @@ int main()
 		//std::cout << "testing done" << std::endl;
 		std::cout << t_result.to_string() << "\n\n";
 
+		//std::cout << "start testing on training data" << std::endl;
+		test_result t_result_training = overlord.test_on_training_data();
+		//std::cout << "testing on training data done" << std::endl;
+		std::cout << t_result_training.to_string() << "\n\n";
+
 	}
 	return 0;
 

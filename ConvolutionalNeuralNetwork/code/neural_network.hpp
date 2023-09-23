@@ -5,6 +5,7 @@
 #include "pooling_layer.hpp"
 #include "fully_connected_layer.hpp"
 #include "convolutional_layer.hpp"
+#include "softmax_layer.hpp"
 #include "test_result.hpp"
 
 #include "cuda_runtime.h"
@@ -61,6 +62,8 @@ public:
 		size_t stride,
 		e_activation_t activation_fn);
 	void add_pooling_layer(size_t kernel_size, size_t stride, e_pooling_type_t pooling_type);
+
+	void add_softmax_layer();
 
 	//set all weights and biases to that value
 	void set_all_parameters(float value);

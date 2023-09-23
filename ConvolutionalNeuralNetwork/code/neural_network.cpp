@@ -50,6 +50,9 @@ neural_network::neural_network(const std::string& file)
 			case e_layer_type_t::pooling:
 				layers.push_back(std::move(std::make_unique<pooling_layer>(input)));
 				break;
+			case e_layer_type_t::softmax:
+				layers.push_back(std::move(std::make_unique<softmax_layer>(input)));
+				break;
 
 			default:
 				throw std::runtime_error("Unknown layer type");
@@ -148,7 +151,7 @@ void neural_network::add_layer(std::unique_ptr<layer>&& given_layer)
 	//add the index of the layer to the vector of parameter layers
 	//if the layer is not a pooling layer
 	//because pooling layers do not have parameters
-	if (given_layer->get_layer_type() != e_layer_type_t::pooling)
+	if (given_layer->is_parameter_layer())
 	{
 		parameter_layer_indices.push_back((int)layers.size());
 	}
@@ -246,6 +249,12 @@ void neural_network::add_pooling_layer(size_t kernel_size, size_t stride, e_pool
 {
 	//TODO
 	throw std::exception("not implemented");
+}
+
+void neural_network::add_softmax_layer()
+{
+	std::unique_ptr<softmax_layer> new_layer = std::make_unique<softmax_layer>();
+	add_layer(std::move(new_layer));
 }
 
 void neural_network::set_all_parameters(float value)
@@ -469,16 +478,16 @@ void neural_network::apply_deltas(size_t training_data_count, float learning_rat
 }
 void neural_network::xavier_initialization()
 {
-	for (int i = 0; i < layers.size(); i++)
+	for (int i = 0; i < parameter_layer_indices.size(); i++)
 	{
-		layers[i]->set_all_parameters(0.0f);
+		layers[parameter_layer_indices[i]]->set_all_parameters(0.0f);
 
-		size_t input_size = layers[i]->get_input_format().item_count();
-		size_t outputsize = layers[i]->get_activations_readonly().item_count();
+		size_t input_size = layers[parameter_layer_indices[i]]->get_input_format().item_count();
+		size_t outputsize = layers[parameter_layer_indices[i]]->get_activations_readonly().item_count();
 
 		float range = sqrtf(6.0f / ((float)input_size + (float)outputsize));
 
-		layers[i]->apply_noise(range);
+		layers[parameter_layer_indices[i]]->apply_noise(range);
 	}
 }
 void neural_network::enable_gpu_mode()

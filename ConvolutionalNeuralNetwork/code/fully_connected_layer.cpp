@@ -58,6 +58,11 @@ std::unique_ptr<layer> fully_connected_layer::clone() const
 	return std::make_unique<fully_connected_layer>(*this);
 }
 
+bool fully_connected_layer::is_parameter_layer() const
+{
+	return true;
+}
+
 size_t fully_connected_layer::get_parameter_count() const
 {
 	return weights.item_count() + biases.item_count();

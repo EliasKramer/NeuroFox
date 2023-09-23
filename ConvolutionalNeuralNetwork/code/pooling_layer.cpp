@@ -35,6 +35,11 @@ std::unique_ptr<layer> pooling_layer::clone() const
 	return std::make_unique<pooling_layer>(*this);
 }
 
+bool pooling_layer::is_parameter_layer() const
+{
+	return false;
+}
+
 size_t pooling_layer::get_parameter_count() const
 {
 	throw std::invalid_argument("pooling layer does not have any parameters");

@@ -32,6 +32,7 @@ public:
 	
 	const e_layer_type_t get_layer_type() const;
 
+	virtual bool is_parameter_layer() const = 0;
 	virtual size_t get_parameter_count() const = 0;
 	size_t get_param_byte_size() const;
 

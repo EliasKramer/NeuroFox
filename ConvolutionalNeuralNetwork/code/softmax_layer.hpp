@@ -3,12 +3,14 @@
 
 class softmax_layer: public layer {
 public:
-	softmax_layer(vector3 activation_format);
+	softmax_layer();
 	softmax_layer(std::ifstream& file);
 	softmax_layer(const softmax_layer& other);
 	std::unique_ptr<layer> clone() const override;
+	bool is_parameter_layer() const override;
 	size_t get_parameter_count() const override;
 	void set_input_format(vector3 input_format) override;
+	void set_error_for_last_layer(const matrix& expected) override;
 	void set_all_parameters(float value) override;
 	void apply_noise(float range) override;
 	void mutate(float range) override;

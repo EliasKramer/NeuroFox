@@ -24,6 +24,7 @@ public:
 	//clone
 	std::unique_ptr<layer> clone() const override;
 
+	bool is_parameter_layer() const override;
 	size_t get_parameter_count() const override;
 
 	void set_input_format(vector3 input_format) override;

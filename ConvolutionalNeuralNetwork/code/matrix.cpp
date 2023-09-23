@@ -1060,12 +1060,11 @@ void matrix::fully_connected_backprop(
 	for (int neuron_idx = 0; neuron_idx < activations.item_count(); neuron_idx++)
 	{
 		float error_value = error.get_at_flat_host(neuron_idx);
-
 		//z
 		float unactivated_activation = INVERSE[activation_fn](activations.get_at_flat_host(neuron_idx));
 		//sig deriv
 		float activation_derivative = DERIVATIVE[activation_fn](unactivated_activation);
-
+	
 		//bias change
 		float bias_change = error_value * activation_derivative;
 		bias_deltas.add_at_flat(neuron_idx, bias_change);
@@ -1099,8 +1098,8 @@ void matrix::fully_connected_backprop(
 }
 
 void matrix::mult_with_derivative_of_unactivated_fn(
-	const matrix& activations, 
-	const matrix& error, 
+	const matrix& activations,
+	const matrix& error,
 	matrix& result,
 	e_activation_t activation_fn)
 {
@@ -1152,6 +1151,73 @@ bool matrix::are_equal(const matrix& a, const matrix& b, float tolerance)
 bool matrix::equal_format(const matrix& a, const matrix& b)
 {
 	return vector3::are_equal(a.format, b.format);
+}
+
+void matrix::softmax(const matrix& input, matrix& result)
+{
+	smart_assert(input.is_initialized());
+	smart_assert(result.is_initialized());
+	smart_assert(matrix::equal_format(input, result));
+
+	if (input.is_in_gpu_mode() && result.is_in_gpu_mode())
+	{
+		throw std::runtime_error("Not implemented");
+		//gpu_softmax(input, result);
+		result.set_device_as_last_updated();
+		return;
+	}
+
+	float sum = 0;
+	for (int i = 0; i < input.item_count(); i++)
+	{
+		sum += std::exp(input.get_at_flat_host(i));
+	}
+	for (int i = 0; i < input.item_count(); i++)
+	{
+		result.set_at_flat_host(i, std::exp(input.get_at_flat_host(i)) / sum);
+	}
+	result.set_host_as_last_updated();
+}
+
+void matrix::cross_entropy(const matrix& input, const matrix& target, matrix& result)
+{
+	smart_assert(input.is_initialized());
+	smart_assert(target.is_initialized());
+	smart_assert(result.is_initialized());
+	smart_assert(matrix::equal_format(input, target));
+	smart_assert(matrix::equal_format(input, result));
+	if (input.is_in_gpu_mode() && target.is_in_gpu_mode() && result.is_in_gpu_mode())
+	{
+		throw std::runtime_error("Not implemented");
+		//gpu_cross_entropy(input, target, result);
+		result.set_device_as_last_updated();
+		return;
+	}
+	int target_idx = -1;
+	for (int i = 0; i < input.item_count(); i++)
+	{
+		if (target.get_at_flat_host(i) == 1)
+		{
+			target_idx = i;
+			break;
+		}
+	}
+
+	smart_assert(target_idx != -1);
+
+	float target_sotfm_output = input.get_at_flat_host(target_idx);
+	static int counter = 0;
+	for (int i = 0; i < input.item_count(); i++)
+	{
+		float curr_soft_m_output = input.get_at_flat_host(i);
+		float chosen = i == target_idx ? 1 : 0;
+
+		float gradient = target_sotfm_output * (chosen - curr_soft_m_output);
+		gradient *= -1;
+		result.set_at_flat_host(i, gradient);
+	}
+	counter++;
+	result.set_host_as_last_updated();
 }
 
 void matrix::cross_correlation(
@@ -1301,7 +1367,7 @@ void matrix::apply_deltas(
 
 	const float beta_1 = 0.9f;
 	const float beta_2 = 0.99f;
-	
+
 	for (int i = 0; i < item_count(); i++)
 	{
 		float final_gradient = delta.host_data[i] / (float)training_data_count;
