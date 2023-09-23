@@ -67,6 +67,11 @@ std::unique_ptr<layer> convolutional_layer::clone() const
 	return std::make_unique<convolutional_layer>(*this);
 }
 
+bool convolutional_layer::is_parameter_layer() const
+{
+	return true;
+}
+
 size_t convolutional_layer::get_parameter_count() const
 {
 	size_t result = 0;
@@ -142,6 +147,11 @@ void convolutional_layer::set_input_format(vector3 input_format)
 			output_width,
 			output_height,
 			kernel_count));
+}
+
+void convolutional_layer::set_error_for_last_layer(const matrix& expected)
+{
+	throw std::runtime_error("convolutional_layer::set_error_for_last_layer not implemented");
 }
 
 void convolutional_layer::set_all_parameters(float value)

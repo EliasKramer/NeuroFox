@@ -32,6 +32,7 @@ public:
 	
 	const e_layer_type_t get_layer_type() const;
 
+	virtual bool is_parameter_layer() const = 0;
 	virtual size_t get_parameter_count() const = 0;
 	size_t get_param_byte_size() const;
 
@@ -45,8 +46,7 @@ public:
 	const matrix& get_error() const;
 	matrix* get_error_p();
 
-	//TODO - make this separate
-	void set_error_for_last_layer(const matrix& expected);
+	virtual void set_error_for_last_layer(const matrix& expected) = 0;
 
 	//set all weights and biases to that value
 	virtual void set_all_parameters(float value) = 0;

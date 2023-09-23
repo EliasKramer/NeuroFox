@@ -149,10 +149,18 @@ public:
 		e_activation_t activation_fn
 	);
 
+	static void mult_with_derivative_of_unactivated_fn(
+		const matrix& activations,
+		const matrix& error,
+		matrix& result,
+		e_activation_t activation_fn);
+
 	static bool are_equal(const matrix& a, const matrix& b);
 	static bool are_equal(const matrix& a, const matrix& b, float tolerance);
 	static bool equal_format(const matrix& a, const matrix& b);
 
+	static void softmax(const matrix& input, matrix& result);
+	static void cross_entropy(const matrix& input, const matrix& target, matrix& result);
 
 	static void cross_correlation(
 		const matrix& input,

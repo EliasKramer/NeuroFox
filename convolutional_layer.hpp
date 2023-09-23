@@ -31,6 +31,7 @@ public:
 
 	std::unique_ptr<layer> clone() const override;
 
+	bool is_parameter_layer() const override;
 	size_t get_parameter_count() const override;
 
 	//getters
@@ -44,6 +45,8 @@ public:
 	const matrix& get_kernel_biases_readonly() const;
 
 	void set_input_format(vector3 input_format) override;
+
+	void set_error_for_last_layer(const matrix& expected) override;
 
 	//set all weights and biases to that value
 	void set_all_parameters(float value) override;

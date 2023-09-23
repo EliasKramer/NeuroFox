@@ -35,6 +35,11 @@ std::unique_ptr<layer> pooling_layer::clone() const
 	return std::make_unique<pooling_layer>(*this);
 }
 
+bool pooling_layer::is_parameter_layer() const
+{
+	return false;
+}
+
 size_t pooling_layer::get_parameter_count() const
 {
 	throw std::invalid_argument("pooling layer does not have any parameters");
@@ -86,6 +91,11 @@ size_t pooling_layer::get_stride() const
 e_pooling_type_t pooling_layer::get_pooling_fn() const
 {
 	return pooling_fn;
+}
+
+void pooling_layer::set_error_for_last_layer(const matrix& expected)
+{
+	throw std::invalid_argument("not implemented");
 }
 
 void pooling_layer::set_all_parameters(float value)
