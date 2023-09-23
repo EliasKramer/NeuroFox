@@ -168,6 +168,7 @@
     <ClCompile Include="..\ConvolutionalNeuralNetwork\code\matrix.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\code\neural_network.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\code\pooling_layer.cpp" />
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\code\softmax_layer.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\code\test_result.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\code\util.cpp" />
     <ClCompile Include="..\ConvolutionalNeuralNetwork\code\vector3.cpp" />
@@ -201,6 +202,7 @@
     <ClInclude Include="..\ConvolutionalNeuralNetwork\code\matrix.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\code\neural_network.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\code\pooling_layer.hpp" />
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\code\softmax_layer.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\code\test_result.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\code\util.hpp" />
     <ClInclude Include="..\ConvolutionalNeuralNetwork\code\vector3.hpp" />

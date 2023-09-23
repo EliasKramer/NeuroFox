@@ -198,7 +198,8 @@ mnist_digit_overlord::mnist_digit_overlord()
 	//nn.add_fully_connected_layer(16, e_activation_t::sigmoid_fn);
 	nn.add_fully_connected_layer(26, e_activation_t::leaky_relu_fn);
 	nn.add_fully_connected_layer(26, e_activation_t::leaky_relu_fn);
-	nn.add_fully_connected_layer(vector3(1, 10, 1), e_activation_t::leaky_relu_fn);
+	nn.add_fully_connected_layer(vector3(1, 10, 1), e_activation_t::identity_fn);
+	nn.add_softmax_layer();
 
 	//nn.apply_noise(.1);
 	nn.xavier_initialization();
@@ -259,7 +260,7 @@ test_result mnist_digit_overlord::test()
 {
 	smart_assert(ds_test.is_in_gpu_mode() == nn.is_in_gpu_mode());
 	test_result result;
-
+	
 	size_t correct = 0;
 	float cost_sum = 0;
 	size_t total = 0;
@@ -278,6 +279,53 @@ test_result mnist_digit_overlord::test()
 	{
 		ds_test.observe_data_at_idx(input, i);
 		ds_test.observe_label_at_idx(label, i);
+		nn.forward_propagation(input);
+		nn.get_output().sync_device_and_host();
+
+		cost_sum += get_digit_cost(nn.get_output_readonly(), label);
+
+		size_t idx = idx_of_max(nn.get_output_readonly());
+		size_t label_idx = idx_of_max(label);
+		if (idx == label_idx)
+		{
+			correct++;
+		}
+		total++;
+	}
+
+	auto end = std::chrono::high_resolution_clock::now();
+
+	result.accuracy = (float)correct / (float)total;
+	result.data_count = total;
+	result.time_in_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+	result.avg_cost = (float)cost_sum / (float)total;
+
+	return result;
+}
+
+test_result mnist_digit_overlord::test_on_training_data()
+{
+	smart_assert(ds_test.is_in_gpu_mode() == nn.is_in_gpu_mode());
+	test_result result;
+
+	size_t correct = 0;
+	float cost_sum = 0;
+	size_t total = 0;
+
+	auto start = std::chrono::high_resolution_clock::now();
+
+	matrix input(vector3(28, 28, 1));
+	matrix label(vector3(1, 10, 1));
+	if (ds_training.is_in_gpu_mode())
+	{
+		input.enable_gpu_mode();
+		label.enable_gpu_mode();
+	}
+
+	for (int i = 0; i < ds_training.get_item_count(); i++)
+	{
+		ds_training.observe_data_at_idx(input, i);
+		ds_training.observe_label_at_idx(label, i);
 		nn.forward_propagation(input);
 		nn.get_output().sync_device_and_host();
 

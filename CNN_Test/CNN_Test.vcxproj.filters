@@ -96,6 +96,9 @@
     <ClCompile Include="..\ConvolutionalNeuralNetwork\code\math_functions.cpp">
       <Filter>Source Files\nn</Filter>
     </ClCompile>
+    <ClCompile Include="..\ConvolutionalNeuralNetwork\code\softmax_layer.cpp">
+      <Filter>Source Files\nn</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="test_util.hpp">
@@ -141,6 +144,9 @@
       <Filter>Header Files\nn</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\_coding\Leonardo\LeonardoAi\NeuroFox\smart_assert.hpp">
+      <Filter>Header Files\nn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ConvolutionalNeuralNetwork\code\softmax_layer.hpp">
       <Filter>Header Files\nn</Filter>
     </ClInclude>
   </ItemGroup>

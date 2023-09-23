@@ -12,8 +12,8 @@ private:
 	float get_digit_cost(const matrix& output, const matrix& label) const;
 	void print_digit_image(const matrix& m) const;
 	void load_data(
-		data_space& ds, 
-		std::string data_path, 
+		data_space& ds,
+		std::string data_path,
 		std::string label_path);
 
 	//returns the flat index of the float with the highest value in the matrix
@@ -32,5 +32,7 @@ public:
 	void print_nn_size() const;
 
 	test_result test();
+	test_result test_on_training_data();
+
 	void train(size_t epochs, size_t batch_size, float learning_rate);
 };
