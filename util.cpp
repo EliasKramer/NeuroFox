@@ -199,3 +199,12 @@ std::string get_current_time_str()
 	// Return the formatted time as a string
 	return  std::string(dateBuffer) + " " + std::string(timeBuffer);
 }
+
+long long remaining_time(long long elapsed_ms, long progress, long max_progress)
+{
+	if (progress == 0)
+	{
+		return 0;
+	}
+	return ((max_progress * elapsed_ms) / progress) - elapsed_ms;
+}
