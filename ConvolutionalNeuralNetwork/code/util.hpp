@@ -58,3 +58,5 @@ size_t convolution_output_size(
 std::string ms_to_str(size_t ms);
 std::string ms_to_str(size_t ms, size_t time_unit_count);
 std::string get_current_time_str();
+
+long long remaining_time(long long elapsed_ms, long progress, long max_progress);
