@@ -22,6 +22,7 @@
     <ClInclude Include="code\matrix.hpp" />
     <ClInclude Include="code\neural_network.hpp" />
     <ClInclude Include="code\pooling_layer.hpp" />
+    <ClInclude Include="code\softmax_layer.hpp" />
     <ClInclude Include="code\test_result.hpp" />
     <ClInclude Include="code\util.hpp" />
     <ClInclude Include="code\vector3.hpp" />
@@ -36,6 +37,7 @@
     <ClCompile Include="code\matrix.cpp" />
     <ClCompile Include="code\neural_network.cpp" />
     <ClCompile Include="code\pooling_layer.cpp" />
+    <ClCompile Include="code\softmax_layer.cpp" />
     <ClCompile Include="code\test_result.cpp" />
     <ClCompile Include="code\util.cpp" />
     <ClCompile Include="code\vector3.cpp" />

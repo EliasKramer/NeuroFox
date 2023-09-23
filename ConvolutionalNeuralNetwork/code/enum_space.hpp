@@ -10,7 +10,8 @@ enum _pooling_type
 typedef enum _layer_type {
 	convolutional,
 	pooling,
-	fully_connected
+	fully_connected,
+	softmax
 } e_layer_type_t;
 
 enum _activation {

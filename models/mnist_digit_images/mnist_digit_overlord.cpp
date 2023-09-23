@@ -202,7 +202,7 @@ mnist_digit_overlord::mnist_digit_overlord()
 
 	//nn.apply_noise(.1);
 	nn.xavier_initialization();
-	enable_gpu();
+	//enable_gpu();
 }
 
 void mnist_digit_overlord::debug_function()

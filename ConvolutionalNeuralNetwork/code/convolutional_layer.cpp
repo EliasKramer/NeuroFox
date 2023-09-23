@@ -144,6 +144,11 @@ void convolutional_layer::set_input_format(vector3 input_format)
 			kernel_count));
 }
 
+void convolutional_layer::set_error_for_last_layer(const matrix& expected)
+{
+	throw std::runtime_error("convolutional_layer::set_error_for_last_layer not implemented");
+}
+
 void convolutional_layer::set_all_parameters(float value)
 {
 	for (matrix& weights : kernel_weights)

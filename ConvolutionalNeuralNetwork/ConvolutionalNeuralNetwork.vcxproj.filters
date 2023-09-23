@@ -81,6 +81,9 @@
     <ClInclude Include="..\models\mnist_digit_images\mnist_digit_overlord.hpp">
       <Filter>Header Files\model</Filter>
     </ClInclude>
+    <ClInclude Include="code\softmax_layer.hpp">
+      <Filter>Header Files\layer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="code\layer.cpp">
@@ -121,6 +124,9 @@
     </ClCompile>
     <ClCompile Include="..\models\mnist_digit_images\mnist_digit_overlord.cpp">
       <Filter>Source Files\model</Filter>
+    </ClCompile>
+    <ClCompile Include="code\softmax_layer.cpp">
+      <Filter>Source Files\layer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

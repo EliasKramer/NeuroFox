@@ -10,15 +10,15 @@ fully_connected_layer::fully_connected_layer(
 {}
 
 fully_connected_layer::fully_connected_layer(
-	vector3 activation_format,
+	vector3 neuron_format,
 	e_activation_t activation_function
 ) :
-	layer(activation_format, e_layer_type_t::fully_connected),
+	layer(neuron_format, e_layer_type_t::fully_connected),
 	activation_fn(activation_function),
-	biases(activation_format),
-	bias_deltas(activation_format),
-	bias_momentum(activation_format),
-	bias_momentum_squared(activation_format)
+	biases(neuron_format),
+	bias_deltas(neuron_format),
+	bias_momentum(neuron_format),
+	bias_momentum_squared(neuron_format)
 {}
 
 fully_connected_layer::fully_connected_layer(std::ifstream& file)
@@ -95,6 +95,24 @@ matrix& fully_connected_layer::get_weights_ref()
 matrix& fully_connected_layer::get_biases_ref()
 {
 	return biases;
+}
+
+void fully_connected_layer::set_error_for_last_layer(const matrix& expected)
+{
+	smart_assert(matrix::equal_format(activations, expected));
+
+	//this calculates the cost derivative
+	error.set_all(0); // i don think that is necessary - has to be tested
+	matrix::subtract(activations, expected, error);
+	error.scalar_multiplication(2);
+
+	//TODO rename or restructure
+	matrix::mult_with_derivative_of_unactivated_fn(
+		activations,
+		error,
+		error,
+		activation_fn
+	);
 }
 
 void fully_connected_layer::set_all_parameters(float value)

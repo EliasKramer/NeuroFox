@@ -1061,7 +1061,9 @@ void matrix::fully_connected_backprop(
 	{
 		float error_value = error.get_at_flat_host(neuron_idx);
 
+		//z
 		float unactivated_activation = INVERSE[activation_fn](activations.get_at_flat_host(neuron_idx));
+		//sig deriv
 		float activation_derivative = DERIVATIVE[activation_fn](unactivated_activation);
 
 		//bias change
@@ -1074,7 +1076,7 @@ void matrix::fully_connected_backprop(
 			float input_value = input.get_at_flat_host(input_idx);
 
 			//this weight connects the current input node to the current neuron
-			float weight = weights.get_at_host(vector3(input_idx, neuron_idx));
+			float connecting_weight = weights.get_at_host(vector3(input_idx, neuron_idx));
 
 			weight_deltas.add_at_host(
 				vector3(input_idx, neuron_idx),
@@ -1083,7 +1085,7 @@ void matrix::fully_connected_backprop(
 			//passing error is null when this is the first layer
 			if (passing_error != nullptr)
 			{
-				passing_error->set_at_flat_host(input_idx, error_value * activation_derivative * weight);
+				passing_error->set_at_flat_host(input_idx, error_value * connecting_weight * activation_derivative);
 			}
 		}
 	}
@@ -1094,6 +1096,32 @@ void matrix::fully_connected_backprop(
 	{
 		passing_error->set_host_as_last_updated();
 	}
+}
+
+void matrix::mult_with_derivative_of_unactivated_fn(
+	const matrix& activations, 
+	const matrix& error, 
+	matrix& result,
+	e_activation_t activation_fn)
+{
+	if (activations.is_in_gpu_mode())
+	{
+		throw std::runtime_error("Not implemented");
+	}
+
+	smart_assert(activations.is_initialized());
+	smart_assert(error.is_initialized());
+	smart_assert(result.is_initialized());
+	smart_assert(matrix::equal_format(activations, error));
+	smart_assert(matrix::equal_format(activations, result));
+
+	for (int i = 0; i < activations.item_count(); i++)
+	{
+		float unactivated_activation = INVERSE[activation_fn](activations.get_at_flat_host(i));
+		float activation_derivative = DERIVATIVE[activation_fn](unactivated_activation);
+		result.set_at_flat_host(i, error.get_at_flat_host(i) * activation_derivative);
+	}
+	result.set_host_as_last_updated();
 }
 
 bool matrix::are_equal(const matrix& a, const matrix& b)

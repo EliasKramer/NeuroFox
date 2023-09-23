@@ -88,6 +88,11 @@ e_pooling_type_t pooling_layer::get_pooling_fn() const
 	return pooling_fn;
 }
 
+void pooling_layer::set_error_for_last_layer(const matrix& expected)
+{
+	throw std::invalid_argument("not implemented");
+}
+
 void pooling_layer::set_all_parameters(float value)
 {
 	throw std::invalid_argument("pooling layer does not have any parameters");

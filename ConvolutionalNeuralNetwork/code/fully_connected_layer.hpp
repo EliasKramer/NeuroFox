@@ -30,7 +30,7 @@ public:
 		e_activation_t activation_function);
 
 	fully_connected_layer(
-		vector3 activation_format,
+		vector3 neuron_format,
 		e_activation_t activation_function);
 
 	fully_connected_layer(
@@ -48,6 +48,8 @@ public:
 	const matrix& get_biases() const;
 	matrix& get_weights_ref();
 	matrix& get_biases_ref();
+
+	void set_error_for_last_layer(const matrix& expected) override;
 
 	//set all weights and biases to that value
 	void set_all_parameters(float value) override;

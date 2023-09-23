@@ -350,6 +350,7 @@ void neural_network::learn_on_ds(
 		label.enable_gpu_mode();
 	}
 
+	ds.shuffle(); //shuffling in order to avoid some biases, that come from the order of the data
 	for (size_t curr_epoch = 0; curr_epoch < epochs; curr_epoch++)
 	{
 		size_t batch_item = 0;

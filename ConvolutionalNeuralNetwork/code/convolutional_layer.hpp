@@ -45,6 +45,8 @@ public:
 
 	void set_input_format(vector3 input_format) override;
 
+	void set_error_for_last_layer(const matrix& expected) override;
+
 	//set all weights and biases to that value
 	void set_all_parameters(float value) override;
 	//a random value to the current weights and biases between -value and value
