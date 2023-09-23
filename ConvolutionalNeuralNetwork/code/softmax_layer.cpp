@@ -17,7 +17,7 @@ softmax_layer::softmax_layer(const softmax_layer& other)
 
 std::unique_ptr<layer> softmax_layer::clone() const
 {
-	return std::unique_ptr<layer>();
+	return std::make_unique<softmax_layer>(*this);
 }
 
 bool softmax_layer::is_parameter_layer() const
@@ -60,7 +60,7 @@ void softmax_layer::mutate(float range)
 
 std::string softmax_layer::parameter_analysis() const
 {
-	return "Softmax Layer";
+	return "softmax layer\n";
 }
 
 void softmax_layer::forward_propagation(const matrix& input)
@@ -103,7 +103,7 @@ bool softmax_layer::equal_format(const layer& other)
 
 bool softmax_layer::equal_parameter(const layer& other)
 {
-	return equal_format(other);
+	return layer::equal_format(other);
 }
 
 void softmax_layer::set_parameters(const layer& other)

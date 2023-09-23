@@ -260,7 +260,7 @@ test_result mnist_digit_overlord::test()
 {
 	smart_assert(ds_test.is_in_gpu_mode() == nn.is_in_gpu_mode());
 	test_result result;
-	
+
 	size_t correct = 0;
 	float cost_sum = 0;
 	size_t total = 0;
