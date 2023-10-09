@@ -29,4 +29,4 @@ const activation_fn DERIVATIVE[] =
 { sigmoid_derivative, relu_derivative, leaky_relu_derivative, identity_derivative};
 
 const activation_fn INVERSE[]
-{ logit, inverse_relu, leaky_relu, inverse_leaky_relu, inverse_identity };
+{ logit, inverse_relu, inverse_leaky_relu, inverse_identity };

@@ -313,6 +313,30 @@ void neural_network::forward_propagation(const matrix& input)
 	}
 }
 
+void neural_network::partial_forward_prop(const matrix& input, const matrix& prev_input, const vector3& change_idx)
+{
+	smart_assert(!is_in_gpu_mode()); //not supported
+	smart_assert(layers.size() > 0);
+	smart_assert(layers[0]->is_parameter_layer());
+
+	layers[0]->partial_forward_prop(input, prev_input, change_idx);
+}
+
+void neural_network::rest_partial_forward_prop()
+{
+	smart_assert(!is_in_gpu_mode()); //not supported
+	smart_assert(layers.size() > 0);
+
+	matrix& last_layer = layers[0]->get_activations();
+	
+	std::lock_guard<std::mutex> lock(forward_mutex);
+	for (int i = 1; i < layers.size(); i++)
+	{
+		layers[i]->forward_propagation(last_layer);
+		last_layer = layers[i]->get_activations();
+	}
+}
+
 void neural_network::back_propagation(const matrix& given_data, const matrix& given_label)
 {
 	//feeding the data through
