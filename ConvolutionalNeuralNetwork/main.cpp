@@ -3,7 +3,6 @@
 
 int main()
 {
-
 	mnist_digit_overlord overlord;
 
 	for (int i = 0; ; i++)

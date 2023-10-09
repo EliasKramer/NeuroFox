@@ -174,7 +174,41 @@ void fully_connected_layer::forward_propagation(const matrix& input)
 	matrix::add_flat(activations, biases, activations);
 	activations.apply_activation_function(activation_fn);
 }
+void fully_connected_layer::partial_forward_prop(
+	const matrix& input,
+	const matrix& prev_input,
+	const vector3& change_pos)
+{
+	smart_assert(vector3::are_equal(input.get_format(), prev_input.get_format()));
+	smart_assert(!input.is_in_gpu_mode());
+	smart_assert(!prev_input.is_in_gpu_mode());
+	smart_assert(!activations.is_in_gpu_mode());
+	
 
+	for (int y = 0; y < activations.get_height(); y++)
+	{
+		int x = change_pos.get_index(input.get_format());
+
+		float bias = biases.get_at_flat_host(y);
+		//calculate the unactivated, unbiased value of the neuron
+		float prev_val = INVERSE[activation_fn](
+			activations.get_at_flat_host(y));
+		prev_val -= bias;
+
+		float connecting_weight = weights.get_at_host(vector3(x, y));
+		float prev_input_v = prev_input.get_at_flat_host(x);
+		float new_input = input.get_at_flat_host(x);
+		float new_val =
+			prev_val
+			- connecting_weight * prev_input_v
+			+ connecting_weight * new_input;
+
+		//set the new value with its bias and activation fn
+		activations.set_at_flat_host(
+			y,
+			ACTIVATION[activation_fn](new_val + bias));
+	}
+}
 void fully_connected_layer::back_propagation(const matrix& input, matrix* passing_error)
 {
 	layer::back_propagation(input, passing_error);

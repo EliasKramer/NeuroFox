@@ -19,7 +19,7 @@ namespace CNNTest
 		TEST_METHOD(creating_fully_connected_layer_with_multiple_inputs)
 		{
 			fully_connected_layer fc_layer(5, relu_fn);
-			fc_layer.set_input_format(vector3(1,4,1));
+			fc_layer.set_input_format(vector3(1, 4, 1));
 
 			Assert::AreEqual((size_t)5, fc_layer.get_activations_readonly().get_height());
 
@@ -66,6 +66,74 @@ namespace CNNTest
 			Assert::AreEqual(35.0f, fc_layer.get_activations_readonly().get_at_flat_host(0));
 			Assert::AreEqual(41.0f, fc_layer.get_activations_readonly().get_at_flat_host(1));
 			Assert::AreEqual(41.0f, fc_layer.get_activations_readonly().get_at_flat_host(2));
+		}
+		TEST_METHOD(partial_forward_prop_test_1)
+		{
+			matrix input(vector3(1, 2, 1));
+			input.set_at_flat_host(0, 2);
+			input.set_at_flat_host(1, 3);
+
+			fully_connected_layer fc_layer(2, leaky_relu_fn);
+			fc_layer.set_input_format(input.get_format());
+			fc_layer.get_weights_ref().set_at_flat_host(0, 0);
+			fc_layer.get_weights_ref().set_at_flat_host(1, 1);
+			fc_layer.get_weights_ref().set_at_flat_host(2, 2);
+			fc_layer.get_weights_ref().set_at_flat_host(3, 3);
+			fc_layer.get_biases_ref().set_all(1.3);
+			fc_layer.forward_propagation(input);
+			matrix normal_forward = fc_layer.get_activations();
+			fc_layer.get_activations_p()->set_all(0);
+
+			matrix input_prev(vector3(1, 2, 1));
+			input_prev.set_at_flat_host(0, 2);
+			input_prev.set_at_flat_host(1, 2);
+			matrix input_part(vector3(1, 2, 1));
+			input_part.set_at_flat_host(0, 2);
+			input_part.set_at_flat_host(1, 3);
+
+			fc_layer.forward_propagation(input_prev);
+
+			fc_layer.partial_forward_prop(input_part, input_prev, vector3(0, 1, 0));
+			matrix partial_forward = fc_layer.get_activations();
+			
+			Assert::AreEqual(normal_forward.get_at_flat_host(0), partial_forward.get_at_flat_host(0));
+			Assert::AreEqual(normal_forward.get_at_flat_host(1), partial_forward.get_at_flat_host(1));
+		}
+		TEST_METHOD(partial_forward_prop_test_2)
+		{
+			matrix input(vector3(1, 5, 1));
+			input.set_all(1.5f);
+			input.set_at_flat_host(0, 2);
+			input.set_at_flat_host(1, 3);
+
+			fully_connected_layer fc_layer(4, leaky_relu_fn);
+			fc_layer.set_input_format(input.get_format());
+			fc_layer.set_all_parameters(13.0123f);
+			
+			fc_layer.apply_noise(100);
+			fc_layer.forward_propagation(input);
+			matrix normal_forward = fc_layer.get_activations();
+			fc_layer.get_activations_p()->set_all(0);
+
+			matrix input_prev(vector3(1, 5, 1));
+			input_prev.set_all(1.5f);
+			input_prev.set_at_flat_host(0, 2);
+			input_prev.set_at_flat_host(1, 2);
+			matrix input_part(vector3(1, 5, 1));
+			input_part.set_all(1.5f);
+			input_part.set_at_flat_host(0, 2);
+			input_part.set_at_flat_host(1, 3);
+
+			std::string normal_forward_str = normal_forward.get_string();
+			fc_layer.forward_propagation(input_prev);
+			std::string part_prv_str = fc_layer.get_activations().get_string();
+
+			fc_layer.partial_forward_prop(input_part, input_prev, vector3(0, 1, 0));
+			matrix partial_forward = fc_layer.get_activations();
+
+			std::string partial_forward_str = partial_forward.get_string();
+
+			Assert::IsTrue(matrix::are_equal(normal_forward,partial_forward, 0.0001f));
 		}
 	};
 }

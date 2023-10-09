@@ -199,7 +199,7 @@ mnist_digit_overlord::mnist_digit_overlord()
 	nn.add_fully_connected_layer(26, e_activation_t::leaky_relu_fn);
 	nn.add_fully_connected_layer(26, e_activation_t::leaky_relu_fn);
 	nn.add_fully_connected_layer(vector3(1, 10, 1), e_activation_t::identity_fn);
-	nn.add_softmax_layer();
+	//nn.add_softmax_layer();
 
 	//nn.apply_noise(.1);
 	nn.xavier_initialization();
