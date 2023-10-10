@@ -824,7 +824,10 @@ void matrix::dot_product_flat(const matrix& a, const matrix& flat, matrix& resul
 		result_flat.set_at_flat_host(y, 0);
 		for (int x = 0; x < a.get_width(); x++)
 		{
-			result_flat.add_at_flat(y, a.get_at_host(vector3(x, y)) * flat.get_at_flat_host(x));
+			result_flat.add_at_flat(
+				y, 
+				a.get_at_host(vector3(x, y)) * 
+				flat.get_at_flat_host(x));
 		}
 	}
 	result_flat.set_host_as_last_updated();

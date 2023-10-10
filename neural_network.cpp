@@ -389,7 +389,7 @@ void neural_network::learn_on_ds(
 		ds.shuffle();
 	}
 }
-/*size_t mnist_digit_overlord::idx_of_max(const matrix& m) const
+static size_t idx_of_max(const matrix& m)
 {
 	size_t max_idx = 0;
 	float max = m.get_at_host(vector3(0, 0));
@@ -405,7 +405,7 @@ void neural_network::learn_on_ds(
 	return max_idx;
 }
 
-
+/*
 float mnist_digit_overlord::get_digit_cost(const matrix& output, const matrix& label) const
 {
 	float cost = 0;
@@ -445,15 +445,25 @@ test_result neural_network::test_on_ds(data_space& ds)
 		forward_propagation(input);
 		get_output().sync_device_and_host();
 
-		cost_sum += calculate_cost(label);  
+		cost_sum += calculate_cost(label);
 
-		float value = get_output_readonly().get_at_flat_host(0);
-		float label_v = label.get_at_flat_host(0);
-		float threshold = 3;
-		if (std::abs(value - label_v) < threshold) //THIS ONLY WORKS FOR 1x1 labels - TODO: FIX THIS
+		bool one_is_incorrect = false;
+		for (int i = 0; i < get_output().item_count(); i++)
+		{
+			float value = get_output_readonly().get_at_flat_host(i);
+			float label_v = label.get_at_flat_host(i);
+			float threshold = .5;
+			if (std::abs(value - label_v) >= threshold) //THIS ONLY WORKS FOR 1x1 labels - TODO: FIX THIS
+			{
+				one_is_incorrect = true;
+				break;
+			}
+		}
+		if (!one_is_incorrect)
 		{
 			correct++;
 		}
+
 		total++;
 	}
 
