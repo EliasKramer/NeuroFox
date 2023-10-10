@@ -919,6 +919,36 @@ void matrix::subtract(const matrix& a, const matrix& b, matrix& result)
 	result.set_host_as_last_updated();
 }
 
+void matrix::subtract_flat(const matrix& a, const matrix& b, matrix& result)
+{
+	smart_assert(a.is_initialized());
+	smart_assert(b.is_initialized());
+	smart_assert(result.is_initialized());
+	smart_assert(result.is_owning_data());
+
+	smart_assert(a.item_count() == b.item_count());
+	smart_assert(b.item_count() == result.item_count());
+
+	if (a.gpu_enabled &&
+		b.gpu_enabled &&
+		result.gpu_enabled)
+	{
+		gpu_subtract(
+			a,
+			b,
+			result
+		);
+		result.set_device_as_last_updated();
+
+		return;
+	}
+
+	for (int i = 0; i < a.item_count(); i++)
+	{
+		result.host_data[i] = a.host_data[i] - b.host_data[i];
+	}
+	result.set_host_as_last_updated();
+}
 void matrix::pooling(
 	const matrix& input,
 	matrix& output,
@@ -1430,6 +1460,26 @@ void matrix::apply_activation_function(e_activation_t activation_fn)
 	for (int i = 0; i < item_count(); i++)
 	{
 		host_data[i] = ACTIVATION[activation_fn](host_data[i]);
+	}
+	set_host_as_last_updated();
+}
+
+void matrix::remove_activation_function(e_activation_t activation_fn)
+{
+	smart_assert(is_initialized());
+	smart_assert(is_owning_data());
+
+	if (gpu_enabled)
+	{
+		throw std::runtime_error("Not implemented");
+		//gpu_activation_fn(*this, activation_fn);
+		//set_device_as_last_updated();
+		return;
+	}
+
+	for (int i = 0; i < item_count(); i++)
+	{
+		host_data[i] = INVERSE[activation_fn](host_data[i]);
 	}
 	set_host_as_last_updated();
 }

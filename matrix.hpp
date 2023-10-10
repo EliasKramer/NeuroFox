@@ -131,6 +131,8 @@ public:
 
 	static void subtract(const matrix& a, const matrix& b, matrix& result);
 
+	static void subtract_flat(const matrix& a, const matrix& b, matrix& result);
+
 	static void pooling(
 		const matrix& input,
 		matrix& output,
@@ -180,6 +182,7 @@ public:
 
 	void scalar_multiplication(float a);
 	void apply_activation_function(e_activation_t activation_fn);
+	void remove_activation_function(e_activation_t activation_fn);
 
 	std::string get_string() const;
 };
