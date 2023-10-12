@@ -327,13 +327,10 @@ void neural_network::rest_partial_forward_prop()
 	smart_assert(!is_in_gpu_mode()); //not supported
 	smart_assert(layers.size() > 0);
 
-	matrix& last_layer = layers[0]->get_activations();
-	
 	std::lock_guard<std::mutex> lock(forward_mutex);
 	for (int i = 1; i < layers.size(); i++)
 	{
-		layers[i]->forward_propagation(last_layer);
-		last_layer = layers[i]->get_activations();
+		layers[i]->forward_propagation(layers[i-1]->get_activations_readonly());
 	}
 }
 

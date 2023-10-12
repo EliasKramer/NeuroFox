@@ -1505,3 +1505,25 @@ std::string matrix::get_string() const
 
 	return ret_val;
 }
+
+std::string matrix::get_difference_string(const matrix& a, const matrix& b)
+{
+	smart_assert(matrix::equal_format(a, b));
+
+	std::string ret_val = "";
+
+	for (int z = 0; z < a.get_depth(); z++)
+	{
+		for (int y = 0; y < a.get_height(); y++)
+		{
+			for (int x = 0; x < a.get_width(); x++)
+			{
+				ret_val += std::to_string(a.get_at_host(vector3(x, y, z)) - b.get_at_host(vector3(x, y, z))) + " ";
+			}
+			ret_val += "\n";
+		}
+		ret_val += "\n";
+	}
+
+	return ret_val;
+}
