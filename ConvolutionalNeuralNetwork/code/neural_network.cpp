@@ -339,7 +339,7 @@ void neural_network::rest_partial_forward_prop()
 	std::lock_guard<std::mutex> lock(forward_mutex);
 	for (int i = 1; i < layers.size(); i++)
 	{
-		layers[i]->forward_propagation(layers[i-1].get()->get_activations());
+		layers[i]->forward_propagation(layers[i-1]->get_activations_readonly());
 	}
 }
 
