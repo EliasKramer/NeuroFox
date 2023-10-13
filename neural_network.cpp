@@ -425,6 +425,7 @@ test_result neural_network::test_on_ds(data_space& ds)
 	test_result result;
 
 	size_t correct = 0;
+	size_t correct_sign = 0;
 	float cost_sum = 0;
 	size_t total = 0;
 
@@ -445,11 +446,18 @@ test_result neural_network::test_on_ds(data_space& ds)
 		forward_propagation(input);
 		get_output().sync_device_and_host();
 
-		cost_sum += calculate_cost(label);  
+		cost_sum += calculate_cost(label);
 
 		float value = get_output_readonly().get_at_flat_host(0);
 		float label_v = label.get_at_flat_host(0);
-		float threshold = 3;
+
+		float threshold = .5;
+		if (std::abs(label_v) > threshold &&
+			((value < 0 && label_v < 0) || (value > 0 && label_v > 0)))
+		{
+			correct_sign++;
+		}
+
 		if (std::abs(value - label_v) < threshold) //THIS ONLY WORKS FOR 1x1 labels - TODO: FIX THIS
 		{
 			correct++;
@@ -461,6 +469,7 @@ test_result neural_network::test_on_ds(data_space& ds)
 
 	result.accuracy = (float)correct / (float)total;
 	result.data_count = total;
+	result.sign_accuracy = (float)correct_sign / (float)total;
 	result.time_in_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 	result.avg_cost = (float)cost_sum / (float)total;
 

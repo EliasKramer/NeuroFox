@@ -1452,3 +1452,8 @@ std::string matrix::get_string() const
 
 	return ret_val;
 }
+
+std::string matrix::get_difference_string(const matrix& a, const matrix& b)
+{
+	return "get_difference_string is not implemented\n";
+}
