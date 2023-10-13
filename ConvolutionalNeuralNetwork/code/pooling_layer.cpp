@@ -134,6 +134,11 @@ void pooling_layer::partial_forward_prop(const matrix& input, const matrix& prev
 	throw std::invalid_argument("not implemented");
 }
 
+void pooling_layer::partial_forward_prop(const matrix& input, float value, const vector3& change_idx)
+{
+	throw std::invalid_argument("not implemented");
+}
+
 void pooling_layer::back_propagation(const matrix& input, matrix* passing_error)
 {
 	layer::back_propagation(input, passing_error);

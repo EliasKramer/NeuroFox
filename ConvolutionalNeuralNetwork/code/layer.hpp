@@ -61,6 +61,7 @@ public:
 
 	virtual void forward_propagation(const matrix& input);
 	virtual void partial_forward_prop(const matrix& input, const matrix& prev_input, const vector3& change_idx) = 0;
+	virtual void partial_forward_prop(const matrix& input, float value, const vector3& change_idx) = 0;
 	virtual	void back_propagation(const matrix& input, matrix* passing_error);
 
 	//the deltas got calculated in the backprop function

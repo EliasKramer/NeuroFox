@@ -135,5 +135,41 @@ namespace CNNTest
 
 			Assert::IsTrue(matrix::are_equal(normal_forward,partial_forward, 0.0001f));
 		}
+		TEST_METHOD(partial_forward_prop_test_one_val)
+		{
+			matrix input(vector3(1, 5, 1));
+			input.set_all(1.5f);
+			input.set_at_flat_host(0, 2);
+			input.set_at_flat_host(1, 3);
+
+			fully_connected_layer fc_layer(4, leaky_relu_fn);
+			fc_layer.set_input_format(input.get_format());
+			fc_layer.set_all_parameters(13.0123f);
+
+			fc_layer.apply_noise(100);
+			fc_layer.forward_propagation(input);
+			matrix normal_forward = fc_layer.get_activations();
+			fc_layer.get_activations_p()->set_all(0);
+
+			matrix input_prev(vector3(1, 5, 1));
+			input_prev.set_all(1.5f);
+			input_prev.set_at_flat_host(0, 2);
+			input_prev.set_at_flat_host(1, 2);
+			matrix input_part(vector3(1, 5, 1));
+			input_part.set_all(1.5f);
+			input_part.set_at_flat_host(0, 2);
+			input_part.set_at_flat_host(1, 3);
+
+			//std::string normal_forward_str = normal_forward.get_string();
+			fc_layer.forward_propagation(input_prev);
+			//std::string part_prv_str = fc_layer.get_activations().get_string();
+
+			fc_layer.partial_forward_prop(input_prev, 3, vector3(0, 1, 0));
+			matrix partial_forward = fc_layer.get_activations();
+
+			//std::string partial_forward_str = partial_forward.get_string();
+
+			Assert::IsTrue(matrix::are_equal(normal_forward, partial_forward, 0.0001f));
+		}
 	};
 }

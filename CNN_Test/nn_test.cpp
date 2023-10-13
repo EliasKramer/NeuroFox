@@ -118,7 +118,6 @@ namespace CNNTest
 			nn.set_input_format(input_format);
 			nn.add_fully_connected_layer(15, e_activation_t::leaky_relu_fn);
 			nn.add_fully_connected_layer(10, e_activation_t::sigmoid_fn);
-			nn.set_all_parameters(1.0f);
 
 			nn.apply_noise(.5);
 
@@ -130,22 +129,24 @@ namespace CNNTest
 			matrix fast_input = slow_input;
 			matrix fast_i_prev = slow_input;
 
-			fast_i_prev.set_at_host(vector3(0, 23), 23);
-			fast_i_prev.set_at_host(vector3(2, 1), 1.35);
-			fast_i_prev.set_at_host(vector3(19, 3), 7.65);
-			fast_i_prev.set_at_host(vector3(2, 24), 3.35);
-
+			fast_i_prev.set_at_host(vector3(0, 23), .38);
+			fast_i_prev.set_at_host(vector3(2, 1), .135);
+			fast_i_prev.set_at_host(vector3(19, 3), .65);
+			fast_i_prev.set_at_host(vector3(2, 24), -.35);
 
 			nn.forward_propagation(fast_i_prev);
+			Assert::IsFalse(matrix::are_equal(slow_output, nn.get_output(), 0.0001f));
+
 			nn.partial_forward_prop(fast_input, fast_i_prev, vector3(0, 23));
+			Assert::IsFalse(matrix::are_equal(slow_output, nn.get_output(), 0.0001f));
 			nn.partial_forward_prop(fast_input, fast_i_prev, vector3(2, 1));
+			Assert::IsFalse(matrix::are_equal(slow_output, nn.get_output(), 0.0001f));
 			nn.partial_forward_prop(fast_input, fast_i_prev, vector3(19, 3));
+			Assert::IsFalse(matrix::are_equal(slow_output, nn.get_output(), 0.0001f));
 			nn.partial_forward_prop(fast_input, fast_i_prev, vector3(2, 24));
+			Assert::IsFalse(matrix::are_equal(slow_output, nn.get_output(), 0.0001f));
 			nn.rest_partial_forward_prop();
-
-			matrix fast_output = nn.get_output();
-
-			Assert::IsTrue(matrix::are_equal(slow_output, fast_output, 0.0001f));
+			Assert::IsTrue(matrix::are_equal(slow_output, nn.get_output(), 0.0001f));
 		}
 	};
 }
