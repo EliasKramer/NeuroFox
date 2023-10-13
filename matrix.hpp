@@ -185,6 +185,8 @@ public:
 	void remove_activation_function(e_activation_t activation_fn);
 
 	std::string get_string() const;
+
+	static std::string get_difference_string(const matrix& a, const matrix& b);
 };
 
 //GPU SECTION

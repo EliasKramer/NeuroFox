@@ -179,16 +179,20 @@ void fully_connected_layer::partial_forward_prop(
 	const matrix& prev_input,
 	const vector3& change_pos)
 {
-	smart_assert(vector3::are_equal(input.get_format(), prev_input.get_format()));
+	int x = change_pos.get_index(input.get_format());
+	partial_forward_prop(prev_input, input.get_at_flat_host(x), change_pos);
+}
+void fully_connected_layer::partial_forward_prop(const matrix& input, float new_value, const vector3& change_idx)
+{
 	smart_assert(!input.is_in_gpu_mode());
-	smart_assert(!prev_input.is_in_gpu_mode());
 	smart_assert(!activations.is_in_gpu_mode());
-	
+
+	int x = change_idx.get_index(input.get_format());
+	float prev_input_v = input.get_at_flat_host(x);
+	float new_input = new_value;
 
 	for (int y = 0; y < activations.get_height(); y++)
 	{
-		int x = change_pos.get_index(input.get_format());
-
 		float bias = biases.get_at_flat_host(y);
 		//calculate the unactivated, unbiased value of the neuron
 		float prev_val = INVERSE[activation_fn](
@@ -196,8 +200,7 @@ void fully_connected_layer::partial_forward_prop(
 		prev_val -= bias;
 
 		float connecting_weight = weights.get_at_host(vector3(x, y));
-		float prev_input_v = prev_input.get_at_flat_host(x);
-		float new_input = input.get_at_flat_host(x);
+
 		float new_val =
 			prev_val
 			- connecting_weight * prev_input_v

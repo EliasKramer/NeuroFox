@@ -322,18 +322,24 @@ void neural_network::partial_forward_prop(const matrix& input, const matrix& pre
 	layers[0]->partial_forward_prop(input, prev_input, change_idx);
 }
 
+void neural_network::partial_forward_prop(const matrix& input, float value, const vector3& change_idx)
+{
+	smart_assert(!is_in_gpu_mode()); //not supported
+	smart_assert(layers.size() > 0);
+	smart_assert(layers[0]->is_parameter_layer());
+
+	layers[0]->partial_forward_prop(input, value, change_idx);
+}
+
 void neural_network::rest_partial_forward_prop()
 {
 	smart_assert(!is_in_gpu_mode()); //not supported
 	smart_assert(layers.size() > 0);
 
-	matrix& last_layer = layers[0]->get_activations();
-	
 	std::lock_guard<std::mutex> lock(forward_mutex);
 	for (int i = 1; i < layers.size(); i++)
 	{
-		layers[i]->forward_propagation(last_layer);
-		last_layer = layers[i]->get_activations();
+		layers[i]->forward_propagation(layers[i-1].get()->get_activations());
 	}
 }
 
@@ -413,7 +419,7 @@ void neural_network::learn_on_ds(
 		ds.shuffle();
 	}
 }
-/*size_t mnist_digit_overlord::idx_of_max(const matrix& m) const
+static size_t idx_of_max(const matrix& m)
 {
 	size_t max_idx = 0;
 	float max = m.get_at_host(vector3(0, 0));
@@ -429,7 +435,7 @@ void neural_network::learn_on_ds(
 	return max_idx;
 }
 
-
+/*
 float mnist_digit_overlord::get_digit_cost(const matrix& output, const matrix& label) const
 {
 	float cost = 0;
@@ -469,15 +475,25 @@ test_result neural_network::test_on_ds(data_space& ds)
 		forward_propagation(input);
 		get_output().sync_device_and_host();
 
-		cost_sum += calculate_cost(label);  
+		cost_sum += calculate_cost(label);
 
-		float value = get_output_readonly().get_at_flat_host(0);
-		float label_v = label.get_at_flat_host(0);
-		float threshold = 3;
-		if (std::abs(value - label_v) < threshold) //THIS ONLY WORKS FOR 1x1 labels - TODO: FIX THIS
+		bool one_is_incorrect = false;
+		for (int i = 0; i < get_output().item_count(); i++)
+		{
+			float value = get_output_readonly().get_at_flat_host(i);
+			float label_v = label.get_at_flat_host(i);
+			float threshold = .5;
+			if (std::abs(value - label_v) >= threshold) //THIS ONLY WORKS FOR 1x1 labels - TODO: FIX THIS
+			{
+				one_is_incorrect = true;
+				break;
+			}
+		}
+		if (!one_is_incorrect)
 		{
 			correct++;
 		}
+
 		total++;
 	}
 
