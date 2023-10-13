@@ -9,5 +9,5 @@ std::string test_result::to_string()
 	result += "Sign accuracy: " + std::to_string(sign_accuracy * 100) + "%\n";
 	result += "Avg cost: " + std::to_string(avg_cost) + "\n";
 	result += "Accuracy: " + std::to_string(accuracy * 100) + "%\n";
-	return result;	
+	return result;
 }

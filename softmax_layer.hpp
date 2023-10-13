@@ -16,6 +16,8 @@ public:
 	void mutate(float range) override;
 	std::string parameter_analysis() const override;
 	void forward_propagation(const matrix& input) override;
+	void partial_forward_prop(const matrix& input, const matrix& prev_input, const vector3& change_idx) override;
+	void partial_forward_prop(const matrix& input, float value, const vector3& change_idx) override;
 	void back_propagation(const matrix& input, matrix* passing_error) override;
 	void apply_deltas(size_t training_data_count, float learning_rate) override;
 	void enable_gpu_mode() override;

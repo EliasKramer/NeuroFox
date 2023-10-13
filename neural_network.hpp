@@ -74,7 +74,11 @@ public:
 
 	//test_result test(const std::vector<std::unique_ptr<nn_data>>& training_data);
 	void forward_propagation(const matrix& input);
-	
+	//first layer partial forward propagation
+	void partial_forward_prop(const matrix& input, const matrix& prev_input, const vector3& change_idx);
+	void partial_forward_prop(const matrix& input, float value, const vector3& change_idx);
+	void rest_partial_forward_prop();
+
 	void back_propagation(const matrix& given_data, const matrix& given_label);
 
 	void learn_on_ds(

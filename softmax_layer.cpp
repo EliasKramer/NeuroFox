@@ -68,6 +68,16 @@ void softmax_layer::forward_propagation(const matrix& input)
 	matrix::softmax(input, activations);
 }
 
+void softmax_layer::partial_forward_prop(const matrix& input, const matrix& prev_input, const vector3& change_idx)
+{
+	throw std::logic_error("softmax has no parameter");
+}
+
+void softmax_layer::partial_forward_prop(const matrix& input, float value, const vector3& change_idx)
+{
+	throw std::logic_error("softmax has no parameter");
+}
+
 void softmax_layer::back_propagation(const matrix& input, matrix* passing_error)
 {
 	if (passing_error == nullptr)

@@ -248,6 +248,16 @@ void convolutional_layer::forward_propagation(const matrix& input)
 	activations.apply_activation_function(activation_fn);
 }
 
+void convolutional_layer::partial_forward_prop(const matrix& input, const matrix& prev_input, const vector3& change_idx)
+{
+	throw std::exception("not existing");
+}
+
+void convolutional_layer::partial_forward_prop(const matrix& input, float value, const vector3& change_idx)
+{
+	throw std::exception("not existing");
+}
+
 void convolutional_layer::back_propagation(const matrix& input, matrix* passing_error)
 {
 	throw std::exception("not implemented");
