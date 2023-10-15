@@ -1355,7 +1355,7 @@ static float discount(float oldValue, float newValue, float discountFactor)
 	return (oldValue * discountFactor) + ((1 - discountFactor) * newValue);
 }
 
-static float fix_bias(float value, float discountFactor, int timeStep)
+static float fix_bias(float value, float discountFactor, long long timeStep)
 {
 	return value / (1 - pow(discountFactor, timeStep));
 }
@@ -1364,7 +1364,7 @@ void matrix::apply_deltas(
 	matrix& delta,
 	matrix& momentum,
 	matrix& momentum_squared,
-	int time_step,
+	long long time_step,
 	size_t training_data_count,
 	float learning_rate)
 {
