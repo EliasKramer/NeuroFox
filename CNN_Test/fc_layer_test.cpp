@@ -53,6 +53,17 @@ namespace CNNTest
 			input.set_at_flat_host(3, 5);
 			input.set_at_flat_host(4, 6);
 
+			/*
+								2
+								3
+								4
+								5
+								6
+				-1, 2, 2, 2, 2 -1*2 + 3*2 + 4*2 + 5*2 + 6*2 = 34 + 1
+				 2, 2, 2, 2, 2  2*2 + 3*2 + 4*2 + 5*2 + 6*2 = 40 + 1
+				 2, 2, 2, 2, 2  2*2 + 3*2 + 4*2 + 5*2 + 6*2 = 40 + 1
+			*/
+
 			fully_connected_layer fc_layer(3, relu_fn);
 			fc_layer.set_input_format(input.get_format());
 

@@ -134,11 +134,15 @@ namespace CNNTest
 		TEST_METHOD(dot_product_flat)
 		{
 			matrix input(vector3(2, 2, 2), std::vector<float> {
-				0, 1,
-					2, 3,
+				0, 
+				1,
+				2,
+				3,
 
-					4, 5,
-					6, 7
+				4, 
+				5,
+				6, 
+				7
 			});
 
 			matrix result(vector3(1, 2, 3));
@@ -146,11 +150,11 @@ namespace CNNTest
 
 			matrix weights(vector3(input.item_count(), result.item_count(), 1), std::vector<float> {
 				0, 1, 2, 3, 4, 5, 6, 7,
-					8, 9, 0, 1, 2, 3, 4, 5,
-					6, 7, 8, 9, 0, 1, 2, 3,
-					4, 5, 6, 7, 8, 9, 0, 1,
-					2, 3, 4, 5, 6, 7, 8, 9,
-					0, 1, 2, 3, 4, 5, 6, 7
+				8, 9, 0, 1, 2, 3, 4, 5,
+				6, 7, 8, 9, 0, 1, 2, 3,
+				4, 5, 6, 7, 8, 9, 0, 1,
+				2, 3, 4, 5, 6, 7, 8, 9,
+				0, 1, 2, 3, 4, 5, 6, 7
 			});
 
 			matrix::dot_product_flat(weights, input, result);
@@ -462,6 +466,120 @@ namespace CNNTest
 			m.sync_device_and_host();
 
 			Assert::IsTrue(m.contains_non_zero_items());
+		}
+		void test_add_flat_helper(int n)
+		{
+			std::vector <float> v1(n);
+			std::vector <float> v2(n);
+			std::vector <float> expected(n);
+			std::vector <float> result(n);
+
+			for (int i = 0; i < n; i++)
+			{
+				v1[i] = i;
+				v2[i] = i;
+				expected[i] = i + i;
+				result[i] = 0;
+			}
+
+			matrix m1(vector3(1, n, 1), v1);
+			matrix m2(vector3(1, n, 1), v2);
+			matrix m3(vector3(1, n, 1), result);
+
+			matrix::add_flat(m1, m2, m3);
+			matrix expected_m(vector3(1, n, 1), expected);
+
+			Assert::IsTrue(matrix::are_equal(expected_m, m3));
+		}
+		TEST_METHOD(test_add_flat)
+		{
+			test_add_flat_helper(1);
+			test_add_flat_helper(2);
+			test_add_flat_helper(3);
+			test_add_flat_helper(4);
+			test_add_flat_helper(5);
+			test_add_flat_helper(6);
+			test_add_flat_helper(7);
+			test_add_flat_helper(8);
+			test_add_flat_helper(9);
+			test_add_flat_helper(100);
+			test_add_flat_helper(1000);
+			test_add_flat_helper(1024);
+		}
+		void test_substract_flat_helper(int n)
+		{
+			std::vector <float> v1(n);
+			std::vector <float> v2(n);
+			std::vector <float> expected(n);
+			std::vector <float> result(n);
+
+			for (int i = 0; i < n; i++)
+			{
+				v1[i] = i * 1.3;
+				v2[i] = i * 0.6;
+				expected[i] = v1[i] - v2[i];
+				result[i] = 0;
+			}
+
+			matrix m1(vector3(1, n, 1), v1);
+			matrix m2(vector3(1, n, 1), v2);
+			matrix m3(vector3(1, n, 1), result);
+
+			matrix::subtract_flat(m1, m2, m3);
+			matrix expected_m(vector3(1, n, 1), expected);
+
+			Assert::IsTrue(matrix::are_equal(expected_m, m3));
+		}
+		TEST_METHOD(test_sub_flat)
+		{
+			test_add_flat_helper(1);
+			test_add_flat_helper(2);
+			test_add_flat_helper(3);
+			test_add_flat_helper(4);
+			test_add_flat_helper(5);
+			test_add_flat_helper(6);
+			test_add_flat_helper(7);
+			test_add_flat_helper(8);
+			test_add_flat_helper(9);
+			test_add_flat_helper(100);
+			test_add_flat_helper(1000);
+			test_add_flat_helper(1024);
+		}
+		void scalar_product_helper(int n, float scalar)
+		{
+			std::vector <float> v1(n);
+			std::vector <float> expected(n);
+			std::vector <float> result(n);
+
+			for (int i = 0; i < n; i++)
+			{
+				v1[i] = i * 1.25;
+				expected[i] = v1[i] * scalar;
+				result[i] = 0;
+			}
+
+			matrix m1(vector3(1, n, 1), v1);
+			matrix expected_m(vector3(1, n, 1), expected);
+
+			m1.scalar_multiplication(scalar);
+
+			Assert::IsTrue(matrix::are_equal(expected_m, m1, 0.1f));
+		}
+		TEST_METHOD(sclar_product_test)
+		{
+			scalar_product_helper(2, 1.3f);
+			scalar_product_helper(3, 2);
+			scalar_product_helper(4, 13.3094f);
+			scalar_product_helper(1, 4 * 3.141592653);
+			scalar_product_helper(5, 63.2);
+			scalar_product_helper(6, 1);
+			scalar_product_helper(7, 8.854);
+			scalar_product_helper(8, 90);
+			scalar_product_helper(9, 931);
+			scalar_product_helper(10, 9.10938);
+			scalar_product_helper(100, 9.84);
+			scalar_product_helper(1000, 3.14159);
+			scalar_product_helper(1024, 8.314);
 		}
 	};
 }
