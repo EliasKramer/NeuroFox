@@ -196,9 +196,9 @@ mnist_digit_overlord::mnist_digit_overlord()
 	//nn.add_pooling_layer(2, 2, e_pooling_type_t::average_pooling);
 	//nn.add_convolutional_layer(2, 3, 1, e_activation_t::sigmoid_fn);
 	//nn.add_fully_connected_layer(16, e_activation_t::sigmoid_fn);
-	nn.add_fully_connected_layer(26, e_activation_t::leaky_relu_fn);
-	nn.add_fully_connected_layer(26, e_activation_t::leaky_relu_fn);
-	nn.add_fully_connected_layer(vector3(1, 10, 1), e_activation_t::identity_fn);
+	nn.add_fully_connected_layer(16, e_activation_t::leaky_relu_fn);
+	nn.add_fully_connected_layer(16, e_activation_t::leaky_relu_fn);
+	nn.add_fully_connected_layer(vector3(1, 10, 1), e_activation_t::sigmoid_fn);
 	//nn.add_softmax_layer();
 
 	//nn.apply_noise(.1);
