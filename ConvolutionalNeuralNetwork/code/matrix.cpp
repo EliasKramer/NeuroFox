@@ -833,6 +833,14 @@ void matrix::dot_product_flat(const matrix& a, const matrix& flat, matrix& resul
 	result_flat.set_host_as_last_updated();
 }
 
+void matrix::rm_partial_dot_product_flat(const matrix& a, const matrix& flat, matrix& result_flat, int x)
+{
+}
+
+void matrix::apply_partial_dot_product_flat(const matrix& a, const matrix& flat, matrix& result_flat, int x)
+{
+}
+
 void matrix::add(const matrix& a, const matrix& b, matrix& result)
 {
 	smart_assert(a.is_initialized());
