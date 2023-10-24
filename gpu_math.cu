@@ -587,7 +587,7 @@ __device__ float discount_device(float oldValue, float newValue, float discountF
 	return (oldValue * discountFactor) + ((1 - discountFactor) * newValue);
 }
 
-__device__ float fix_bias_device(float value, float discountFactor, int timeStep)
+__device__ float fix_bias_device(float value, float discountFactor, long long timeStep)
 {
 	return value / (1 - pow(discountFactor, timeStep));
 }
@@ -597,7 +597,7 @@ __global__ void gpu_apply_deltas_kernel(
 	float* delta,
 	float* momentum,
 	float* momentum_squared,
-	int time_step,
+	long long time_step,
 	int training_data_count,
 	float learning_rate,
 	unsigned int size
@@ -631,7 +631,7 @@ void gpu_apply_deltas(
 	matrix& delta,
 	matrix& momentum,
 	matrix& momentum_squared,
-	int time_step,
+	long long time_step,
 	size_t training_data_count,
 	float learning_rate)
 {

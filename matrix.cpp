@@ -1,6 +1,10 @@
 #include "matrix.hpp"
 #include <fstream>
 #include <numeric>
+//include simd
+#include <immintrin.h>
+
+#define USE_SIMD
 
 void matrix::set_host_as_last_updated()
 {
@@ -801,6 +805,24 @@ bool matrix::contains_non_zero_items() {
 	return false;
 }
 
+static float horizontal_add(__m256& a)
+{
+	// Perform horizontal add
+	__m128 sum1 = _mm256_extractf128_ps(a, 0); // Get the first 128 bits
+	__m128 sum2 = _mm256_extractf128_ps(a, 1); // Get the next 128 bits
+	__m128 hsum = _mm_add_ps(sum1, sum2); // Add the two 128-bit halves
+
+	// Horizontal add using shuffle and add
+	hsum = _mm_hadd_ps(hsum, hsum);
+	hsum = _mm_hadd_ps(hsum, hsum);
+
+	// Extract the result as a single float
+	float result;
+	_mm_store_ss(&result, hsum);
+
+	return result;
+}
+
 void matrix::dot_product_flat(const matrix& a, const matrix& flat, matrix& result_flat)
 {
 	smart_assert(a.is_initialized());
@@ -819,17 +841,48 @@ void matrix::dot_product_flat(const matrix& a, const matrix& flat, matrix& resul
 		return;
 	}
 
+#ifndef USE_SIMD
 	for (int y = 0; y < a.get_height(); y++)
 	{
 		result_flat.set_at_flat_host(y, 0);
 		for (int x = 0; x < a.get_width(); x++)
 		{
 			result_flat.add_at_flat(
-				y, 
-				a.get_at_host(vector3(x, y)) * 
+				y,
+				a.get_at_host(vector3(x, y)) *
 				flat.get_at_flat_host(x));
 		}
 	}
+#endif // !USE_SIMD
+
+#ifdef USE_SIMD
+	int to_simd_width = a.get_width() - (a.get_width() % 8);
+	vector3 pos = vector3(0, 0, 0);
+	for (int y = 0; y < a.get_height(); y++)
+	{
+		pos.y = y;
+		result_flat.set_at_flat_host(y, 0);
+		for (int x = 0; x < to_simd_width; x += 8)
+		{
+			pos.x = x;
+			int flat_idx = pos.get_index(a.format);
+			__m256 avx_weight_row = _mm256_loadu_ps(&a.host_data[flat_idx]);
+			__m256 avx_flat_row = _mm256_loadu_ps(&flat.host_data[x]);
+
+			__m256 avx_result_row = _mm256_mul_ps(avx_weight_row, avx_flat_row);
+			result_flat.add_at_flat(y, horizontal_add(avx_result_row));
+		}
+		for(int x = to_simd_width; x < a.get_width(); x++)
+		{
+			result_flat.add_at_flat(
+				y,
+				a.get_at_host(vector3(x, y)) *
+				flat.get_at_flat_host(x));
+		}
+	}
+
+#endif // USE_SIMD
+
 	result_flat.set_host_as_last_updated();
 }
 
@@ -847,20 +900,7 @@ void matrix::add(const matrix& a, const matrix& b, matrix& result)
 	smart_assert(a.get_height() == result.get_height());
 	smart_assert(a.get_depth() == result.get_depth());
 
-	if (a.gpu_enabled &&
-		b.gpu_enabled &&
-		result.gpu_enabled)
-	{
-		gpu_add(a, b, result);
-		result.set_device_as_last_updated();
-		return;
-	}
-
-	for (int i = 0; i < a.item_count(); i++)
-	{
-		result.host_data[i] = a.host_data[i] + b.host_data[i];
-	}
-	result.set_host_as_last_updated();
+	add_flat(a, b, result);
 }
 
 void matrix::add_flat(const matrix& a, const matrix& b, matrix& result)
@@ -881,10 +921,36 @@ void matrix::add_flat(const matrix& a, const matrix& b, matrix& result)
 		return;
 	}
 
+#ifndef USE_SIMD
 	for (int i = 0; i < a.item_count(); i++)
 	{
 		result.host_data[i] = a.host_data[i] + b.host_data[i];
 	}
+#endif // !USE_SIMD
+
+#ifdef USE_SIMD
+	int n = a.item_count(); // the number of elements
+	int simd_width = 8; // 8 single-precision floats in a 256-bit AVX register
+
+	int to_idx_simd = n - (n % simd_width);
+
+	//simd
+	for (int i = 0; i < to_idx_simd; i += simd_width) {
+		__m256 a_simd = _mm256_loadu_ps(&a.host_data[i]);
+		__m256 b_simd = _mm256_loadu_ps(&b.host_data[i]);
+
+		__m256 result_simd = _mm256_add_ps(a_simd, b_simd);
+
+		_mm256_storeu_ps(&result.host_data[i], result_simd);
+	}
+
+	//calculate rest
+	for (int i = to_idx_simd; i < n; i++)
+	{
+		result.host_data[i] = a.host_data[i] + b.host_data[i];
+	}
+#endif // USE_SIMD
+
 	result.set_host_as_last_updated();
 }
 
@@ -898,25 +964,7 @@ void matrix::subtract(const matrix& a, const matrix& b, matrix& result)
 	smart_assert(equal_format(a, b));
 	smart_assert(equal_format(b, result));
 
-	if (a.gpu_enabled &&
-		b.gpu_enabled &&
-		result.gpu_enabled)
-	{
-		gpu_subtract(
-			a,
-			b,
-			result
-		);
-		result.set_device_as_last_updated();
-
-		return;
-	}
-
-	for (int i = 0; i < a.item_count(); i++)
-	{
-		result.host_data[i] = a.host_data[i] - b.host_data[i];
-	}
-	result.set_host_as_last_updated();
+	subtract_flat(a, b, result);
 }
 
 void matrix::subtract_flat(const matrix& a, const matrix& b, matrix& result)
@@ -933,22 +981,45 @@ void matrix::subtract_flat(const matrix& a, const matrix& b, matrix& result)
 		b.gpu_enabled &&
 		result.gpu_enabled)
 	{
-		gpu_subtract(
-			a,
-			b,
-			result
-		);
+		gpu_subtract(a, b, result);
 		result.set_device_as_last_updated();
 
 		return;
 	}
 
+#ifndef USE_SIMD
 	for (int i = 0; i < a.item_count(); i++)
 	{
 		result.host_data[i] = a.host_data[i] - b.host_data[i];
 	}
+#endif // !USE_SIMD
+
+#ifdef USE_SIMD
+	int n = a.item_count(); // the number of elements
+	int simd_width = 8; // 8 single-precision floats in a 256-bit AVX register
+
+	int to_idx_simd = n - (n % simd_width);
+
+
+	for (int i = 0; i < to_idx_simd; i += simd_width) {
+		__m256 a_simd = _mm256_loadu_ps(&a.host_data[i]);
+		__m256 b_simd = _mm256_loadu_ps(&b.host_data[i]);
+
+		__m256 result_simd = _mm256_sub_ps(a_simd, b_simd);
+
+		_mm256_storeu_ps(&result.host_data[i], result_simd);
+	}
+
+	for (int i = to_idx_simd; i < n; i++)
+	{
+		result.host_data[i] = a.host_data[i] - b.host_data[i];
+	}
+
+#endif // USE_SIMD
+
 	result.set_host_as_last_updated();
 }
+
 void matrix::pooling(
 	const matrix& input,
 	matrix& output,
@@ -1097,7 +1168,7 @@ void matrix::fully_connected_backprop(
 		float unactivated_activation = INVERSE[activation_fn](activations.get_at_flat_host(neuron_idx));
 		//sig deriv
 		float activation_derivative = DERIVATIVE[activation_fn](unactivated_activation);
-	
+
 		//bias change
 		float bias_change = error_value * activation_derivative;
 		bias_deltas.add_at_flat(neuron_idx, bias_change);
@@ -1355,7 +1426,7 @@ static float discount(float oldValue, float newValue, float discountFactor)
 	return (oldValue * discountFactor) + ((1 - discountFactor) * newValue);
 }
 
-static float fix_bias(float value, float discountFactor, int timeStep)
+static float fix_bias(float value, float discountFactor, long long timeStep)
 {
 	return value / (1 - pow(discountFactor, timeStep));
 }
@@ -1364,7 +1435,7 @@ void matrix::apply_deltas(
 	matrix& delta,
 	matrix& momentum,
 	matrix& momentum_squared,
-	int time_step,
+	long long time_step,
 	size_t training_data_count,
 	float learning_rate)
 {
@@ -1438,10 +1509,35 @@ void matrix::scalar_multiplication(float a)
 		return;
 	}
 
+#ifndef USE_SIMD
 	for (int i = 0; i < item_count(); i++)
 	{
 		host_data[i] *= a;
 	}
+#endif // !USE_SIMD
+
+#ifdef USE_SIMD
+	int n = item_count(); // the number of elements
+	int simd_width = 8; // 8 single-precision floats in a 256-bit AVX register
+
+	int to_idx_simd = n - (n % simd_width);
+
+	__m256 factor = _mm256_set1_ps(a);
+	for (int i = 0; i < to_idx_simd; i += simd_width) {
+		__m256 a_simd = _mm256_loadu_ps(&host_data[i]);
+
+		__m256 result_simd = _mm256_mul_ps(a_simd, factor);
+
+		_mm256_storeu_ps(&host_data[i], result_simd);
+	}
+
+	for (int i = to_idx_simd; i < n; i++)
+	{
+		host_data[i] *= a;
+	}
+
+#endif // USE_SIMD
+
 	set_host_as_last_updated();
 }
 
