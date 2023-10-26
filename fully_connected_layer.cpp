@@ -182,6 +182,7 @@ void fully_connected_layer::partial_forward_prop(
 	int x = change_pos.get_index(input.get_format());
 	partial_forward_prop(prev_input, input.get_at_flat_host(x), change_pos);
 }
+#define USE_SIMD
 void fully_connected_layer::partial_forward_prop(const matrix& input, float new_value, const vector3& change_idx)
 {
 	smart_assert(!input.is_in_gpu_mode());

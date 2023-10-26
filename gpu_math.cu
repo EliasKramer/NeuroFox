@@ -597,7 +597,7 @@ __global__ void gpu_apply_deltas_kernel(
 	float* delta,
 	float* momentum,
 	float* momentum_squared,
-	unsigned long long time_step,
+	long long time_step,
 	int training_data_count,
 	float learning_rate,
 	unsigned int size
@@ -631,7 +631,7 @@ void gpu_apply_deltas(
 	matrix& delta,
 	matrix& momentum,
 	matrix& momentum_squared,
-	size_t time_step,
+	long long time_step,
 	size_t training_data_count,
 	float learning_rate)
 {

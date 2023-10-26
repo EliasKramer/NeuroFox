@@ -46,6 +46,7 @@ private:
 	float* get_ptr_layer(float* given_ptr, size_t depth_idx);
 	float* get_ptr_row(float* given_ptr, size_t height_idx, size_t depth_idx);
 	float* get_ptr_item(float* given_ptr, size_t width_idx, size_t height_idx, size_t depth_idx);
+
 public:
 	matrix();
 	matrix(vector3 given_format);
@@ -176,7 +177,7 @@ public:
 		matrix& delta, 
 		matrix& momentum,
 		matrix& momentum_squared,
-		size_t time_step,
+		long long time_step,
 		size_t training_data_count, 
 		float learning_rate);
 
@@ -271,7 +272,7 @@ void gpu_apply_deltas(
 	matrix& delta,
 	matrix& momentum,
 	matrix& momentum_squared,
-	size_t time_step,
+	long long time_step,
 	size_t training_data_count,
 	float learning_rate);
 
