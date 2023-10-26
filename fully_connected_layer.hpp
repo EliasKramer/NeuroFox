@@ -20,7 +20,7 @@ private:
 	matrix weight_momentum_squared;
 	matrix bias_momentum_squared;
 
-	int time_step = 1;
+	size_t time_step = 1;
 
 	e_activation_t activation_fn;
 

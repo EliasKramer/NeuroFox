@@ -176,7 +176,7 @@ public:
 		matrix& delta, 
 		matrix& momentum,
 		matrix& momentum_squared,
-		int time_step,
+		size_t time_step,
 		size_t training_data_count, 
 		float learning_rate);
 
@@ -271,7 +271,7 @@ void gpu_apply_deltas(
 	matrix& delta,
 	matrix& momentum,
 	matrix& momentum_squared,
-	int time_step,
+	size_t time_step,
 	size_t training_data_count,
 	float learning_rate);
 
