@@ -618,6 +618,17 @@ std::string neural_network::parameter_analysis() const
 	return result;
 }
 
+std::string neural_network::get_layer_str() const
+{
+	std::string result = input_format.to_string() + " ";
+	for (auto& l : layers)
+	{
+		result += l->get_activations().get_format().to_string() + " ";
+	}
+	return result;
+
+}
+
 void neural_network::save_to_file(const std::string& file_path)
 {
 	std::ofstream out(file_path, std::ios::out | std::ios::binary);
