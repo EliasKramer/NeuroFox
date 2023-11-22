@@ -3,7 +3,7 @@
 void layer::valid_input_check(const matrix& input) const
 {
 	if (input_format.item_count() == 0 || // the input format is not set
-		matrix::equal_format(input_format, input) == false)
+		vector3::are_equal(input_format, input.get_format()) == false)
 	{
 		throw std::runtime_error("input format is not set or does not match the input format");
 	}
