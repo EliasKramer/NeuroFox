@@ -11,6 +11,7 @@
 
 class matrix {
 private:
+	int global_idx = 0;
 	vector3 format;
 
 	bool owning_data;
@@ -55,7 +56,7 @@ public:
 		const std::vector<float>& given_vector);
 	matrix(const matrix& source, bool copy_values);
 	matrix(const matrix& source);
-	matrix(std::ifstream& file);
+	explicit matrix(std::ifstream& file);
 
 	matrix& operator=(const matrix& other);
 

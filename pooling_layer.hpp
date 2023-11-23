@@ -21,6 +21,8 @@ public:
 
 	pooling_layer(const pooling_layer& other);
 
+	~pooling_layer() override = default;
+
 	//clone
 	std::unique_ptr<layer> clone() const override;
 
