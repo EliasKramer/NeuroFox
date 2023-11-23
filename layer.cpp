@@ -128,7 +128,7 @@ bool layer::equal_format(const layer& other)
 		type == other.type &&
 		matrix::equal_format(activations, other.activations) &&
 		matrix::equal_format(error, other.error) &&
-		matrix::equal_format(input_format, other.input_format);
+		vector3::are_equal(input_format, other.input_format);
 }
 
 void layer::write_to_ofstream(std::ofstream& file) const
