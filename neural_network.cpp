@@ -91,7 +91,6 @@ neural_network& neural_network::operator=(const neural_network& source)
 {
 	if (this != &source)
 	{
-		//this is a memory leak for some reason
 		layers = std::vector<std::unique_ptr<layer>>();
 		for (const auto& curr : source.layers)
 		{
