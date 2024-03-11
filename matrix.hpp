@@ -115,6 +115,8 @@ public:
 	void set_row_from_matrix(const matrix& m, size_t row_idx);
 	void set_row_from_matrix(const matrix& m, size_t row_idx, size_t item_idx);
 
+	void observe_partial(matrix& m, vector3 start_point, vector3 new_format);
+
 	//setter
 	void set_at_host(vector3 position, float value);
 	void add_at_host(vector3 position, float value);
