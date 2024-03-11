@@ -587,7 +587,7 @@ __device__ float discount_device(float oldValue, float newValue, float discountF
 	return (oldValue * discountFactor) + ((1 - discountFactor) * newValue);
 }
 
-__device__ float fix_bias_device(float value, float discountFactor, long long timeStep)
+__device__ float fix_bias_device(float value, float discountFactor, unsigned long long timeStep)
 {
 	return value / (1 - pow(discountFactor, timeStep));
 }

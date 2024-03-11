@@ -108,7 +108,7 @@ void fully_connected_layer::set_error_for_last_layer(const matrix& expected)
 
 	//this calculates the cost derivative
 	error.set_all(0); // i don think that is necessary - has to be tested
-	matrix::subtract(activations, expected, error);
+	matrix::subtract(activations, expected, error); // why is this not the other way around
 	error.scalar_multiplication(2);
 
 	//TODO rename or restructure

@@ -38,6 +38,8 @@ public:
 
 	fully_connected_layer(const fully_connected_layer& other);
 
+	~fully_connected_layer() override = default;
+
 	std::unique_ptr<layer> clone() const override;
 
 	bool is_parameter_layer() const override;

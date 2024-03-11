@@ -6,6 +6,7 @@ public:
 	softmax_layer();
 	softmax_layer(std::ifstream& file);
 	softmax_layer(const softmax_layer& other);
+	~softmax_layer() override = default;
 	std::unique_ptr<layer> clone() const override;
 	bool is_parameter_layer() const override;
 	size_t get_parameter_count() const override;

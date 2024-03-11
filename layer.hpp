@@ -28,6 +28,9 @@ public:
 	//copy
 	layer(const layer& other);
 	//clone
+
+	virtual ~layer() = default;
+
 	virtual std::unique_ptr<layer> clone() const = 0;
 	
 	const e_layer_type_t get_layer_type() const;

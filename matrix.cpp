@@ -218,6 +218,7 @@ matrix::matrix(
 	}
 }
 
+
 matrix::matrix(
 	vector3 given_format,
 	const std::vector<float>& given_vector
@@ -891,7 +892,7 @@ void matrix::dot_product_flat(const matrix& a, const matrix& flat, matrix& resul
 			__m256 avx_result_row = _mm256_mul_ps(avx_weight_row, avx_flat_row);
 			result_flat.add_at_flat(y, horizontal_add(avx_result_row));
 		}
-		for(int x = to_simd_width; x < a.get_width(); x++)
+		for (int x = to_simd_width; x < a.get_width(); x++)
 		{
 			result_flat.add_at_flat(
 				y,

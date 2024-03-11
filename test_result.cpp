@@ -7,6 +7,7 @@ std::string test_result::to_string()
 	result += "Time taken: " + ms_to_str(time_in_ms) + "\n";
 	result += "data/ms: " + std::to_string((float)data_count / (float)time_in_ms) + "\n";
 	result += "Avg cost: " + std::to_string(avg_cost) + "\n";
+	result += "Avg cost sqrt: " + std::to_string(std::sqrt(avg_cost)) + "\n";
 	result += "Accuracy: " + std::to_string(accuracy * 100) + "%\n";
 	return result;
 }
