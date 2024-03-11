@@ -11,7 +11,6 @@
 
 class matrix {
 private:
-	int global_idx = 0;
 	vector3 format;
 
 	bool owning_data;
