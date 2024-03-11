@@ -106,6 +106,22 @@ data_space::data_space(
 	}
 }
 
+data_space::data_space(data_space& other, size_t from_idx, size_t item_count)
+{
+	smart_assert(item_count > 0);
+	smart_assert(from_idx < other.item_count);
+
+	data_format = other.data_format;
+	label_format = other.label_format;
+	this->item_count = item_count;
+
+	vector3 new_format(other.data_table.get_format().x, item_count, 1);
+	
+	data_table.observe_partial(other.data_table, vector3(0, from_idx, 0), new_format);
+
+	init_shuffle_table();
+}
+
 data_space& data_space::operator=(const data_space& other)
 {
 	if (this != &other)

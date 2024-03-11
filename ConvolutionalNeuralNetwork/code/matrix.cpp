@@ -157,16 +157,16 @@ void matrix::delete_data_if_owning()
 		if (host_data != nullptr)
 		{
 			delete[] host_data;
-			host_data = nullptr;
 		}
 		if (device_data != nullptr)
 		{
 			cudaFree(device_data);
 			if_cuda_error_throw();
-			device_data = nullptr;
 		}
 		owning_data = false;
 	}
+	host_data = nullptr;
+	device_data = nullptr;
 }
 
 float* matrix::get_ptr_layer(float* given_ptr, size_t depth_idx)
@@ -764,6 +764,25 @@ void matrix::set_row_from_matrix(const matrix& m, size_t row_idx, size_t item_id
 	}
 }
 
+void matrix::observe_partial(matrix& m, vector3 start_point, vector3 new_format)
+{
+	smart_assert(m.is_initialized());
+	smart_assert(start_point.get_index(m.format) < m.item_count());
+	smart_assert(m.is_in_gpu_mode() == is_in_gpu_mode());
+
+	delete_data_if_owning();
+
+	host_data = m.get_ptr_item(m.host_data, start_point.x, start_point.y, start_point.z);
+
+	if (gpu_enabled)
+	{
+		device_data = m.get_ptr_item(m.device_data, start_point.x, start_point.y, start_point.z);
+	}
+
+	format = new_format;
+	owning_data = false;
+}
+
 void matrix::set_at_host(vector3 pos, float value)
 {
 	smart_assert(is_initialized());
@@ -884,14 +903,6 @@ void matrix::dot_product_flat(const matrix& a, const matrix& flat, matrix& resul
 #endif // USE_SIMD
 
 	result_flat.set_host_as_last_updated();
-}
-
-void matrix::rm_partial_dot_product_flat(const matrix& a, const matrix& flat, matrix& result_flat, int x)
-{
-}
-
-void matrix::apply_partial_dot_product_flat(const matrix& a, const matrix& flat, matrix& result_flat, int x)
-{
 }
 
 void matrix::add(const matrix& a, const matrix& b, matrix& result)

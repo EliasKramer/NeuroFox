@@ -60,6 +60,12 @@ public:
 		vector3 data_format,
 		const std::vector<matrix>& given_data);
 
+	//observe other dataspace
+	data_space(
+		data_space& other,
+		size_t from_idx,
+		size_t item_count);
+
 	data_space& operator=(const data_space& other);
 
 	bool is_initialized() const;

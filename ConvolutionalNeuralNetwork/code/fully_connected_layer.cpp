@@ -192,7 +192,6 @@ void fully_connected_layer::partial_forward_prop(const matrix& input, float new_
 	float prev_input_v = input.get_at_flat_host(x);
 	float new_input = new_value;
 
-#ifndef USE_SIMD
 	for (int y = 0; y < activations.get_height(); y++)
 	{
 		float bias = biases.get_at_flat_host(y);
@@ -213,19 +212,6 @@ void fully_connected_layer::partial_forward_prop(const matrix& input, float new_
 			y,
 			ACTIVATION[activation_fn](new_val + bias));
 	}
-#endif // !USE_SIMD
-
-
-#ifdef USE_SIMD
-	activations.remove_activation_function(activation_fn);
-	matrix::subtract(activations, biases, activations);
-	matrix::rm_partial_flat_dot(weights, input, activations, x);
-	//update
-	matrix::partial_flat_dot(weights, input, activations, x);
-	matrix::add(activations, biases, activations);
-	activations.apply_activation_function(activation_fn);
-#endif // USE_SIMD
-
 }
 void fully_connected_layer::back_propagation(const matrix& input, matrix* passing_error)
 {
