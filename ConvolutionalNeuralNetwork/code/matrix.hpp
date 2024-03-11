@@ -49,13 +49,13 @@ private:
 
 public:
 	matrix();
-	matrix(vector3 given_format);
+	explicit matrix(vector3 given_format);
 	matrix(
 		vector3 given_format,
 		const std::vector<float>& given_vector);
 	matrix(const matrix& source, bool copy_values);
 	matrix(const matrix& source);
-	matrix(std::ifstream& file);
+	explicit matrix(std::ifstream& file);
 
 	matrix& operator=(const matrix& other);
 

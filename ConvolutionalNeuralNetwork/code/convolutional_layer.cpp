@@ -39,7 +39,7 @@ convolutional_layer::convolutional_layer(std::ifstream& file)
 	for (size_t i = 0; i < kernel_count; i++)
 	{
 		kernel_weights.push_back(matrix(file));
-		kernel_weights_deltas.push_back(kernel_weights[0].get_format());
+		kernel_weights_deltas.push_back(matrix(kernel_weights[0].get_format()));
 	}
 	kernel_biases = matrix(file);
 	kernel_bias_deltas = matrix(kernel_biases.get_format());

@@ -28,6 +28,8 @@ public:
 	convolutional_layer(std::ifstream& file);
 
 	convolutional_layer(const convolutional_layer& other);
+	
+	~convolutional_layer() override = default;
 
 	std::unique_ptr<layer> clone() const override;
 

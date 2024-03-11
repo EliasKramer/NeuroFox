@@ -105,6 +105,7 @@ public:
 	void set_parameters(const neural_network& other);
 
 	std::string parameter_analysis() const;
+	std::string get_layer_str() const;
 
 	//this is not const, because we need to sync the device and host memory before saving
 	void save_to_file(const std::string& file_path);

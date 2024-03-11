@@ -1,6 +1,7 @@
 #include "neural_network.hpp"
 #include "util.hpp"
 #include <fstream>
+#include <filesystem>
 
 const float FILE_MAGIC_NUMBER = (float)0xfacade;
 
@@ -64,6 +65,8 @@ neural_network::neural_network(const std::string& file)
 	catch (const std::exception& e)
 	{
 		input.close();
+		std::cout << "Error while loading neural network from file " << file << std::endl;
+		std::cout << "current dir: " << std::filesystem::current_path() << "\n";
 		throw e;
 	}
 	input.close();
@@ -616,6 +619,17 @@ std::string neural_network::parameter_analysis() const
 	}
 
 	return result;
+}
+
+std::string neural_network::get_layer_str() const
+{
+	std::string result = input_format.to_string() + " ";
+	for (auto& l : layers)
+	{
+		result += l->get_activations().get_format().to_string() + " ";
+	}
+	return result;
+
 }
 
 void neural_network::save_to_file(const std::string& file_path)

@@ -3,7 +3,7 @@
 void layer::valid_input_check(const matrix& input) const
 {
 	if (input_format.item_count() == 0 || // the input format is not set
-		matrix::equal_format(input_format, input) == false)
+		vector3::are_equal(input_format, input.get_format()) == false)
 	{
 		throw std::runtime_error("input format is not set or does not match the input format");
 	}
@@ -33,10 +33,13 @@ layer::layer(std::ifstream& file, e_layer_type_t given_type)
 	activations = matrix(activation_format);
 	error = matrix(activation_format);
 }
-
+static int created = 0;
+static int deleted = 0;
 layer::layer(e_layer_type_t given_layer_type)
 	: type(given_layer_type)
-{}
+{
+	created++;
+}
 
 layer::layer(
 	vector3 activation_format,
@@ -45,7 +48,9 @@ layer::layer(
 	type(given_layer_type),
 	activations(activation_format),
 	error(activation_format)
-{}
+{
+	created++;
+}
 
 layer::layer(
 	const layer& other
@@ -54,7 +59,9 @@ layer::layer(
 	activations(other.activations, false), // copy the format - not the values
 	error(other.error, false), //copy the format - not the values
 	input_format(other.input_format)
-{}
+{
+	created++;
+}
 
 const e_layer_type_t layer::get_layer_type() const
 {
@@ -128,7 +135,7 @@ bool layer::equal_format(const layer& other)
 		type == other.type &&
 		matrix::equal_format(activations, other.activations) &&
 		matrix::equal_format(error, other.error) &&
-		matrix::equal_format(input_format, other.input_format);
+		vector3::are_equal(input_format, other.input_format);
 }
 
 void layer::write_to_ofstream(std::ofstream& file) const
