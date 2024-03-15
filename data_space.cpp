@@ -35,12 +35,30 @@ void data_space::allocate_data_table()
 void data_space::init_shuffle_table()
 {
 	smart_assert(is_initialized());
-	shuffle_table.clear();
-	shuffle_table.resize(item_count);
-	for (size_t i = 0; i < item_count; i++)
+	shuffle_table = init_new_shuffle_table(item_count);
+}
+
+std::vector<size_t> data_space::init_new_shuffle_table(size_t size)
+{
+	smart_assert(size > 0);
+	std::vector<size_t> ret_val;
+
+	ret_val.resize(size);
+
+	for (size_t i = 0; i < size; i++)
 	{
-		shuffle_table[i] = i;
+		ret_val[i] = i;
 	}
+
+	return ret_val;
+}
+
+void data_space::mix_shuffle_table(std::vector<size_t>& shuffle_table)
+{
+	std::random_device rd;
+	std::mt19937 generator(rd());
+
+	std::shuffle(shuffle_table.begin(), shuffle_table.end(), generator);
 }
 
 data_space::data_space()
@@ -85,10 +103,13 @@ data_space::data_space(
 		throw std::exception("data and label size mismatch");
 	}
 
-	for (size_t i = 0; i < given_data.size(); i++)
+	std::vector<size_t> tmp_shuffle_table = init_new_shuffle_table(given_data.size());
+	mix_shuffle_table(tmp_shuffle_table);
+
+	for (size_t i = 0; i < tmp_shuffle_table.size(); i++)
 	{
-		set_data_in_table_at(given_data[i], i);
-		set_label_in_table_at(given_label[i], i);
+		set_data_in_table_at(given_data[tmp_shuffle_table[i]], i);
+		set_label_in_table_at(given_label[tmp_shuffle_table[i]], i);
 	}
 }
 
@@ -100,9 +121,12 @@ data_space::data_space(
 		given_data.size(),
 		data_format)
 {
-	for (size_t i = 0; i < given_data.size(); i++)
+	std::vector<size_t> tmp_shuffle_table = init_new_shuffle_table(given_data.size());
+	mix_shuffle_table(tmp_shuffle_table);
+
+	for (size_t i = 0; i < tmp_shuffle_table.size(); i++)
 	{
-		set_data_in_table_at(given_data[i], i);
+		set_data_in_table_at(given_data[tmp_shuffle_table[i]], i);
 	}
 }
 
@@ -111,12 +135,15 @@ data_space::data_space(data_space& other, size_t from_idx, size_t item_count)
 	smart_assert(item_count > 0);
 	smart_assert(from_idx < other.item_count);
 
+	item_count = std::min(item_count, other.item_count - from_idx);
+	smart_assert(item_count > 0);
+
 	data_format = other.data_format;
 	label_format = other.label_format;
 	this->item_count = item_count;
 
 	vector3 new_format(other.data_table.get_format().x, item_count, 1);
-	
+
 	data_table.observe_partial(other.data_table, vector3(0, from_idx, 0), new_format);
 
 	init_shuffle_table();
@@ -164,9 +191,7 @@ void data_space::shuffle()
 {
 	smart_assert(is_initialized());
 
-	std::random_device rd;
-	std::mt19937 generator(rd());
-	std::shuffle(shuffle_table.begin(), shuffle_table.end(), generator);
+	mix_shuffle_table(shuffle_table);
 }
 
 size_t data_space::byte_size() const
@@ -227,7 +252,7 @@ void data_space::copy_to_gpu()
 void data_space::clear()
 {
 	smart_assert(is_initialized());
-	
+
 	std::lock_guard<std::mutex> lock1(label_mutex);
 	std::lock_guard<std::mutex> lock2(data_mutex);
 

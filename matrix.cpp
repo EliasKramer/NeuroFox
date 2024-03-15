@@ -765,19 +765,19 @@ void matrix::set_row_from_matrix(const matrix& m, size_t row_idx, size_t item_id
 	}
 }
 
-void matrix::observe_partial(matrix& m, vector3 start_point, vector3 new_format)
+void matrix::observe_partial(matrix& to_observe, vector3 start_point, vector3 new_format)
 {
-	smart_assert(m.is_initialized());
-	smart_assert(start_point.get_index(m.format) < m.item_count());
-	smart_assert(m.is_in_gpu_mode() == is_in_gpu_mode());
+	smart_assert(to_observe.is_initialized());
+	smart_assert(start_point.get_index(to_observe.format) < to_observe.item_count());
 
 	delete_data_if_owning();
 
-	host_data = m.get_ptr_item(m.host_data, start_point.x, start_point.y, start_point.z);
+	host_data = to_observe.get_ptr_item(to_observe.host_data, start_point.x, start_point.y, start_point.z);
 
-	if (gpu_enabled)
+	if (to_observe.gpu_enabled)
 	{
-		device_data = m.get_ptr_item(m.device_data, start_point.x, start_point.y, start_point.z);
+		device_data = to_observe.get_ptr_item(to_observe.device_data, start_point.x, start_point.y, start_point.z);
+		gpu_enabled = true;
 	}
 
 	format = new_format;
@@ -1227,16 +1227,24 @@ void matrix::mult_with_derivative_of_unactivated_fn(
 	matrix& result,
 	e_activation_t activation_fn)
 {
-	if (activations.is_in_gpu_mode())
-	{
-		throw std::runtime_error("Not implemented");
-	}
-
 	smart_assert(activations.is_initialized());
 	smart_assert(error.is_initialized());
 	smart_assert(result.is_initialized());
 	smart_assert(matrix::equal_format(activations, error));
 	smart_assert(matrix::equal_format(activations, result));
+
+	if (activations.is_in_gpu_mode())
+	{
+		gpu_mult_with_derivative_of_unactivated_fn(
+			activations,
+			error,
+			result,
+			activation_fn
+		);
+
+		result.set_device_as_last_updated();
+		return;
+	}
 
 	for (int i = 0; i < activations.item_count(); i++)
 	{

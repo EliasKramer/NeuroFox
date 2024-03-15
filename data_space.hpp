@@ -46,6 +46,8 @@ private:
 
 	void init_shuffle_table();
 
+	std::vector<size_t> init_new_shuffle_table(size_t size);
+	void mix_shuffle_table(std::vector<size_t>& shuffle_table);
 public:
 	data_space();
 	data_space(size_t given_item_count, vector3 data_format);

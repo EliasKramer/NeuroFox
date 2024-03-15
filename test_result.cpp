@@ -9,5 +9,6 @@ std::string test_result::to_string()
 	result += "Avg cost: " + std::to_string(avg_cost) + "\n";
 	result += "Avg cost sqrt: " + std::to_string(std::sqrt(avg_cost)) + "\n";
 	result += "Accuracy: " + std::to_string(accuracy * 100) + "%\n";
+	result += "Avg Diff: " + std::to_string(avg_diff) + "\n";
 	return result;
 }

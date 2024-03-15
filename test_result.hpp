@@ -9,6 +9,7 @@ public:
 	long long time_in_ms = 0;
 	float avg_cost = 0;
 	float accuracy = 0;
+	float avg_diff = 0;
 
 	std::string to_string();
 };

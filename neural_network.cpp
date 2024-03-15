@@ -342,7 +342,7 @@ void neural_network::rest_partial_forward_prop()
 	std::lock_guard<std::mutex> lock(forward_mutex);
 	for (int i = 1; i < layers.size(); i++)
 	{
-		layers[i]->forward_propagation(layers[i-1]->get_activations_readonly());
+		layers[i]->forward_propagation(layers[i - 1]->get_activations_readonly());
 	}
 }
 
@@ -460,6 +460,7 @@ test_result neural_network::test_on_ds(data_space& ds)
 	size_t correct = 0;
 	float cost_sum = 0;
 	size_t total = 0;
+	float diff_sum = 0;
 
 	auto start = std::chrono::high_resolution_clock::now();
 
@@ -481,17 +482,18 @@ test_result neural_network::test_on_ds(data_space& ds)
 		cost_sum += calculate_cost(label);
 
 		bool one_is_incorrect = false;
-		for (int i = 0; i < get_output().item_count(); i++)
+		//for (int i = 0; i < get_output().item_count(); i++)
+		//{
+		float value = get_output_readonly().get_at_flat_host(0);
+		float label_v = label.get_at_flat_host(0);
+		float threshold = 100;
+		if (std::abs(value - label_v) * 2000 >= threshold) //THIS ONLY WORKS FOR 1x1 labels - TODO: FIX THIS
 		{
-			float value = get_output_readonly().get_at_flat_host(i);
-			float label_v = label.get_at_flat_host(i);
-			float threshold = .5;
-			if (std::abs(value - label_v) >= threshold) //THIS ONLY WORKS FOR 1x1 labels - TODO: FIX THIS
-			{
-				one_is_incorrect = true;
-				break;
-			}
+			one_is_incorrect = true;
+			//break;
 		}
+		diff_sum += std::abs(value - label_v);
+		//}
 		if (!one_is_incorrect)
 		{
 			correct++;
@@ -506,6 +508,7 @@ test_result neural_network::test_on_ds(data_space& ds)
 	result.data_count = total;
 	result.time_in_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 	result.avg_cost = (float)cost_sum / (float)total;
+	result.avg_diff = (float)diff_sum / (float)total;
 
 	return result;
 }

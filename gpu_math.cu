@@ -608,7 +608,7 @@ __global__ void gpu_apply_deltas_kernel(
 	{
 		const float beta_1 = 0.9f;
 		const float beta_2 = 0.99f;
-		
+
 		float final_gradient = delta[index] / (float)training_data_count;
 
 		momentum[index] = discount_device(momentum[index], final_gradient, beta_1);
@@ -653,6 +653,41 @@ void gpu_apply_deltas(
 		learning_rate,
 		a.item_count()
 		);
+	check_for_error_and_synchronize();
+}
+
+__global__ void gpu_mult_with_derivative_of_unactivated_fn_kernel(
+	const float* activations,
+	const float* error,
+	float* result,
+	e_activation_t activation_fn,
+	unsigned int size
+)
+{
+	unsigned int index = blockIdx.x * blockDim.x + threadIdx.x;
+	if (index < size)
+	{
+		float activation = activations[index];
+		float unactivated = gpu_single_inverse(activation, activation_fn);
+		float activation_deriv = gpu_single_derivative(unactivated, activation_fn);
+		result[index] = error[index] * activation_deriv;
+	}
+}
+
+void gpu_mult_with_derivative_of_unactivated_fn(const matrix& activations, const matrix& error, matrix& result, e_activation_t activation_fn)
+{
+	smart_assert((activations.get_device_ptr_readonly() != nullptr));
+	smart_assert((error.get_device_ptr_readonly() != nullptr));
+	smart_assert((result.get_device_ptr() != nullptr));
+
+	unsigned int size = activations.item_count();
+	cuda_sync();
+	gpu_mult_with_derivative_of_unactivated_fn_kernel << <get_block_count(size), THREADS_PER_BLOCK >> > (
+		activations.get_device_ptr_readonly(),
+		error.get_device_ptr_readonly(),
+		result.get_device_ptr(),
+		activation_fn,
+		size);
 	check_for_error_and_synchronize();
 }
 
