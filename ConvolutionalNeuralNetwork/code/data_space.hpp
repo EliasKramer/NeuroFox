@@ -46,6 +46,8 @@ private:
 
 	void init_shuffle_table();
 
+	std::vector<size_t> init_new_shuffle_table(size_t size);
+	void mix_shuffle_table(std::vector<size_t>& shuffle_table);
 public:
 	data_space();
 	data_space(size_t given_item_count, vector3 data_format);
@@ -54,11 +56,15 @@ public:
 		vector3 data_format,
 		vector3 label_format,
 		const std::vector<matrix>& given_data,
-		const std::vector<matrix>& given_label);
+		const std::vector<matrix>& given_label,
+		bool shuffle = false
+	);
 
 	data_space(
 		vector3 data_format,
-		const std::vector<matrix>& given_data);
+		const std::vector<matrix>& given_data, 
+		bool shuffle = false
+	);
 
 	//observe other dataspace
 	data_space(

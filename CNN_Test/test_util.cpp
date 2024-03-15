@@ -13,3 +13,8 @@ bool float_vectors_equal(const std::vector<float>& vec1, const std::vector<float
 		}
 	}
 }
+
+std::wstring string_to_wstring(const std::string& str)
+{
+    return std::wstring(str.begin(), str.end());
+}

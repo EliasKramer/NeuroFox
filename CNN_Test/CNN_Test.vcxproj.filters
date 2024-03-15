@@ -99,9 +99,6 @@
     <ClCompile Include="..\ConvolutionalNeuralNetwork\code\softmax_layer.cpp">
       <Filter>Source Files\nn</Filter>
     </ClCompile>
-    <ClCompile Include="ds_test.cpp">
-      <Filter>Source Files\test</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="test_util.hpp">

@@ -115,7 +115,7 @@ public:
 	void set_row_from_matrix(const matrix& m, size_t row_idx);
 	void set_row_from_matrix(const matrix& m, size_t row_idx, size_t item_idx);
 
-	void observe_partial(matrix& m, vector3 start_point, vector3 new_format);
+	void observe_partial(matrix& to_observe, vector3 start_point, vector3 new_format);
 
 	//setter
 	void set_at_host(vector3 position, float value);
@@ -277,6 +277,12 @@ void gpu_apply_deltas(
 	long long time_step,
 	size_t training_data_count,
 	float learning_rate);
+
+void gpu_mult_with_derivative_of_unactivated_fn(
+	const matrix& activations,
+	const matrix& error,
+	matrix& result,
+	e_activation_t activation_fn);
 
 /*
 	activation functions
